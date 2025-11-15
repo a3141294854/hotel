@@ -2,7 +2,7 @@ package employee_action
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"hotel/internal/models"
 	"log"
 	"net/http"
