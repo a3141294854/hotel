@@ -25,7 +25,7 @@ func main() {
 	table.Table(db)
 
 	store := cookie.NewStore([]byte("secret"))
-	limiter := function.NewTokenBucketLimiter(10, time.Second)
+	limiter := function.NewTokenBucketLimiter(100, time.Second)
 
 	r := gin.Default()
 	r.Use(sessions.Sessions("session", store))
@@ -63,9 +63,28 @@ func main() {
 		e.PUT("/update", employee_check.Check(), func(c *gin.Context) {
 			employee_action.Update(c, db)
 		})
-		e.GET("/get", employee_check.Check(), func(c *gin.Context) {
-			employee_action.Get(c, db)
-		})
+		g := e.Group("/get")
+		{
+			g.GET("/name", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetName(c, db)
+			})
+			g.GET("/all", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetAll(c, db)
+			})
+			g.GET("/guest_id", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetGuestID(c, db)
+			})
+			g.GET("/location", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetLocation(c, db)
+			})
+			g.GET("/status", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetStatus(c, db)
+			})
+			g.POST("/guest_advance", employee_check.Check(), func(c *gin.Context) {
+				employee_action.GetAdvance(c, db)
+			})
+		}
+
 		c := e.Group("/count")
 		{
 			c.GET("/sum", employee_check.Check(), func(c *gin.Context) {

@@ -227,8 +227,8 @@ func Update(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-// Get 获取行李
-func Get(c *gin.Context, db *gorm.DB) {
+// GetName 获取行李
+func GetName(c *gin.Context, db *gorm.DB) {
 	var luggage []models.Luggage
 
 	guestName := c.Query("guest_name")
@@ -266,6 +266,206 @@ func Get(c *gin.Context, db *gorm.DB) {
 		"data":    luggage,
 		"count":   len(luggage),
 	})
+}
+
+// GetAll 获取所有行李
+func GetAll(c *gin.Context, db *gorm.DB) {
+	var luggage []models.Luggage
+	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+		Where("status = ?", "寄存中").
+		Find(&luggage)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		log.Println("获取行李失败:", result.Error)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李获取成功",
+		"data":    luggage,
+		"count":   len(luggage),
+	})
+
+}
+
+// GetGuestID 获取行李
+func GetGuestID(c *gin.Context, db *gorm.DB) {
+	guestID := c.Query("guest_id")
+	if guestID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请输入客户ID",
+		})
+		return
+	}
+	var luggage []models.Luggage
+	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+		Where("guest_id = ? AND status = ?", guestID, "寄存中").
+		Find(&luggage)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		log.Println("获取行李失败:", result.Error)
+		return
+	}
+
+	if len(luggage) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "未找到该客户的行李",
+		})
+		return
+	}
+}
+
+// GetLocation 获取行李
+func GetLocation(c *gin.Context, db *gorm.DB) {
+	location := c.Query("location")
+	if location == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请输入存放地点",
+		})
+		return
+	}
+
+	var luggage []models.Luggage
+	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+		Where("location = ? AND status = ?", location, "寄存中").
+		Find(&luggage)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		log.Println("获取行李失败:", result.Error)
+		return
+	}
+
+	if len(luggage) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "未找到该存放地点的行李",
+		})
+		return
+	}
+
+}
+
+// GetStatus 获取行李
+func GetStatus(c *gin.Context, db *gorm.DB) {
+	status := c.Query("status")
+	if status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请输入状态",
+		})
+		return
+	}
+
+	var luggage []models.Luggage
+	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+		Where("status = ?", status).
+		Find(&luggage)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		log.Println("获取行李失败:", result.Error)
+		return
+	}
+
+	if len(luggage) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "未找到该状态的行李",
+		})
+		return
+	}
+}
+
+func GetAdvance(c *gin.Context, db *gorm.DB) {
+	var find models.Luggage
+	err := c.ShouldBind(&find)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		log.Println("获取行李信息绑定错误", err.Error())
+		return
+	}
+
+	guestName := find.GuestName
+	guestID := find.GuestID
+	location := find.Location
+	status := find.Status
+	tag := find.Tag
+	weight := find.Weight
+
+	var luggage []models.Luggage
+	// 构建基础查询
+	query := db.Model(&models.Luggage{})
+
+	// 只有当参数不为空时才添加条件
+	if guestName != "" {
+		query = query.Where("guest_name = ?", guestName)
+	}
+
+	if guestID != 0 {
+		query = query.Where("guest_id = ?", guestID)
+	}
+
+	if location != "" {
+		query = query.Where("location = ?", location)
+	}
+
+	if status != "" {
+		query = query.Where("status = ?", status)
+	} else {
+		query = query.Where("status = ?", "寄存中")
+	}
+
+	if tag != "" {
+		query = query.Where("tag = ?", tag)
+	}
+
+	if weight != 0 {
+		query = query.Where("weight = ?", weight)
+	}
+
+	result := query.Find(&luggage)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		log.Println("获取行李失败:", result.Error)
+		return
+	}
+
+	if len(luggage) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "未找到该状态的行李",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "获取行李成功",
+		"data":    luggage,
+		"count":   len(luggage),
+	})
+
 }
 
 // CountSum 获取总行李数量

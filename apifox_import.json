@@ -3,7 +3,7 @@
   "info": {
     "title": "Hotel 行李管理系统 API",
     "description": "酒店行李管理系统，提供员工认证、行李管理和统计功能",
-    "version": "1.1.0"
+    "version": "1.3.0"
   },
   "servers": [
     {
@@ -384,11 +384,11 @@
         }
       }
     },
-    "/employee/get": {
+    "/employee/get/name": {
       "get": {
-        "summary": "查询行李",
+        "summary": "查询行李（按客户姓名）",
         "tags": ["行李管理"],
-        "description": "根据客户姓名查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李）",
+        "description": "根据客户姓名查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李，排除系统时间字段）",
         "parameters": [
           {
             "name": "guest_name",
@@ -449,11 +449,344 @@
         }
       }
     },
+    "/employee/get/all": {
+      "get": {
+        "summary": "查询所有行李",
+        "tags": ["行李管理"],
+        "description": "获取所有状态为寄存中的行李记录（排除系统时间字段）",
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "行李获取成功"},
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "integer", "example": 1},
+                          "guest_id": {"type": "integer", "example": 1},
+                          "guest_name": {"type": "string", "example": "张三"},
+                          "tag": {"type": "string", "example": "红色行李箱"},
+                          "weight": {"type": "number", "example": 15.5},
+                          "status": {"type": "string", "example": "寄存中"},
+                          "location": {"type": "string", "example": "前台"}
+                        }
+                      }
+                    },
+                    "count": {"type": "integer", "example": 25}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/employee/get/guest_id": {
+      "get": {
+        "summary": "查询行李（按客户ID）",
+        "tags": ["行李管理"],
+        "description": "根据客户ID查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李）",
+        "parameters": [
+          {
+            "name": "guest_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1",
+            "description": "客户ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "行李获取成功"},
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "integer", "example": 1},
+                          "guest_id": {"type": "integer", "example": 1},
+                          "guest_name": {"type": "string", "example": "张三"},
+                          "tag": {"type": "string", "example": "红色行李箱"},
+                          "weight": {"type": "number", "example": 15.5},
+                          "status": {"type": "string", "example": "寄存中"},
+                          "location": {"type": "string", "example": "前台"}
+                        }
+                      }
+                    },
+                    "count": {"type": "integer", "example": 1}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "未找到该客户的行李"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/employee/get/location": {
+      "get": {
+        "summary": "查询行李（按存放位置）",
+        "tags": ["行李管理"],
+        "description": "根据存放位置查询行李，返回该位置的所有行李（仅返回状态为寄存中的行李）",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "前台",
+            "description": "存放位置"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "行李获取成功"},
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "integer", "example": 1},
+                          "guest_id": {"type": "integer", "example": 1},
+                          "guest_name": {"type": "string", "example": "张三"},
+                          "tag": {"type": "string", "example": "红色行李箱"},
+                          "weight": {"type": "number", "example": 15.5},
+                          "status": {"type": "string", "example": "寄存中"},
+                          "location": {"type": "string", "example": "前台"}
+                        }
+                      }
+                    },
+                    "count": {"type": "integer", "example": 1}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "未找到该存放地点的行李"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/employee/get/status": {
+      "get": {
+        "summary": "查询行李（按状态）",
+        "tags": ["行李管理"],
+        "description": "根据状态查询行李，返回该状态的所有行李",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "寄存中",
+            "description": "行李状态"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "行李获取成功"},
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "integer", "example": 1},
+                          "guest_id": {"type": "integer", "example": 1},
+                          "guest_name": {"type": "string", "example": "张三"},
+                          "tag": {"type": "string", "example": "红色行李箱"},
+                          "weight": {"type": "number", "example": 15.5},
+                          "status": {"type": "string", "example": "寄存中"},
+                          "location": {"type": "string", "example": "前台"}
+                        }
+                      }
+                    },
+                    "count": {"type": "integer", "example": 1}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "未找到该状态的行李"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/employee/get/guest_advance": {
+      "post": {
+        "summary": "高级查询（多条件组合查询）",
+        "tags": ["行李管理"],
+        "description": "支持多条件组合查询行李，只有非空字段才会作为查询条件，如果不指定status默认查询寄存中的行李",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guest_name": {
+                    "type": "string",
+                    "example": "张三",
+                    "description": "客户姓名（可选）"
+                  },
+                  "guest_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "客户ID（可选）"
+                  },
+                  "tag": {
+                    "type": "string",
+                    "example": "红色行李箱",
+                    "description": "行李标签（可选）"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "example": 15.5,
+                    "description": "行李重量（可选）"
+                  },
+                  "location": {
+                    "type": "string",
+                    "example": "前台",
+                    "description": "存放位置（可选）"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "寄存中",
+                    "description": "行李状态（可选，默认为寄存中）"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "获取行李成功"},
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "integer", "example": 1},
+                          "guest_id": {"type": "integer", "example": 1},
+                          "guest_name": {"type": "string", "example": "张三"},
+                          "tag": {"type": "string", "example": "红色行李箱"},
+                          "weight": {"type": "number", "example": 15.5},
+                          "status": {"type": "string", "example": "寄存中"},
+                          "location": {"type": "string", "example": "前台"}
+                        }
+                      }
+                    },
+                    "count": {"type": "integer", "example": 1}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "未找到该状态的行李"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/employee/count/sum": {
       "get": {
         "summary": "获取总行李数量",
         "tags": ["统计功能"],
-        "description": "获取当前状态为寄存中的行李总数量",
+        "description": "获取当前状态为寄存中的行李总数量（不包含已取出或已删除的行李）",
         "responses": {
           "200": {
             "description": "统计成功",
@@ -492,8 +825,8 @@
                       "type": "object",
                       "properties": {
                         "date": {"type": "string", "example": "2025-11-17"},
-                        "today_added": {"type": "integer", "example": 8, "description": "今日新增行李数量"},
-                        "today_taken": {"type": "integer", "example": 3, "description": "今日取出行李数量"}
+                        "today_added": {"type": "integer", "example": 8, "description": "今日创建的行李记录数量"},
+                        "today_taken": {"type": "integer", "example": 3, "description": "今日状态更新为'已取出'的行李数量"}
                       }
                     }
                   }
