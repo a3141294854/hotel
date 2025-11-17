@@ -66,6 +66,16 @@ func main() {
 		e.GET("/get", employee_check.Check(), func(c *gin.Context) {
 			employee_action.Get(c, db)
 		})
+		c := e.Group("/count")
+		{
+			c.GET("/sum", employee_check.Check(), func(c *gin.Context) {
+				employee_action.CountSum(c, db)
+			})
+			c.GET("/today", employee_check.Check(), func(c *gin.Context) {
+				employee_action.CountToday(c, db)
+			})
+		}
+
 	}
 	r.Run("0.0.0.0:8080")
 }

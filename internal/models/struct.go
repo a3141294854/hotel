@@ -1,5 +1,10 @@
 package models
 
+import (
+	"gorm.io/gorm"
+	"time"
+)
+
 type Employee struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement"`
 	User     string `json:"user" gorm:"column:user_name"`
@@ -7,14 +12,18 @@ type Employee struct {
 }
 
 type Luggage struct {
-	ID        uint    `gorm:"primaryKey;autoIncrement"`
-	GuestID   uint    `json:"guest_id" gorm:"column:guest_id"`
-	GuestName string  `json:"guest_name" gorm:"column:guest_name"`
-	Tag       string  `json:"tag" gorm:"column:tag;size:50"`
-	Weight    float32 `json:"weight" gorm:"column:weight"`
-	Status    string  `json:"status" gorm:"column:status;size:20"`
-	Location  string  `json:"location" gorm:"column:location;size:100"`
+	ID        uint           `gorm:"primaryKey;autoIncrement"`
+	GuestID   uint           `json:"guest_id" gorm:"column:guest_id"`
+	GuestName string         `json:"guest_name" gorm:"column:guest_name"`
+	Tag       string         `json:"tag" gorm:"column:tag;size:50"`
+	Weight    float32        `json:"weight" gorm:"column:weight"`
+	Status    string         `json:"status" gorm:"column:status;size:20"`
+	Location  string         `json:"location" gorm:"column:location;size:100"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
+
 type Guest struct {
 	ID   uint   `gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"column:guest_name"`

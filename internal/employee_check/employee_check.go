@@ -43,7 +43,10 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 	}
 
 	var user []models.Employee
-	result := db.Select("user_name", "password").Where("user_name=?", e.User).Where("password=?", e.Password).Find(&user)
+	result := db.Select("user_name", "password").
+		Where("user_name=?", e.User).
+		Where("password=?", e.Password).
+		First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusBadRequest, gin.H{

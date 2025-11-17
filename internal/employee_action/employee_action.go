@@ -7,6 +7,7 @@ import (
 	"hotel/internal/models"
 	"log"
 	"net/http"
+	"time"
 )
 
 // Add 添加行李
@@ -96,6 +97,7 @@ func Add(c *gin.Context, db *gorm.DB) {
 			"location":   luggage.Location,
 		},
 	})
+
 }
 
 // Delete 删除指定资源
@@ -104,12 +106,41 @@ func Delete(c *gin.Context, db *gorm.DB) {
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": "删除行李失败",
+			"message": "请求数据格式错误",
 		})
 		return
 	}
-	result := db.Delete(&luggage)
+	var existingLuggage models.Luggage
+	if err := db.Where("status = ?", "寄存中").First(&existingLuggage, luggage.ID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "行李记录不存在",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "查询行李失败",
+			})
+			log.Println("查询行李失败:", err)
+		}
+		return
+	}
+
+	luggage.Status = "已取出"
+	luggage.Location = "已取出"
+	result := db.Model(&models.Luggage{}).Where("id = ?", luggage.ID).Updates(luggage)
 	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除行李失败",
+		})
+		log.Println("删除行李失败:", result.Error)
+		return
+	}
+
+	result2 := db.Where("id = ?", luggage.ID).Delete(&models.Luggage{})
+	if result2.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "删除行李失败",
@@ -120,6 +151,7 @@ func Delete(c *gin.Context, db *gorm.DB) {
 		"success": true,
 		"message": "行李删除成功",
 	})
+
 }
 
 func Update(c *gin.Context, db *gorm.DB) {
@@ -132,7 +164,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 		log.Println("行李数据绑定错误:", err.Error())
 		return
 	}
-	
+
 	// 检查ID是否提供
 	if luggage.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -141,7 +173,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 		})
 		return
 	}
-	
+
 	// 先检查记录是否存在
 	var existingLuggage models.Luggage
 	if err := db.First(&existingLuggage, luggage.ID).Error; err != nil {
@@ -159,7 +191,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 		}
 		return
 	}
-	
+
 	// 执行更新
 	result := db.Model(&existingLuggage).Updates(luggage)
 	if result.Error != nil {
@@ -170,7 +202,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 		log.Println("更新行李失败:", result.Error)
 		return
 	}
-	
+
 	// 检查是否真的更新了记录
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -179,7 +211,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李更新成功",
@@ -208,7 +240,9 @@ func Get(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	result := db.Where("guest_name = ?", guestName).Find(&luggage)
+	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+		Where("guest_name = ? AND status = ?", guestName, "寄存中").
+		Find(&luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -232,4 +266,45 @@ func Get(c *gin.Context, db *gorm.DB) {
 		"data":    luggage,
 		"count":   len(luggage),
 	})
+}
+
+// CountSum 获取总行李数量
+func CountSum(c *gin.Context, db *gorm.DB) {
+	var count int64
+	db.Model(&models.Luggage{}).Where("status = ?", "寄存中").Count(&count)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李数量获取成功",
+		"count":   count,
+	})
+}
+
+// CountToday 获取今日行李数量
+func CountToday(c *gin.Context, db *gorm.DB) {
+	today := time.Now().Format("2006-01-02")
+
+	// 统计今天新增的行李（进入）
+	var todayAdded int64
+	db.Model(&models.Luggage{}).
+		Where("DATE(created_at) = ?", today).
+		Count(&todayAdded)
+
+	// 统计今天状态变为"已取出"的行李（出去）
+	var todayTaken int64
+	db.Model(&models.Luggage{}).
+		Unscoped().
+		Where("status = ? AND DATE(updated_at) = ?", "已取出", today).
+		Count(&todayTaken)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "获取今日统计成功",
+		"data": gin.H{
+			"date":        today,
+			"today_added": todayAdded, // 今日进入
+			"today_taken": todayTaken, // 今日出去
+		},
+	})
+
 }

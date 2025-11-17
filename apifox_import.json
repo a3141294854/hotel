@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供员工认证和行李管理功能",
-    "version": "1.0.0"
+    "description": "酒店行李管理系统，提供员工认证、行李管理和统计功能",
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -232,6 +232,7 @@
       "delete": {
         "summary": "删除行李",
         "tags": ["行李管理"],
+        "description": "删除指定行李（软删除），只能删除状态为寄存中的行李。删除前会先将状态更新为已取出，然后进行软删除。",
         "requestBody": {
           "required": true,
           "content": {
@@ -264,6 +265,20 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "行李记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "行李记录不存在"}
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -287,12 +302,12 @@
                   },
                   "status": {
                     "type": "string",
-                    "example": "已取走",
+                    "example": "已取出",
                     "description": "行李状态（可选）"
                   },
                   "location": {
                     "type": "string",
-                    "example": "已取走",
+                    "example": "已取出",
                     "description": "行李位置（可选）"
                   },
                   "tag": {
@@ -329,8 +344,8 @@
                         "guest_name": {"type": "string", "example": "张三"},
                         "tag": {"type": "string", "example": "新标签"},
                         "weight": {"type": "number", "example": 12.5},
-                        "status": {"type": "string", "example": "已取走"},
-                        "location": {"type": "string", "example": "已取走"}
+                        "status": {"type": "string", "example": "已取出"},
+                        "location": {"type": "string", "example": "已取出"}
                       }
                     }
                   }
@@ -373,7 +388,7 @@
       "get": {
         "summary": "查询行李",
         "tags": ["行李管理"],
-        "description": "根据客户姓名查询行李，返回该客户的所有行李",
+        "description": "根据客户姓名查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李）",
         "parameters": [
           {
             "name": "guest_name",
@@ -433,6 +448,61 @@
           }
         }
       }
+    },
+    "/employee/count/sum": {
+      "get": {
+        "summary": "获取总行李数量",
+        "tags": ["统计功能"],
+        "description": "获取当前状态为寄存中的行李总数量",
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "行李数量获取成功"},
+                    "count": {"type": "integer", "example": 25}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/employee/count/today": {
+      "get": {
+        "summary": "获取今日行李统计",
+        "tags": ["统计功能"],
+        "description": "获取今日新增和取出的行李数量统计",
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "获取今日统计成功"},
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "date": {"type": "string", "example": "2025-11-17"},
+                        "today_added": {"type": "integer", "example": 8, "description": "今日新增行李数量"},
+                        "today_taken": {"type": "integer", "example": 3, "description": "今日取出行李数量"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -474,6 +544,10 @@
     {
       "name": "行李管理",
       "description": "行李增删改查操作"
+    },
+    {
+      "name": "统计功能",
+      "description": "行李统计相关接口"
     }
   ]
 }
