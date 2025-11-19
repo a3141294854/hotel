@@ -3,7 +3,7 @@
   "info": {
     "title": "Hotel 行李管理系统 API",
     "description": "酒店行李管理系统，提供员工认证、行李管理和统计功能",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "servers": [
     {
@@ -852,20 +852,21 @@
         "type": "object",
         "properties": {
           "id": {"type": "integer", "example": 1},
-          "guest_id": {"type": "integer", "example": 1},
-          "guest_name": {"type": "string", "example": "张三"},
+          "guest_id": {"type": "integer", "example": 1, "description": "外键，关联Guest表"},
           "tag": {"type": "string", "example": "红色行李箱"},
           "weight": {"type": "number", "example": 15.5},
           "status": {"type": "string", "example": "寄存中"},
           "location": {"type": "string", "example": "前台"}
-        }
+        },
+        "description": "行李表，通过guest_id外键关联Guest表"
       },
       "Guest": {
         "type": "object",
         "properties": {
           "id": {"type": "integer", "example": 1},
-          "guest_name": {"type": "string", "example": "张三"}
-        }
+          "guest_name": {"type": "string", "example": "张三", "description": "客户姓名，唯一存储位置"}
+        },
+        "description": "客户表，存储客户基本信息"
       }
     }
   },
@@ -882,5 +883,46 @@
       "name": "统计功能",
       "description": "行李统计相关接口"
     }
-  ]
+  ],
+  "x-database-relationships": {
+    "description": "数据库关系说明",
+    "relationships": [
+      {
+        "from": "Luggage.guest_id",
+        "to": "Guest.id",
+        "type": "foreign_key",
+        "description": "一对多关系：一个客户可以有多个行李记录"
+      }
+    ],
+    "optimizations": [
+      "使用GORM Preload功能进行关联查询",
+      "支持JOIN查询获取完整的客户信息",
+      "查询时自动加载关联的Guest数据",
+      "客户姓名统一存储在Guest表中，避免数据冗余"
+    ]
+  },
+  "x-changelog": {
+    "v1.4.0": {
+      "date": "2025-11-19",
+      "changes": [
+        "数据库结构优化：移除Luggage表中的冗余GuestName字段",
+        "外键关联：使用标准的外键关系连接Luggage和Guest表",
+        "查询优化：使用GORM Preload功能替代手动JOIN查询",
+        "表名修正：修复查询中的表名错误（luggage → luggages）",
+        "关联查询：支持通过客户姓名查询时自动关联客户信息",
+        "数据一致性：客户姓名统一存储，避免数据不一致问题"
+      ]
+    },
+    "v1.3.0": {
+      "date": "2025-11-17",
+      "changes": [
+        "新增按客户ID查询行李功能",
+        "新增按存放位置查询行李功能",
+        "新增按状态查询行李功能",
+        "新增高级多条件组合查询功能",
+        "完善API响应状态码说明",
+        "优化查询逻辑，支持动态条件构建"
+      ]
+    }
+  }
 }

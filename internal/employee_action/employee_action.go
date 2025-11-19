@@ -12,10 +12,18 @@ import (
 
 // Add 添加行李
 func Add(c *gin.Context, db *gorm.DB) {
-	var luggage models.Luggage
 
-	// 绑定请求数据到行李结构体
-	if err := c.ShouldBind(&luggage); err != nil {
+	// 定义请求结构体，包含guest_name字段
+	type AddRequest struct {
+		GuestName string  `json:"guest_name"`
+		Tag       string  `json:"tag"`
+		Weight    float32 `json:"weight"`
+		Status    string  `json:"status"`
+		Location  string  `json:"location"`
+	}
+
+	var req AddRequest
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
@@ -24,31 +32,14 @@ func Add(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if luggage.Tag == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "行李标签不能为空",
-		})
-		return
-	}
-
-	// 设置默认状态和位置
-	if luggage.Status == "" {
-		luggage.Status = "寄存中"
-	}
-
-	if luggage.Location == "" {
-		luggage.Location = "前台"
-	}
-
 	// 先创建或获取客户记录
 	var guest models.Guest
-	result := db.Where("guest_name = ?", luggage.GuestName).First(&guest)
+	result := db.Where("guest_name = ?", req.GuestName).First(&guest)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			// 客户不存在，创建新客户
 			guest = models.Guest{
-				Name: luggage.GuestName,
+				Name: req.GuestName,
 			}
 			if err := db.Create(&guest).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
@@ -69,10 +60,15 @@ func Add(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// 设置行李的 GuestID
-	luggage.GuestID = guest.ID
-
 	// 创建行李记录
+	luggage := models.Luggage{
+		GuestID:  guest.ID,
+		Tag:      req.Tag,
+		Weight:   req.Weight,
+		Status:   req.Status,
+		Location: req.Location,
+	}
+
 	result = db.Create(&luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -83,14 +79,14 @@ func Add(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// 返回成功响应
+	// 返回成功响应，包含客户信息
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李添加成功",
 		"data": gin.H{
 			"id":         luggage.ID,
 			"guest_id":   luggage.GuestID,
-			"guest_name": luggage.GuestName,
+			"guest_name": req.GuestName,
 			"tag":        luggage.Tag,
 			"weight":     luggage.Weight,
 			"status":     luggage.Status,
@@ -212,13 +208,17 @@ func Update(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// 获取客户信息
+	var guest models.Guest
+	db.First(&guest, existingLuggage.GuestID)
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李更新成功",
 		"data": gin.H{
 			"id":         existingLuggage.ID,
 			"guest_id":   existingLuggage.GuestID,
-			"guest_name": existingLuggage.GuestName,
+			"guest_name": guest.Name,
 			"tag":        existingLuggage.Tag,
 			"weight":     existingLuggage.Weight,
 			"status":     existingLuggage.Status,
@@ -240,8 +240,9 @@ func GetName(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
-		Where("guest_name = ? AND status = ?", guestName, "寄存中").
+	result := db.Preload("Guest").
+		Joins("JOIN guests ON luggages.guest_id = guests.id").
+		Where("guests.guest_name = ? AND luggages.status = ?", guestName, "寄存中").
 		Find(&luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -271,7 +272,8 @@ func GetName(c *gin.Context, db *gorm.DB) {
 // GetAll 获取所有行李
 func GetAll(c *gin.Context, db *gorm.DB) {
 	var luggage []models.Luggage
-	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+	result := db.
+		Preload("Guest").
 		Where("status = ?", "寄存中").
 		Find(&luggage)
 	if result.Error != nil {
@@ -303,7 +305,8 @@ func GetGuestID(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var luggage []models.Luggage
-	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+	result := db.
+		Preload("Guest").
 		Where("guest_id = ? AND status = ?", guestID, "寄存中").
 		Find(&luggage)
 	if result.Error != nil {
@@ -322,6 +325,13 @@ func GetGuestID(c *gin.Context, db *gorm.DB) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李获取成功",
+		"data":    luggage,
+		"count":   len(luggage),
+	})
 }
 
 // GetLocation 获取行李
@@ -336,7 +346,8 @@ func GetLocation(c *gin.Context, db *gorm.DB) {
 	}
 
 	var luggage []models.Luggage
-	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+	result := db.
+		Preload("Guest"). // 预加载Guest信息
 		Where("location = ? AND status = ?", location, "寄存中").
 		Find(&luggage)
 	if result.Error != nil {
@@ -356,6 +367,12 @@ func GetLocation(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李获取成功",
+		"data":    luggage,
+		"count":   len(luggage),
+	})
 }
 
 // GetStatus 获取行李
@@ -370,7 +387,8 @@ func GetStatus(c *gin.Context, db *gorm.DB) {
 	}
 
 	var luggage []models.Luggage
-	result := db.Select("id", "guest_id", "guest_name", "tag", "weight", "status", "location").
+	result := db.
+		Preload("Guest").
 		Where("status = ?", status).
 		Find(&luggage)
 	if result.Error != nil {
@@ -389,11 +407,29 @@ func GetStatus(c *gin.Context, db *gorm.DB) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李获取成功",
+		"data":    luggage,
+		"count":   len(luggage),
+	})
 }
 
+// GetAdvance 高级查询
 func GetAdvance(c *gin.Context, db *gorm.DB) {
-	var find models.Luggage
-	err := c.ShouldBind(&find)
+
+	type AdvanceRequest struct {
+		GuestName string  `json:"guest_name"`
+		GuestID   uint    `json:"guest_id"`
+		Location  string  `json:"location"`
+		Status    string  `json:"status"`
+		Tag       string  `json:"tag"`
+		Weight    float32 `json:"weight"`
+	}
+
+	var req AdvanceRequest
+	err := c.ShouldBind(&req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -403,42 +439,35 @@ func GetAdvance(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	guestName := find.GuestName
-	guestID := find.GuestID
-	location := find.Location
-	status := find.Status
-	tag := find.Tag
-	weight := find.Weight
-
 	var luggage []models.Luggage
-	// 构建基础查询
+
 	query := db.Model(&models.Luggage{})
 
-	// 只有当参数不为空时才添加条件
-	if guestName != "" {
-		query = query.Where("guest_name = ?", guestName)
+	if req.GuestName != "" {
+		query = query.Joins("JOIN guests ON luggages.guest_id = guests.id").
+			Where("guests.guest_name = ?", req.GuestName)
 	}
 
-	if guestID != 0 {
-		query = query.Where("guest_id = ?", guestID)
+	if req.GuestID != 0 {
+		query = query.Where("guest_id = ?", req.GuestID)
 	}
 
-	if location != "" {
-		query = query.Where("location = ?", location)
+	if req.Location != "" {
+		query = query.Where("location = ?", req.Location)
 	}
 
-	if status != "" {
-		query = query.Where("status = ?", status)
+	if req.Status != "" {
+		query = query.Where("status = ?", req.Status)
 	} else {
 		query = query.Where("status = ?", "寄存中")
 	}
 
-	if tag != "" {
-		query = query.Where("tag = ?", tag)
+	if req.Tag != "" {
+		query = query.Where("tag = ?", req.Tag)
 	}
 
-	if weight != 0 {
-		query = query.Where("weight = ?", weight)
+	if req.Weight != 0 {
+		query = query.Where("weight = ?", req.Weight)
 	}
 
 	result := query.Find(&luggage)
@@ -454,7 +483,7 @@ func GetAdvance(c *gin.Context, db *gorm.DB) {
 	if len(luggage) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"success": false,
-			"message": "未找到该状态的行李",
+			"message": "未找到符合条件的行李",
 		})
 		return
 	}
@@ -484,13 +513,13 @@ func CountSum(c *gin.Context, db *gorm.DB) {
 func CountToday(c *gin.Context, db *gorm.DB) {
 	today := time.Now().Format("2006-01-02")
 
-	// 统计今天新增的行李（进入）
+	// 统计今天新增的行李
 	var todayAdded int64
 	db.Model(&models.Luggage{}).
 		Where("DATE(created_at) = ?", today).
 		Count(&todayAdded)
 
-	// 统计今天状态变为"已取出"的行李（出去）
+	// 统计今天取出的行李
 	var todayTaken int64
 	db.Model(&models.Luggage{}).
 		Unscoped().
@@ -502,8 +531,8 @@ func CountToday(c *gin.Context, db *gorm.DB) {
 		"message": "获取今日统计成功",
 		"data": gin.H{
 			"date":        today,
-			"today_added": todayAdded, // 今日进入
-			"today_taken": todayTaken, // 今日出去
+			"today_added": todayAdded,
+			"today_taken": todayTaken,
 		},
 	})
 

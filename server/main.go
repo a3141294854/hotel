@@ -30,7 +30,7 @@ func main() {
 	r := gin.Default()
 	r.Use(sessions.Sessions("session", store))
 
-	// 使用限流中间件
+
 	r.Use(middleware.RateLimit(limiter))
 
 	e := r.Group("/employee")
