@@ -13,7 +13,7 @@ import (
 
 	"hotel/internal/employee_action"
 	"hotel/internal/employee_check"
-	"hotel/internal/function"
+	"hotel/internal/middleware"
 )
 
 func main() {
@@ -25,23 +25,13 @@ func main() {
 	table.Table(db)
 
 	store := cookie.NewStore([]byte("secret"))
-	limiter := function.NewTokenBucketLimiter(100, time.Second)
+	limiter := middleware.NewTokenBucketLimiter(100, time.Second)
 
 	r := gin.Default()
 	r.Use(sessions.Sessions("session", store))
 
-	// 限流中间件
-	r.Use(func(c *gin.Context) {
-		if !limiter.Allow() {
-			c.JSON(429, gin.H{
-				"success": false,
-				"message": "请求过于频繁，请稍后再试",
-			})
-			c.Abort()
-			return
-		}
-		c.Next()
-	})
+	// 使用限流中间件
+	r.Use(middleware.RateLimit(limiter))
 
 	e := r.Group("/employee")
 	{
@@ -54,47 +44,49 @@ func main() {
 		e.POST("/logout", func(c *gin.Context) {
 			employee_check.EmployeeLogout(c)
 		})
-		e.POST("/add", employee_check.Check(), func(c *gin.Context) {
+		e.POST("/add", middleware.AuthCheck(), func(c *gin.Context) {
 			employee_action.Add(c, db)
 		})
-		e.DELETE("/delete", employee_check.Check(), func(c *gin.Context) {
+		e.DELETE("/delete", middleware.AuthCheck(), func(c *gin.Context) {
 			employee_action.Delete(c, db)
 		})
-		e.PUT("/update", employee_check.Check(), func(c *gin.Context) {
+		e.PUT("/update", middleware.AuthCheck(), func(c *gin.Context) {
 			employee_action.Update(c, db)
 		})
 		g := e.Group("/get")
 		{
-			g.GET("/name", employee_check.Check(), func(c *gin.Context) {
+			g.GET("/name", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetName(c, db)
 			})
-			g.GET("/all", employee_check.Check(), func(c *gin.Context) {
+			g.GET("/all", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetAll(c, db)
 			})
-			g.GET("/guest_id", employee_check.Check(), func(c *gin.Context) {
+			g.GET("/guest_id", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetGuestID(c, db)
 			})
-			g.GET("/location", employee_check.Check(), func(c *gin.Context) {
+			g.GET("/location", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetLocation(c, db)
 			})
-			g.GET("/status", employee_check.Check(), func(c *gin.Context) {
+			g.GET("/status", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetStatus(c, db)
 			})
-			g.POST("/guest_advance", employee_check.Check(), func(c *gin.Context) {
+			g.POST("/guest_advance", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.GetAdvance(c, db)
 			})
 		}
 
 		c := e.Group("/count")
 		{
-			c.GET("/sum", employee_check.Check(), func(c *gin.Context) {
+			c.GET("/sum", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.CountSum(c, db)
 			})
-			c.GET("/today", employee_check.Check(), func(c *gin.Context) {
+			c.GET("/today", middleware.AuthCheck(), func(c *gin.Context) {
 				employee_action.CountToday(c, db)
 			})
 		}
 
 	}
+	middleware.FindIp()
 	r.Run("0.0.0.0:8080")
+
 }
