@@ -5,7 +5,7 @@
 
 ## 基础信息
 - 服务器地址: http://localhost:8080
-- 认证方式: Session 会话管理
+- 认证方式: JWT 双令牌认证 (Access Token + Refresh Token)
 - 限流策略: 令牌桶限流，每秒最多10个请求
 
 ## 🔐 认证相关 API
@@ -38,7 +38,13 @@
 响应:
 {
   "success": true,
-  "message": "登录成功"
+  "message": "登录成功",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expires_in": 900,         // Access Token 过期时间（秒）
+    "token_type": "Bearer"
+  }
 }
 
 失败响应:
@@ -51,19 +57,55 @@
 ### 3. 员工退出
 **POST** `/employee/logout`
 ```json
-请求体:
-{
-  "user_name": "zhangsan"      // 注意：字段名是 user_name
-}
+请求头:
+Authorization: Bearer <access_token>
 
 响应:
 {
   "success": true,
   "message": "退出成功"
 }
+
+失败响应:
+{
+  "success": false,
+  "message": "无效的令牌"
+}
 ```
 
-## 🧳 行李管理 API (需要登录)
+### 4. 刷新令牌
+**POST** `/employee/refresh`
+```json
+请求体:
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+响应:
+{
+  "success": true,
+  "message": "令牌刷新成功",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expires_in": 900,         // Access Token 过期时间（秒）
+    "token_type": "Bearer"
+  }
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "无效的刷新令牌"
+}
+```
+
+## 🧳 行李管理 API (需要JWT认证)
+
+**认证方式**: 所有行李管理API都需要在请求头中包含有效的Access Token
+```json
+请求头格式:
+Authorization: Bearer <access_token>
+```
 
 ### 4. 添加行李
 **POST** `/employee/add`
@@ -336,7 +378,13 @@
 - 适用于复杂的搜索场景
 ```
 
-## 📊 统计功能 API (需要登录)
+## 📊 统计功能 API (需要JWT认证)
+
+**认证方式**: 所有统计功能API都需要在请求头中包含有效的Access Token
+```json
+请求头格式:
+Authorization: Bearer <access_token>
+```
 
 ### 13. 获取总行李数量
 **GET** `/employee/count/sum`
@@ -379,6 +427,7 @@
 ```json
 {
   "id": 1,
+  "name": "张三",
   "user": "zhangsan",
   "password": "123456"
 }
@@ -400,7 +449,17 @@
 ```json
 {
   "id": 1,
-  "guest_name": "张三"       // 客户姓名，唯一存储位置
+  "name": "张三"       // 客户姓名，唯一存储位置
+}
+```
+
+### RefreshToken (刷新令牌表)
+```json
+{
+  "user_id": 1,              // 关联员工ID（主键）
+  "user_name": "zhangsan",   // 员工用户名
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // 刷新令牌
+  "created_at": "2025-11-20T10:00:00Z"
 }
 ```
 
@@ -424,15 +483,20 @@
 
 ## 🔒 安全特性
 
-1. **会话管理**: 使用 Gin Sessions 管理用户登录状态
-2. **权限控制**: 行李操作需要登录验证
-3. **限流保护**: 令牌桶限流，每秒最多10个请求
+1. **JWT双令牌认证**: 
+   - Access Token: 15分钟有效期，用于API访问
+   - Refresh Token: 7天有效期，用于刷新Access Token
+2. **令牌验证**: 自动验证令牌有效性和用户身份
+3. **权限控制**: 行李操作需要有效的JWT令牌
+4. **限流保护**: 令牌桶限流，每秒最多10个请求
+5. **令牌撤销**: 登出时自动撤销刷新令牌
 
 ## 📈 状态码说明
 
 - `200`: 操作成功
 - `400`: 请求参数错误
-- `401`: 未登录
+- `401`: 未认证或令牌无效/过期
+- `403`: 权限不足
 - `404`: 资源未找到
 - `429`: 请求过于频繁
 - `500`: 服务器内部错误
@@ -440,7 +504,7 @@
 ## 🚀 启动方式
 
 ```bash
-cd d:\go_study\hotel
+cd c:/Users/傅仁杰/Desktop/hotel
 # 确保数据库连接配置正确
 go run server/main.go
 ```
@@ -463,14 +527,59 @@ hotel/
 
 1. 先启动服务器
 2. 注册员工账号
-3. 登录获取会话
-4. 进行行李管理操作
+3. 登录获取JWT双令牌
+4. 使用Access Token访问API
+5. Token过期时使用Refresh Token刷新
+6. 登出时撤销所有令牌
+
+## 🔧 JWT令牌使用示例
+
+### JavaScript/前端示例
+```javascript
+// 登录获取令牌
+const loginResponse = await fetch('/employee/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ user_name: 'zhangsan', password: '123456' })
+});
+const { data } = await loginResponse.json();
+localStorage.setItem('access_token', data.access_token);
+localStorage.setItem('refresh_token', data.refresh_token);
+
+// 使用Access Token访问API
+const apiCall = await fetch('/employee/add', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+  },
+  body: JSON.stringify({ guest_name: '张三', tag: '红色行李箱' })
+});
+
+// 刷新令牌
+const refreshResponse = await fetch('/employee/refresh', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ refresh_token: localStorage.getItem('refresh_token') })
+});
+const { data: newData } = await refreshResponse.json();
+localStorage.setItem('access_token', newData.access_token);
+```
 
 ---
-文档生成时间: 2025-11-19
-项目版本: 1.4.0
+文档生成时间: 2025-11-20
+项目版本: 2.0.0
 
 ## 🔄 更新日志
+
+### v2.0.0 (2025-11-20)
+- 🔐 **JWT双令牌认证**: 全面升级认证系统，使用Access Token + Refresh Token
+- 🛡️ **安全性提升**: 替换Session认证，提供更安全的无状态认证
+- ⏰ **令牌管理**: Access Token 15分钟过期，Refresh Token 7天有效期
+- 🔄 **自动刷新**: 支持令牌自动刷新机制
+- 🚫 **令牌撤销**: 登出时自动撤销刷新令牌
+- 📱 **前端友好**: 提供完整的JavaScript使用示例
+- 🔧 **中间件升级**: 新增JWT认证中间件，自动验证令牌
 
 ### v1.4.0 (2025-11-19)
 - 🔧 **数据库结构优化**: 移除Luggage表中的冗余GuestName字段

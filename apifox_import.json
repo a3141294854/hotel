@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供员工认证、行李管理和统计功能",
-    "version": "1.4.0"
+    "description": "酒店行李管理系统，提供JWT双令牌认证、行李管理和统计功能",
+    "version": "2.0.0"
   },
   "servers": [
     {
@@ -93,11 +93,27 @@
                   "type": "object",
                   "properties": {
                     "success": {"type": "boolean", "example": true},
-                    "message": {"type": "string", "example": "登录成功"}
+                    "message": {"type": "string", "example": "登录成功"},
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."},
+                        "refresh_token": {"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."},
+                        "expires_in": {"type": "integer", "example": 900, "description": "Access Token 过期时间（秒）"},
+                        "token_type": {"type": "string", "example": "Bearer"}
+                      }
+                    }
                   }
                 }
               }
-            }
+            },
+            "x-apifox-extracts": [
+              {
+                "name": "token",
+                "path": "$.data.access_token",
+                "description": "自动提取访问令牌"
+              }
+            ]
           },
           "401": {
             "description": "登录失败",
@@ -120,24 +136,7 @@
       "post": {
         "summary": "员工退出",
         "tags": ["认证"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user_name": {
-                    "type": "string",
-                    "example": "zhangsan",
-                    "description": "用户名"
-                  }
-                },
-                "required": ["user_name"]
-              }
-            }
-          }
-        },
+        "security": [{"bearerAuth": []}],
         "responses": {
           "200": {
             "description": "退出成功",
@@ -152,6 +151,90 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "令牌无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "无效的令牌"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/employee/refresh": {
+      "post": {
+        "summary": "刷新令牌",
+        "tags": ["认证"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "description": "刷新令牌"
+                  }
+                },
+                "required": ["refresh_token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "令牌刷新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string", "example": "令牌刷新成功"},
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."},
+                        "expires_in": {"type": "integer", "example": 900, "description": "Access Token 过期时间（秒）"},
+                        "token_type": {"type": "string", "example": "Bearer"}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "x-apifox-extracts": [
+              {
+                "name": "token",
+                "path": "$.data.access_token",
+                "description": "自动更新访问令牌"
+              }
+            ]
+          },
+          "401": {
+            "description": "刷新令牌无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": false},
+                    "message": {"type": "string", "example": "无效的刷新令牌"}
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -160,6 +243,7 @@
       "post": {
         "summary": "添加行李",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
@@ -232,6 +316,7 @@
       "delete": {
         "summary": "删除行李",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "删除指定行李（软删除），只能删除状态为寄存中的行李。删除前会先将状态更新为已取出，然后进行软删除。",
         "requestBody": {
           "required": true,
@@ -287,6 +372,7 @@
       "put": {
         "summary": "更新行李",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "更新行李信息，需要提供行李ID，系统会验证记录是否存在",
         "requestBody": {
           "required": true,
@@ -388,6 +474,7 @@
       "get": {
         "summary": "查询行李（按客户姓名）",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "根据客户姓名查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李，排除系统时间字段）",
         "parameters": [
           {
@@ -453,6 +540,7 @@
       "get": {
         "summary": "查询所有行李",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "获取所有状态为寄存中的行李记录（排除系统时间字段）",
         "responses": {
           "200": {
@@ -493,6 +581,7 @@
       "get": {
         "summary": "查询行李（按客户ID）",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "根据客户ID查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李）",
         "parameters": [
           {
@@ -559,6 +648,7 @@
       "get": {
         "summary": "查询行李（按存放位置）",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "根据存放位置查询行李，返回该位置的所有行李（仅返回状态为寄存中的行李）",
         "parameters": [
           {
@@ -625,6 +715,7 @@
       "get": {
         "summary": "查询行李（按状态）",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "根据状态查询行李，返回该状态的所有行李",
         "parameters": [
           {
@@ -691,6 +782,7 @@
       "post": {
         "summary": "高级查询（多条件组合查询）",
         "tags": ["行李管理"],
+        "security": [{"bearerAuth": []}],
         "description": "支持多条件组合查询行李，只有非空字段才会作为查询条件，如果不指定status默认查询寄存中的行李",
         "requestBody": {
           "required": true,
@@ -786,6 +878,7 @@
       "get": {
         "summary": "获取总行李数量",
         "tags": ["统计功能"],
+        "security": [{"bearerAuth": []}],
         "description": "获取当前状态为寄存中的行李总数量（不包含已取出或已删除的行李）",
         "responses": {
           "200": {
@@ -810,6 +903,7 @@
       "get": {
         "summary": "获取今日行李统计",
         "tags": ["统计功能"],
+        "security": [{"bearerAuth": []}],
         "description": "获取今日新增和取出的行李数量统计",
         "responses": {
           "200": {
@@ -844,7 +938,7 @@
         "type": "object",
         "properties": {
           "id": {"type": "integer", "example": 1},
-          "user_name": {"type": "string", "example": "zhangsan"},
+          "user": {"type": "string", "example": "zhangsan", "description": "用户名"},
           "password": {"type": "string", "example": "123456"}
         }
       },
@@ -864,24 +958,48 @@
         "type": "object",
         "properties": {
           "id": {"type": "integer", "example": 1},
-          "guest_name": {"type": "string", "example": "张三", "description": "客户姓名，唯一存储位置"}
+          "name": {"type": "string", "example": "张三", "description": "客户姓名，唯一存储位置"}
         },
         "description": "客户表，存储客户基本信息"
+      },
+      "RefreshToken": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer", "example": 1, "description": "关联员工ID"},
+          "user_name": {"type": "string", "example": "zhangsan", "description": "员工用户名"},
+          "token": {"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", "description": "刷新令牌"},
+          "created_at": {"type": "string", "example": "2025-11-20T10:00:00Z", "description": "创建时间"}
+        },
+        "description": "刷新令牌表，存储JWT刷新令牌"
       }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Access Token认证"
+      }
+    }
+  },
+  "x-apifox-auth": {
+    "type": "bearer",
+    "bearer": {
+      "token": "{{token}}"
     }
   },
   "tags": [
     {
       "name": "认证",
-      "description": "员工认证相关接口"
+      "description": "JWT认证相关接口"
     },
     {
       "name": "行李管理",
-      "description": "行李增删改查操作"
+      "description": "行李增删改查操作（需要JWT认证）"
     },
     {
       "name": "统计功能",
-      "description": "行李统计相关接口"
+      "description": "行李统计相关接口（需要JWT认证）"
     }
   ],
   "x-database-relationships": {
@@ -902,6 +1020,18 @@
     ]
   },
   "x-changelog": {
+    "v2.0.0": {
+      "date": "2025-11-20",
+      "changes": [
+        "JWT双令牌认证：全面升级认证系统，使用Access Token + Refresh Token",
+        "安全性提升：替换Session认证，提供更安全的无状态认证",
+        "令牌管理：Access Token 15分钟过期，Refresh Token 7天有效期",
+        "自动刷新：支持令牌自动刷新机制",
+        "令牌撤销：登出时自动撤销刷新令牌",
+        "前端友好：提供完整的JavaScript使用示例",
+        "中间件升级：新增JWT认证中间件，自动验证令牌"
+      ]
+    },
     "v1.4.0": {
       "date": "2025-11-19",
       "changes": [

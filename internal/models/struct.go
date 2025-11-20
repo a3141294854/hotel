@@ -7,6 +7,7 @@ import (
 
 type Employee struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
+	Name     string `json:"name" gorm:"column:name"`
 	User     string `json:"user" gorm:"column:user_name"`
 	Password string `json:"password" gorm:"column:password"`
 }
@@ -27,4 +28,11 @@ type Luggage struct {
 type Guest struct {
 	ID   uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
 	Name string `json:"name" gorm:"column:guest_name"`
+}
+
+type RefreshToken struct {
+	UserID    uint      `json:"user_id" gorm:"primaryKey"`
+	UserName  string    `json:"user_name" gorm:"column:user_name"`
+	Token     string    `json:"token" gorm:"column:token;size:255"`
+	CreatedAt time.Time `json:"-"`
 }
