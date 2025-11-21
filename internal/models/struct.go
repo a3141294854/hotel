@@ -8,7 +8,7 @@ import (
 type Employee struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
 	Name     string `json:"name" gorm:"column:name"`
-	User     string `json:"user" gorm:"column:user_name"`
+	User     string `json:"user" gorm:"column:user"`
 	Password string `json:"password" gorm:"column:password"`
 }
 

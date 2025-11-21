@@ -15,14 +15,27 @@
 ```json
 请求体:
 {
-  "user_name": "zhangsan",    // 注意：字段名是 user_name
-  "password": "123456"
+  "user": "zhangsan",         // 用户名
+  "password": "123456",       // 密码
+  "name": "张三"              // 员工姓名
 }
 
 响应:
 {
   "success": true,
-  "message": "注册成功"
+  "message": "注册成功",
+  "data": {
+    "id": 1,
+    "name": "张三",
+    "user": "zhangsan",
+    "password": "123456"
+  }
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "用户名已存在" 或 "请求数据格式错误"
 }
 ```
 
@@ -31,7 +44,7 @@
 ```json
 请求体:
 {
-  "user_name": "zhangsan",     // 注意：字段名是 user_name
+  "user_name": "zhangsan",     // 登录接口使用 user_name
   "password": "123456"
 }
 
@@ -107,7 +120,7 @@ Authorization: Bearer <access_token>
 Authorization: Bearer <access_token>
 ```
 
-### 4. 添加行李
+### 5. 添加行李
 **POST** `/employee/add`
 ```json
 请求体:
@@ -135,12 +148,17 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 5. 删除行李
+### 6. 删除行李
 **DELETE** `/employee/delete`
 ```json
 请求体:
 {
-  "id": 1
+  "id": 1,                    // 必填：行李ID
+  "guest_id": 1,             // 可选：客户ID
+  "tag": "红色行李箱",        // 可选：行李标签
+  "weight": 15.5,            // 可选：行李重量
+  "status": "寄存中",         // 可选：行李状态
+  "location": "前台"          // 可选：行李位置
 }
 
 响应:
@@ -155,7 +173,7 @@ Authorization: Bearer <access_token>
 - 软删除的记录不会出现在普通查询中，但会包含在统计中
 ```
 
-### 6. 更新行李
+### 7. 更新行李
 **PUT** `/employee/update`
 ```json
 请求体:
@@ -188,7 +206,7 @@ Authorization: Bearer <access_token>
 - 没有数据需要更新: {"success": false, "message": "没有数据需要更新"}
 ```
 
-### 7. 查询行李（按客户姓名）
+### 8. 查询行李（按客户姓名）
 **GET** `/employee/get/name?guest_name=张三`
 ```
 请求参数:
@@ -227,7 +245,7 @@ Authorization: Bearer <access_token>
 - 返回数据已排除系统时间字段（created_at, updated_at, deleted_at）
 ```
 
-### 8. 查询所有行李
+### 9. 查询所有行李
 **GET** `/employee/get/all`
 ```
 响应:
@@ -262,7 +280,7 @@ Authorization: Bearer <access_token>
 - 返回数据已排除系统时间字段
 ```
 
-### 9. 查询行李（按客户ID）
+### 10. 查询行李（按客户ID）
 **GET** `/employee/get/guest_id?guest_id=1`
 ```
 请求参数:
@@ -290,7 +308,7 @@ Authorization: Bearer <access_token>
 - 只返回状态为"寄存中"的行李记录
 ```
 
-### 10. 查询行李（按存放位置）
+### 11. 查询行李（按存放位置）
 **GET** `/employee/get/location?location=前台`
 ```
 请求参数:
@@ -315,7 +333,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 11. 查询行李（按状态）
+### 12. 查询行李（按状态）
 **GET** `/employee/get/status?status=寄存中`
 ```
 请求参数:
@@ -340,7 +358,12 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 12. 高级查询（多条件组合查询）
+注意:
+- 可以查询任意状态的行李记录，不限制为"寄存中"
+- 支持查询"寄存中"、"已取出"等所有状态
+```
+
+### 13. 高级查询（多条件组合查询）
 **POST** `/employee/get/guest_advance`
 ```json
 请求体:
@@ -386,7 +409,7 @@ Authorization: Bearer <access_token>
 Authorization: Bearer <access_token>
 ```
 
-### 13. 获取总行李数量
+### 14. 获取总行李数量
 **GET** `/employee/count/sum`
 ```
 响应:
@@ -401,7 +424,7 @@ Authorization: Bearer <access_token>
 - 不包含已取出或已删除的行李
 ```
 
-### 14. 获取今日行李统计
+### 15. 获取今日行李统计
 **GET** `/employee/count/today`
 ```
 响应:
@@ -509,6 +532,46 @@ cd c:/Users/傅仁杰/Desktop/hotel
 go run server/main.go
 ```
 
+服务器将在 `http://0.0.0.0:8080` 启动，支持本地和网络访问。
+
+## 📋 路由结构
+
+根据 `main.go` 的实际配置，API路由结构如下：
+
+```
+/employee
+├── POST /register          # 员工注册（无需认证）
+├── POST /login             # 员工登录（无需认证）
+└── /                      # 需要JWT认证的路由组
+    ├── POST /refresh       # 刷新令牌
+    ├── POST /logout        # 员工退出
+    ├── POST /add           # 添加行李
+    ├── DELETE /delete      # 删除行李
+    ├── PUT /update        # 更新行李
+    ├── GET /get
+    │   ├── /name          # 按客户姓名查询
+    │   ├── /all           # 查询所有行李
+    │   ├── /guest_id      # 按客户ID查询
+    │   ├── /location      # 按存放位置查询
+    │   ├── /status        # 按状态查询
+    │   └── POST /guest_advance  # 高级查询
+    └── GET /count
+        ├── /sum           # 获取总行李数量
+        └── /today         # 获取今日统计
+```
+
+## 🔒 认证中间件
+
+系统使用两层认证中间件：
+1. **JwtCheck()**: 基础JWT令牌验证
+2. **AuthCheck()**: 额外的权限检查（用于大部分业务接口）
+
+## ⚡ 限流配置
+
+- 令牌桶限流器：100个令牌/秒
+- 每个请求消耗1个令牌
+- 超出限制返回429状态码
+
 ## 📁 项目结构
 
 ```
@@ -567,10 +630,24 @@ localStorage.setItem('access_token', newData.access_token);
 ```
 
 ---
-文档生成时间: 2025-11-20
-项目版本: 2.0.0
+文档生成时间: 2025-11-21
+项目版本: 2.1.1
 
 ## 🔄 更新日志
+
+### v2.1.1 (2025-11-21)
+- 🔧 **接口文档修复**: 修复删除和更新接口的请求体字段定义
+- 📝 **字段匹配**: 确保所有接口字段与实际代码完全匹配
+- ✅ **状态查询修正**: 修正GetStatus接口的描述，支持查询任意状态
+- 🔄 **请求体完善**: 删除和更新接口支持完整的Luggage结构体字段
+- 📚 **文档同步**: 文档与代码实现保持完全一致
+
+### v2.1.0 (2025-11-21)
+- 🔧 **注册功能修复**: 修复重复用户名检查逻辑错误
+- 📝 **字段完善**: 注册接口新增name字段，支持员工姓名
+- ✅ **验证增强**: 完善注册数据验证和错误处理
+- 🔄 **响应优化**: 注册成功后返回完整的用户信息
+- 🛡️ **安全性提升**: 修复用户ID可能为0的安全隐患
 
 ### v2.0.0 (2025-11-20)
 - 🔐 **JWT双令牌认证**: 全面升级认证系统，使用Access Token + Refresh Token

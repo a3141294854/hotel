@@ -1,0 +1,1768 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Hotel 行李管理系统 API",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、行李管理和统计功能。支持员工注册、登录、行李增删改查和统计功能。",
+    "version": "2.1.0",
+    "contact": {
+      "name": "Hotel Management System",
+      "email": "support@hotel.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "认证管理"
+    },
+    {
+      "name": "行李管理"
+    },
+    {
+      "name": "行李查询"
+    },
+    {
+      "name": "统计功能"
+    }
+  ],
+  "paths": {
+    "/employee/register": {
+      "post": {
+        "summary": "员工注册",
+        "deprecated": false,
+        "description": "注册新员工账号，包含用户名、密码和姓名。系统会检查用户名是否已存在。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "用户名（唯一）",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "zhangsan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "minLength": 6,
+                    "maxLength": 100,
+                    "example": "123456"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "员工真实姓名",
+                    "minLength": 2,
+                    "maxLength": 50,
+                    "example": "张三"
+                  }
+                },
+                "required": [
+                  "user",
+                  "password",
+                  "name"
+                ]
+              },
+              "example": {
+                "user": "zhangsan",
+                "password": "123456",
+                "name": "张三"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "注册成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "员工ID",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "员工姓名",
+                          "example": "张三"
+                        },
+                        "user": {
+                          "type": "string",
+                          "description": "用户名",
+                          "example": "zhangsan"
+                        },
+                        "password": {
+                          "type": "string",
+                          "description": "密码",
+                          "example": "123456"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "注册失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "用户名已存在"
+                    }
+                  }
+                },
+                "examples": {
+                  "1": {
+                    "summary": "用户名重复",
+                    "value": {
+                      "success": false,
+                      "message": "用户名已存在"
+                    }
+                  },
+                  "2": {
+                    "summary": "请求参数错误",
+                    "value": {
+                      "success": false,
+                      "message": "请求数据格式错误"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/employee/login": {
+      "post": {
+        "summary": "员工登录",
+        "deprecated": false,
+        "description": "员工使用用户名和密码登录，成功后返回JWT双令牌（Access Token和Refresh Token）。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "用户名",
+                    "example": "zhangsan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "example": "123456"
+                  }
+                },
+                "required": [
+                  "user",
+                  "password"
+                ]
+              },
+              "example": {
+                "user": "zhangsan",
+                "password": "123456"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "x-apifox-extracts": [
+              {
+                "name": "token",
+                "path": "$.data.access_token",
+                "description": "自动提取访问令牌用于后续请求"
+              }
+            ],
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "登录成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string",
+                          "description": "访问令牌（15分钟有效）",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsImV4cCI6MTY5NTI0NjQwMCwiaWF0IjoxNjk1MjQyODAwfQ.signature"
+                        },
+                        "refresh_token": {
+                          "type": "string",
+                          "description": "刷新令牌（7天有效）",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsImV4cCI6MTY5NTg0NzYwMCwiaWF0IjoxNjk1MjQyODAwfQ.signature"
+                        },
+                        "expires_in": {
+                          "type": "integer",
+                          "description": "Access Token 过期时间（秒）",
+                          "example": 900
+                        },
+                        "token_type": {
+                          "type": "string",
+                          "description": "令牌类型",
+                          "example": "Bearer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "登录失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "没有这名员工"
+                    }
+                  }
+                },
+                "examples": {
+                  "1": {
+                    "summary": "用户名或密码错误",
+                    "value": {
+                      "success": false,
+                      "message": "没有这名员工"
+                    }
+                  },
+                  "2": {
+                    "summary": "其他登录错误",
+                    "value": {
+                      "success": false,
+                      "message": "登录失败"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/employee/logout": {
+      "post": {
+        "summary": "员工退出",
+        "deprecated": false,
+        "description": "员工退出登录，系统会删除对应的刷新令牌，使令牌失效。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "退出成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "退出成功"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "退出失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "token无效"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/refresh": {
+      "post": {
+        "summary": "刷新令牌",
+        "deprecated": false,
+        "description": "使用刷新令牌获取新的访问令牌，当访问令牌过期时使用此接口。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "刷新令牌",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                },
+                "required": [
+                  "refresh_token"
+                ]
+              },
+              "example": {
+                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "x-apifox-extracts": [
+              {
+                "name": "token",
+                "path": "$.data.access_token",
+                "description": "自动更新访问令牌"
+              }
+            ],
+            "description": "令牌刷新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "令牌刷新成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string",
+                          "description": "新的访问令牌",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        },
+                        "expires_in": {
+                          "type": "integer",
+                          "description": "Access Token 过期时间（秒）",
+                          "example": 900
+                        },
+                        "token_type": {
+                          "type": "string",
+                          "description": "令牌类型",
+                          "example": "Bearer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "刷新令牌无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "token无效"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/employee/add": {
+      "post": {
+        "summary": "添加行李",
+        "deprecated": false,
+        "description": "为客户添加新的行李记录。如果客户不存在，系统会自动创建客户记录。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guest_name": {
+                    "type": "string",
+                    "description": "客户姓名（系统自动创建客户记录）",
+                    "example": "张三"
+                  },
+                  "tag": {
+                    "type": "string",
+                    "description": "行李标签（必填）",
+                    "example": "红色行李箱"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "description": "行李重量（可选，单位：kg）",
+                    "example": 15.5
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态（可选，默认：寄存中）",
+                    "enum": [
+                      "寄存中",
+                      "已取出",
+                      "丢失"
+                    ],
+                    "example": "寄存中"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "行李位置（可选，默认：前台）",
+                    "example": "前台"
+                  }
+                },
+                "required": [
+                  "guest_name",
+                  "tag"
+                ]
+              },
+              "examples": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李添加成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "行李ID",
+                          "example": 1
+                        },
+                        "guest_id": {
+                          "type": "integer",
+                          "description": "客户ID",
+                          "example": 1
+                        },
+                        "guest_name": {
+                          "type": "string",
+                          "description": "客户姓名",
+                          "example": "张三"
+                        },
+                        "tag": {
+                          "type": "string",
+                          "description": "行李标签",
+                          "example": "红色行李箱"
+                        },
+                        "weight": {
+                          "type": "number",
+                          "description": "行李重量",
+                          "example": 15.5
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "行李状态",
+                          "example": "寄存中"
+                        },
+                        "location": {
+                          "type": "string",
+                          "description": "行李位置",
+                          "example": "前台"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "添加失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "添加行李失败"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/delete": {
+      "delete": {
+        "summary": "删除行李",
+        "deprecated": false,
+        "description": "删除指定行李（软删除）。只能删除状态为'寄存中'的行李，删除前会先将状态更新为'已取出'，然后进行软删除。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李ID",
+                    "minimum": 1,
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              "examples": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李删除成功"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "行李记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李记录不存在"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/update": {
+      "put": {
+        "summary": "更新行李",
+        "deprecated": false,
+        "description": "更新行李信息，需要提供行李ID。系统会验证记录是否存在，然后更新指定的字段。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李ID（必填）",
+                    "minimum": 1,
+                    "example": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态（可选）",
+                    "enum": [
+                      "寄存中",
+                      "已取出",
+                      "丢失"
+                    ],
+                    "example": "已取出"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "行李位置（可选）",
+                    "example": "已取出"
+                  },
+                  "tag": {
+                    "type": "string",
+                    "description": "行李标签（可选）",
+                    "example": "新标签"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "description": "行李重量（可选）",
+                    "minimum": 0,
+                    "example": 12.5
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              "examples": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李更新成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "guest_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "guest_name": {
+                          "type": "string",
+                          "example": "张三"
+                        },
+                        "tag": {
+                          "type": "string",
+                          "example": "新标签"
+                        },
+                        "weight": {
+                          "type": "number",
+                          "example": 12.5
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "已取出"
+                        },
+                        "location": {
+                          "type": "string",
+                          "example": "已取出"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "请提供行李ID"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "行李记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李记录不存在"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/name": {
+      "get": {
+        "summary": "查询行李（按客户姓名）",
+        "deprecated": false,
+        "description": "根据客户姓名查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李，排除系统时间字段）",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "guest_name",
+            "in": "query",
+            "description": "客户姓名",
+            "required": true,
+            "example": "张三",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李获取成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "未找到该客户的行李"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/all": {
+      "get": {
+        "summary": "查询所有行李",
+        "deprecated": false,
+        "description": "获取所有状态为寄存中的行李记录（排除系统时间字段）",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李获取成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 25
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/guest_id": {
+      "get": {
+        "summary": "查询行李（按客户ID）",
+        "deprecated": false,
+        "description": "根据客户ID查询行李，返回该客户的所有行李（仅返回状态为寄存中的行李）",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "guest_id",
+            "in": "query",
+            "description": "客户ID",
+            "required": true,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李获取成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "未找到该客户的行李"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/location": {
+      "get": {
+        "summary": "查询行李（按存放位置）",
+        "deprecated": false,
+        "description": "根据存放位置查询行李，返回该位置的所有行李（仅返回状态为寄存中的行李）",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "description": "存放位置",
+            "required": true,
+            "example": "前台",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李获取成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "未找到该存放地点的行李"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/status": {
+      "get": {
+        "summary": "查询行李（按状态）",
+        "deprecated": false,
+        "description": "根据状态查询行李，返回该状态的所有行李",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "行李状态",
+            "required": true,
+            "example": "寄存中",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李获取成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "未找到该状态的行李"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/guest_advance": {
+      "post": {
+        "summary": "高级查询（多条件组合查询）",
+        "deprecated": false,
+        "description": "支持多条件组合查询行李，只有非空字段才会作为查询条件，如果不指定status默认查询寄存中的行李",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guest_name": {
+                    "type": "string",
+                    "description": "客户姓名（可选）",
+                    "example": "张三"
+                  },
+                  "guest_id": {
+                    "type": "integer",
+                    "description": "客户ID（可选）",
+                    "example": 1
+                  },
+                  "tag": {
+                    "type": "string",
+                    "description": "行李标签（可选）",
+                    "example": "红色行李箱"
+                  },
+                  "weight": {
+                    "type": "number",
+                    "description": "行李重量（可选）",
+                    "example": 15.5
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "存放位置（可选）",
+                    "example": "前台"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态（可选，默认为寄存中）",
+                    "enum": [
+                      "寄存中",
+                      "已取出",
+                      "丢失"
+                    ],
+                    "example": "寄存中"
+                  }
+                }
+              },
+              "examples": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "获取行李成功"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "guest_name": {
+                            "type": "string",
+                            "example": "张三"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "example": "红色行李箱"
+                          },
+                          "weight": {
+                            "type": "number",
+                            "example": 15.5
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "寄存中"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "前台"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "未找到行李",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "未找到符合条件的行李"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/count/sum": {
+      "get": {
+        "summary": "获取总行李数量",
+        "deprecated": false,
+        "description": "获取当前状态为寄存中的行李总数量（不包含已取出或已删除的行李）",
+        "tags": [
+          "统计功能"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "行李数量获取成功"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "description": "当前寄存中的行李总数",
+                      "example": 25
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/count/today": {
+      "get": {
+        "summary": "获取今日行李统计",
+        "deprecated": false,
+        "description": "获取今日新增和取出的行李数量统计",
+        "tags": [
+          "统计功能"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "获取今日统计成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "description": "统计日期",
+                          "example": "2025-11-21"
+                        },
+                        "today_added": {
+                          "type": "integer",
+                          "description": "今日创建的行李记录数量",
+                          "example": 8
+                        },
+                        "today_taken": {
+                          "type": "integer",
+                          "description": "今日状态更新为'已取出'的行李数量",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "员工ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "员工姓名",
+            "example": "张三"
+          },
+          "user": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码",
+            "example": "123456"
+          }
+        },
+        "description": "员工表，存储员工基本信息和登录凭据"
+      },
+      "Luggage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "行李ID",
+            "example": 1
+          },
+          "guest_id": {
+            "type": "integer",
+            "description": "外键，关联Guest表",
+            "example": 1
+          },
+          "tag": {
+            "type": "string",
+            "description": "行李标签",
+            "example": "红色行李箱"
+          },
+          "weight": {
+            "type": "number",
+            "description": "行李重量（kg）",
+            "example": 15.5
+          },
+          "status": {
+            "type": "string",
+            "description": "行李状态",
+            "example": "寄存中"
+          },
+          "location": {
+            "type": "string",
+            "description": "存放位置",
+            "example": "前台"
+          }
+        },
+        "description": "行李表，通过guest_id外键关联Guest表"
+      },
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "客户ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "客户姓名，唯一存储位置",
+            "example": "张三"
+          }
+        },
+        "description": "客户表，存储客户基本信息"
+      },
+      "RefreshToken": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "description": "关联员工ID",
+            "example": 1
+          },
+          "user_name": {
+            "type": "string",
+            "description": "员工用户名",
+            "example": "zhangsan"
+          },
+          "token": {
+            "type": "string",
+            "description": "刷新令牌",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2025-11-21T10:00:00Z"
+          }
+        },
+        "description": "刷新令牌表，存储JWT刷新令牌"
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "description": "响应数据（可选）"
+          }
+        },
+        "description": "统一API响应格式"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Access Token认证，在请求头中添加：Authorization: Bearer <token>"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}

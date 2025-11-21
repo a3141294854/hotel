@@ -115,7 +115,7 @@ func JwtCheck() gin.HandlerFunc {
 func AuthCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		user, ok := c.Get("claims")
+		_, ok := c.Get("claims")
 		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
@@ -125,15 +125,7 @@ func AuthCheck() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if user.(*util.AccessClaims).UserId == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "请先登录",
-			})
-			log.Println("声明id错误")
-			c.Abort()
-			return
-		}
+
 		c.Next()
 	}
 }

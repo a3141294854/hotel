@@ -2,6 +2,7 @@ package employee_check
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"hotel/internal/models"
@@ -25,23 +26,36 @@ func EmployeeRegister(c *gin.Context, db *gorm.DB) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
+		fmt.Println(e.User, e.Password, e.Name)
+		return
+	}
+	var existingEmployee models.Employee
+	result2 := db.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
+	if result2.Error == nil { // 如果没有错误，说明找到了用户
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "用户名已存在",
+		})
 		return
 	}
 
 	result := db.Create(&e)
+	employee := models.Employee{}
+	db.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
 		log.Println("插入失败", e.User, result.Error)
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"message": "注册成功",
+			"data":    employee,
 		})
 	}
 }
 
 func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 	var e struct {
-		UserName string `json:"user_name"`
+		User     string `json:"user"`
 		Password string `json:"password"`
 	}
 	if err := c.ShouldBindJSON(&e); err != nil {
@@ -54,8 +68,8 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 	}
 
 	var user models.Employee
-	result := db.Select("user_name", "password").
-		Where("user_name=?", e.UserName).
+	result := db.Select("user", "password").
+		Where("user=?", e.User).
 		Where("password=?", e.Password).
 		First(&user)
 	if result.Error != nil {
@@ -74,7 +88,7 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 			return
 		}
 	}
-	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.User)
+	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -97,8 +111,8 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 		"data": gin.H{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
-			"expires_in": 900,
-			"token_type": "Bearer",
+			"expires_in":    900,
+			"token_type":    "Bearer",
 		},
 	})
 }
@@ -185,8 +199,8 @@ func RefreshToken(c *gin.Context, db *gorm.DB) {
 		"data": gin.H{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
-			"expires_in": 900,
-			"token_type": "Bearer",
+			"expires_in":    900,
+			"token_type":    "Bearer",
 		},
 	})
 
