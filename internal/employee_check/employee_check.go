@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"hotel/internal/models"
 	"hotel/internal/util"
+	"hotel/models"
+	"hotel/services"
 	"log"
 	"net/http"
 )
 
-func EmployeeRegister(c *gin.Context, db *gorm.DB) {
+func EmployeeRegister(c *gin.Context, s *services.Servers) {
 	var e models.Employee
 	if err := c.ShouldBind(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +31,7 @@ func EmployeeRegister(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var existingEmployee models.Employee
-	result2 := db.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
+	result2 := s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
 	if result2.Error == nil { // 如果没有错误，说明找到了用户
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -39,9 +40,9 @@ func EmployeeRegister(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	result := db.Create(&e)
+	result := s.DB.Create(&e)
 	employee := models.Employee{}
-	db.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
+	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
 		log.Println("插入失败", e.User, result.Error)
 	} else {
@@ -53,7 +54,7 @@ func EmployeeRegister(c *gin.Context, db *gorm.DB) {
 	}
 }
 
-func EmployeeLogin(c *gin.Context, db *gorm.DB) {
+func EmployeeLogin(c *gin.Context, s *services.Servers) {
 	var e struct {
 		User     string `json:"user"`
 		Password string `json:"password"`
@@ -68,7 +69,7 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 	}
 
 	var user models.Employee
-	result := db.Select("user", "password").
+	result := s.DB.Select("user", "password").
 		Where("user=?", e.User).
 		Where("password=?", e.Password).
 		First(&user)
@@ -103,7 +104,7 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 		UserName: user.Name,
 		Token:    refreshToken,
 	}
-	db.Model(models.RefreshToken{}).Create(&insert)
+	s.DB.Model(models.RefreshToken{}).Create(&insert)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -117,7 +118,7 @@ func EmployeeLogin(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-func EmployeeLogout(c *gin.Context, db *gorm.DB) {
+func EmployeeLogout(c *gin.Context, s *services.Servers) {
 	claims, ok := c.Get("claims")
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -127,7 +128,7 @@ func EmployeeLogout(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	e := claims.(*util.AccessClaims)
-	result := db.Model(models.RefreshToken{}).Where("user_id =?", e.UserId).Delete(models.RefreshToken{})
+	result := s.DB.Model(models.RefreshToken{}).Where("user_id =?", e.UserId).Delete(models.RefreshToken{})
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -143,7 +144,7 @@ func EmployeeLogout(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-func RefreshToken(c *gin.Context, db *gorm.DB) {
+func RefreshToken(c *gin.Context, s *services.Servers) {
 	var e struct {
 		RefreshToken string `json:"refresh_token"`
 	}
@@ -166,7 +167,7 @@ func RefreshToken(c *gin.Context, db *gorm.DB) {
 	}
 
 	var employee models.RefreshToken
-	result := db.Model(models.RefreshToken{}).
+	result := s.DB.Model(models.RefreshToken{}).
 		Where("user_id=?", claims.UserId).First(&employee)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -175,7 +176,7 @@ func RefreshToken(c *gin.Context, db *gorm.DB) {
 		})
 		return
 	}
-	result2 := db.Model(models.RefreshToken{}).
+	result2 := s.DB.Model(models.RefreshToken{}).
 		Where("user_id=?", claims.UserId).
 		Where("token=?", e.RefreshToken).
 		Delete(models.RefreshToken{})

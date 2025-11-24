@@ -4,14 +4,15 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"hotel/internal/models"
+	"hotel/models"
+	"hotel/services"
 	"log"
 	"net/http"
 	"time"
 )
 
 // Add 添加行李
-func Add(c *gin.Context, db *gorm.DB) {
+func Add(c *gin.Context, s *services.Servers) {
 
 	// 定义请求结构体，包含guest_name字段
 	type AddRequest struct {
@@ -34,14 +35,14 @@ func Add(c *gin.Context, db *gorm.DB) {
 
 	// 先创建或获取客户记录
 	var guest models.Guest
-	result := db.Where("guest_name = ?", req.GuestName).First(&guest)
+	result := s.DB.Where("guest_name = ?", req.GuestName).First(&guest)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			// 客户不存在，创建新客户
 			guest = models.Guest{
 				Name: req.GuestName,
 			}
-			if err := db.Create(&guest).Error; err != nil {
+			if err := s.DB.Create(&guest).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"success": false,
 					"message": "创建客户记录失败",
@@ -69,7 +70,7 @@ func Add(c *gin.Context, db *gorm.DB) {
 		Location: req.Location,
 	}
 
-	result = db.Create(&luggage)
+	result = s.DB.Create(&luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -97,7 +98,7 @@ func Add(c *gin.Context, db *gorm.DB) {
 }
 
 // Delete 删除指定资源
-func Delete(c *gin.Context, db *gorm.DB) {
+func Delete(c *gin.Context, s *services.Servers) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -107,7 +108,7 @@ func Delete(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var existingLuggage models.Luggage
-	if err := db.Where("status = ?", "寄存中").First(&existingLuggage, luggage.ID).Error; err != nil {
+	if err := s.DB.Where("status = ?", "寄存中").First(&existingLuggage, luggage.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
@@ -125,7 +126,7 @@ func Delete(c *gin.Context, db *gorm.DB) {
 
 	luggage.Status = "已取出"
 	luggage.Location = "已取出"
-	result := db.Model(&models.Luggage{}).Where("id = ?", luggage.ID).Updates(luggage)
+	result := s.DB.Model(&models.Luggage{}).Where("id = ?", luggage.ID).Updates(luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -135,7 +136,7 @@ func Delete(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	result2 := db.Where("id = ?", luggage.ID).Delete(&models.Luggage{})
+	result2 := s.DB.Where("id = ?", luggage.ID).Delete(&models.Luggage{})
 	if result2.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -150,7 +151,7 @@ func Delete(c *gin.Context, db *gorm.DB) {
 
 }
 
-func Update(c *gin.Context, db *gorm.DB) {
+func Update(c *gin.Context, s *services.Servers) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -172,7 +173,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 
 	// 先检查记录是否存在
 	var existingLuggage models.Luggage
-	if err := db.First(&existingLuggage, luggage.ID).Error; err != nil {
+	if err := s.DB.First(&existingLuggage, luggage.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
@@ -189,7 +190,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 	}
 
 	// 执行更新
-	result := db.Model(&existingLuggage).Updates(luggage)
+	result := s.DB.Model(&existingLuggage).Updates(luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -210,7 +211,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 
 	// 获取客户信息
 	var guest models.Guest
-	db.First(&guest, existingLuggage.GuestID)
+	s.DB.First(&guest, existingLuggage.GuestID)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -228,7 +229,7 @@ func Update(c *gin.Context, db *gorm.DB) {
 }
 
 // GetName 获取行李
-func GetName(c *gin.Context, db *gorm.DB) {
+func GetName(c *gin.Context, s *services.Servers) {
 	var luggage []models.Luggage
 
 	guestName := c.Query("guest_name")
@@ -240,7 +241,7 @@ func GetName(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	result := db.Preload("Guest").
+	result := s.DB.Preload("Guest").
 		Joins("JOIN guests ON luggages.guest_id = guests.id").
 		Where("guests.guest_name = ? AND luggages.status = ?", guestName, "寄存中").
 		Find(&luggage)
@@ -270,9 +271,9 @@ func GetName(c *gin.Context, db *gorm.DB) {
 }
 
 // GetAll 获取所有行李
-func GetAll(c *gin.Context, db *gorm.DB) {
+func GetAll(c *gin.Context, s *services.Servers) {
 	var luggage []models.Luggage
-	result := db.
+	result := s.DB.
 		Preload("Guest").
 		Where("status = ?", "寄存中").
 		Find(&luggage)
@@ -295,7 +296,7 @@ func GetAll(c *gin.Context, db *gorm.DB) {
 }
 
 // GetGuestID 获取行李
-func GetGuestID(c *gin.Context, db *gorm.DB) {
+func GetGuestID(c *gin.Context, s *services.Servers) {
 	guestID := c.Query("guest_id")
 	if guestID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -305,7 +306,7 @@ func GetGuestID(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	var luggage []models.Luggage
-	result := db.
+	result := s.DB.
 		Preload("Guest").
 		Where("guest_id = ? AND status = ?", guestID, "寄存中").
 		Find(&luggage)
@@ -335,7 +336,7 @@ func GetGuestID(c *gin.Context, db *gorm.DB) {
 }
 
 // GetLocation 获取行李
-func GetLocation(c *gin.Context, db *gorm.DB) {
+func GetLocation(c *gin.Context, s *services.Servers) {
 	location := c.Query("location")
 	if location == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -346,7 +347,7 @@ func GetLocation(c *gin.Context, db *gorm.DB) {
 	}
 
 	var luggage []models.Luggage
-	result := db.
+	result := s.DB.
 		Preload("Guest"). // 预加载Guest信息
 		Where("location = ? AND status = ?", location, "寄存中").
 		Find(&luggage)
@@ -376,7 +377,7 @@ func GetLocation(c *gin.Context, db *gorm.DB) {
 }
 
 // GetStatus 获取行李
-func GetStatus(c *gin.Context, db *gorm.DB) {
+func GetStatus(c *gin.Context, s *services.Servers) {
 	status := c.Query("status")
 	if status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -387,7 +388,7 @@ func GetStatus(c *gin.Context, db *gorm.DB) {
 	}
 
 	var luggage []models.Luggage
-	result := db.
+	result := s.DB.
 		Preload("Guest").
 		Where("status = ?", status).
 		Find(&luggage)
@@ -417,7 +418,7 @@ func GetStatus(c *gin.Context, db *gorm.DB) {
 }
 
 // GetAdvance 高级查询
-func GetAdvance(c *gin.Context, db *gorm.DB) {
+func GetAdvance(c *gin.Context, s *services.Servers) {
 
 	type AdvanceRequest struct {
 		GuestName string  `json:"guest_name"`
@@ -441,7 +442,7 @@ func GetAdvance(c *gin.Context, db *gorm.DB) {
 
 	var luggage []models.Luggage
 
-	query := db.Model(&models.Luggage{})
+	query := s.DB.Model(&models.Luggage{})
 
 	if req.GuestName != "" {
 		query = query.Joins("JOIN guests ON luggages.guest_id = guests.id").
@@ -498,9 +499,9 @@ func GetAdvance(c *gin.Context, db *gorm.DB) {
 }
 
 // CountSum 获取总行李数量
-func CountSum(c *gin.Context, db *gorm.DB) {
+func CountSum(c *gin.Context, s *services.Servers) {
 	var count int64
-	db.Model(&models.Luggage{}).Where("status = ?", "寄存中").Count(&count)
+	s.DB.Model(&models.Luggage{}).Where("status = ?", "寄存中").Count(&count)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -510,18 +511,18 @@ func CountSum(c *gin.Context, db *gorm.DB) {
 }
 
 // CountToday 获取今日行李数量
-func CountToday(c *gin.Context, db *gorm.DB) {
+func CountToday(c *gin.Context, s *services.Servers) {
 	today := time.Now().Format("2006-01-02")
 
 	// 统计今天新增的行李
 	var todayAdded int64
-	db.Model(&models.Luggage{}).
+	s.DB.Model(&models.Luggage{}).
 		Where("DATE(created_at) = ?", today).
 		Count(&todayAdded)
 
 	// 统计今天取出的行李
 	var todayTaken int64
-	db.Model(&models.Luggage{}).
+	s.DB.Model(&models.Luggage{}).
 		Unscoped().
 		Where("status = ? AND DATE(updated_at) = ?", "已取出", today).
 		Count(&todayTaken)

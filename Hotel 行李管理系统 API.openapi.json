@@ -3,7 +3,7 @@
   "info": {
     "title": "Hotel 行李管理系统 API",
     "description": "酒店行李管理系统，提供JWT双令牌认证、行李管理和统计功能。支持员工注册、登录、行李增删改查和统计功能。",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "contact": {
       "name": "Hotel Management System",
       "email": "support@hotel.com"

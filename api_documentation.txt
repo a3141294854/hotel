@@ -7,6 +7,8 @@
 - 服务器地址: http://localhost:8080
 - 认证方式: JWT 双令牌认证 (Access Token + Refresh Token)
 - 限流策略: 令牌桶限流，每秒最多10个请求
+- 数据库: MySQL (study数据库)
+- Go版本: 1.25.3
 
 ## 🔐 认证相关 API
 
@@ -15,9 +17,9 @@
 ```json
 请求体:
 {
-  "user": "zhangsan",         // 用户名
-  "password": "123456",       // 密码
-  "name": "张三"              // 员工姓名
+  "user": "zhangsan",         // 用户名（必填）
+  "password": "123456",       // 密码（必填）
+  "name": "张三"              // 员工姓名（必填）
 }
 
 响应:
@@ -44,8 +46,8 @@
 ```json
 请求体:
 {
-  "user_name": "zhangsan",     // 登录接口使用 user_name
-  "password": "123456"
+  "user": "zhangsan",         // 用户名
+  "password": "123456"        // 密码
 }
 
 响应:
@@ -82,7 +84,7 @@ Authorization: Bearer <access_token>
 失败响应:
 {
   "success": false,
-  "message": "无效的令牌"
+  "message": "token无效"
 }
 ```
 
@@ -97,9 +99,10 @@ Authorization: Bearer <access_token>
 响应:
 {
   "success": true,
-  "message": "令牌刷新成功",
+  "message": "token刷新成功",
   "data": {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "expires_in": 900,         // Access Token 过期时间（秒）
     "token_type": "Bearer"
   }
@@ -108,7 +111,7 @@ Authorization: Bearer <access_token>
 失败响应:
 {
   "success": false,
-  "message": "无效的刷新令牌"
+  "message": "token无效"
 }
 ```
 
@@ -153,18 +156,19 @@ Authorization: Bearer <access_token>
 ```json
 请求体:
 {
-  "id": 1,                    // 必填：行李ID
-  "guest_id": 1,             // 可选：客户ID
-  "tag": "红色行李箱",        // 可选：行李标签
-  "weight": 15.5,            // 可选：行李重量
-  "status": "寄存中",         // 可选：行李状态
-  "location": "前台"          // 可选：行李位置
+  "id": 1                    // 必填：行李ID
 }
 
 响应:
 {
   "success": true,
   "message": "行李删除成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "行李记录不存在" 或 "请求数据格式错误"
 }
 
 注意:
@@ -204,6 +208,7 @@ Authorization: Bearer <access_token>
 - 行李记录不存在: {"success": false, "message": "行李记录不存在"}
 - 未提供行李ID: {"success": false, "message": "请提供行李ID"}
 - 没有数据需要更新: {"success": false, "message": "没有数据需要更新"}
+- 请求数据格式错误: {"success": false, "message": "请求数据格式错误"}
 ```
 
 ### 8. 查询行李（按客户姓名）
@@ -447,42 +452,46 @@ Authorization: Bearer <access_token>
 ## 📊 数据模型
 
 ### Employee (员工表)
-```json
-{
-  "id": 1,
-  "name": "张三",
-  "user": "zhangsan",
-  "password": "123456"
+```go
+type Employee struct {
+    ID       uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
+    Name     string `json:"name" gorm:"column:name"`
+    User     string `json:"user" gorm:"column:user"`
+    Password string `json:"password" gorm:"column:password"`
 }
 ```
 
 ### Luggage (行李表)
-```json
-{
-  "id": 1,
-  "guest_id": 1,           // 外键，关联Guest表
-  "tag": "红色行李箱",
-  "weight": 15.5,
-  "status": "寄存中",
-  "location": "前台"
+```go
+type Luggage struct {
+    ID        uint           `gorm:"primaryKey;autoIncrement"`
+    GuestID   uint           `json:"guest_id" gorm:"column:guest_id"`
+    Tag       string         `json:"tag" gorm:"column:tag;size:50"`
+    Weight    float32        `json:"weight" gorm:"column:weight"`
+    Status    string         `json:"status" gorm:"column:status;size:20"`
+    Location  string         `json:"location" gorm:"column:location;size:100"`
+    CreatedAt time.Time      `json:"-"`
+    UpdatedAt time.Time      `json:"-"`
+    DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+    Guest    Guest           `gorm:"foreignKey:GuestID"`
 }
 ```
 
 ### Guest (客户表)
-```json
-{
-  "id": 1,
-  "name": "张三"       // 客户姓名，唯一存储位置
+```go
+type Guest struct {
+    ID   uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
+    Name string `json:"name" gorm:"column:guest_name"`
 }
 ```
 
 ### RefreshToken (刷新令牌表)
-```json
-{
-  "user_id": 1,              // 关联员工ID（主键）
-  "user_name": "zhangsan",   // 员工用户名
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // 刷新令牌
-  "created_at": "2025-11-20T10:00:00Z"
+```go
+type RefreshToken struct {
+    UserID    uint      `json:"user_id" gorm:"primaryKey"`
+    UserName  string    `json:"user_name" gorm:"column:user_name"`
+    Token     string    `json:"token" gorm:"column:token;size:255"`
+    CreatedAt time.Time `json:"-"`
 }
 ```
 
@@ -513,6 +522,8 @@ Authorization: Bearer <access_token>
 3. **权限控制**: 行李操作需要有效的JWT令牌
 4. **限流保护**: 令牌桶限流，每秒最多10个请求
 5. **令牌撤销**: 登出时自动撤销刷新令牌
+6. **双重中间件**: JwtCheck()基础验证 + AuthCheck()权限检查
+7. **密钥分离**: Access Token和Refresh Token使用不同的签名密钥
 
 ## 📈 状态码说明
 
@@ -576,14 +587,19 @@ go run server/main.go
 
 ```
 hotel/
-├── server/main.go          # 主程序入口
+├── server/main.go                    # 主程序入口
+├── models/struct.go                  # 数据模型定义
+├── services/services.go              # 数据库连接服务
 ├── internal/
-│   ├── models/struct.go    # 数据模型定义
-│   ├── employee_check/     # 员工认证逻辑
-│   ├── employee_action/   # 行李操作逻辑
-│   ├── function/          # 限流器功能
-│   └── table/            # 数据库表创建
-└── go.mod                # 依赖管理
+│   ├── employee_check/employee_check.go  # 员工认证逻辑
+│   ├── employee_action/employee_action.go # 行李操作逻辑
+│   ├── middleware/middleware.go          # 中间件（JWT、限流）
+│   ├── util/util.go                      # JWT工具函数
+│   └── table/table.go                    # 数据库表创建
+├── go.mod                            # 依赖管理
+├── go.sum                            # 依赖版本锁定
+├── api_documentation.txt             # API文档
+└── Hotel 行李管理系统 API.openapi.json # OpenAPI规范文档
 ```
 
 ## 💡 使用说明
@@ -630,10 +646,19 @@ localStorage.setItem('access_token', newData.access_token);
 ```
 
 ---
-文档生成时间: 2025-11-21
-项目版本: 2.1.1
+文档生成时间: 2025-11-24
+项目版本: 2.2.0
 
 ## 🔄 更新日志
+
+### v2.2.0 (2025-11-24)
+- 📚 **文档全面更新**: 基于实际代码完全重写API文档
+- 🔧 **字段精确匹配**: 所有接口字段定义与代码实现完全一致
+- 📝 **数据模型更新**: 使用Go结构体定义展示真实数据模型
+- 🏗️ **项目结构完善**: 详细展示完整的项目目录结构
+- 🔐 **安全特性增强**: 补充JWT密钥分离和双重中间件说明
+- 📊 **依赖信息**: 添加Go版本和主要依赖包信息
+- ✅ **接口验证**: 所有API接口描述经过实际代码验证
 
 ### v2.1.1 (2025-11-21)
 - 🔧 **接口文档修复**: 修复删除和更新接口的请求体字段定义

@@ -2,7 +2,7 @@ package table
 
 import (
 	"gorm.io/gorm"
-	"hotel/internal/models"
+	"hotel/models"
 	"log"
 )
 
