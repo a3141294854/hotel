@@ -22,10 +22,5 @@ func Table(db *gorm.DB) {
 		log.Println("创建行李表失败:", err.Error())
 	}
 
-	err = db.AutoMigrate(&models.RefreshToken{})
-	if err != nil {
-		log.Println("创建刷新token表失败:", err.Error())
-	}
-
 	log.Println("创建表成功")
 }

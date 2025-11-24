@@ -10,9 +10,11 @@ import (
 	"hotel/services"
 	"log"
 	"net/http"
+	"time"
 )
 
-func EmployeeRegister(c *gin.Context, s *services.Servers) {
+// EmployeeRegister 员工注册
+func EmployeeRegister(c *gin.Context, s *services.Services) {
 	var e models.Employee
 	if err := c.ShouldBind(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -54,7 +56,8 @@ func EmployeeRegister(c *gin.Context, s *services.Servers) {
 	}
 }
 
-func EmployeeLogin(c *gin.Context, s *services.Servers) {
+// EmployeeLogin 员工登录
+func EmployeeLogin(c *gin.Context, s *services.Services) {
 	var e struct {
 		User     string `json:"user"`
 		Password string `json:"password"`
@@ -99,12 +102,7 @@ func EmployeeLogin(c *gin.Context, s *services.Servers) {
 		return
 	}
 
-	insert := models.RefreshToken{
-		UserID:   user.ID,
-		UserName: user.Name,
-		Token:    refreshToken,
-	}
-	s.DB.Model(models.RefreshToken{}).Create(&insert)
+	s.RDB.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, 24*time.Hour)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -118,7 +116,8 @@ func EmployeeLogin(c *gin.Context, s *services.Servers) {
 	})
 }
 
-func EmployeeLogout(c *gin.Context, s *services.Servers) {
+// EmployeeLogout 员工退出
+func EmployeeLogout(c *gin.Context, s *services.Services) {
 	claims, ok := c.Get("claims")
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -128,15 +127,7 @@ func EmployeeLogout(c *gin.Context, s *services.Servers) {
 		return
 	}
 	e := claims.(*util.AccessClaims)
-	result := s.DB.Model(models.RefreshToken{}).Where("user_id =?", e.UserId).Delete(models.RefreshToken{})
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "退出失败",
-		})
-		log.Println("退出失败", result.Error)
-		return
-	}
+	s.RDB.Del(c, fmt.Sprintf("%d", e.UserId))
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -144,9 +135,10 @@ func EmployeeLogout(c *gin.Context, s *services.Servers) {
 	})
 }
 
-func RefreshToken(c *gin.Context, s *services.Servers) {
+// RefreshToken 员工刷新token
+func RefreshToken(c *gin.Context, s *services.Services) {
 	var e struct {
-		RefreshToken string `json:"refresh_token"`
+		RefreshTokens string `json:"refresh_token"`
 	}
 	if err := c.ShouldBindJSON(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -157,7 +149,7 @@ func RefreshToken(c *gin.Context, s *services.Servers) {
 		return
 	}
 
-	claims, err := util.ParseRefreshToken(e.RefreshToken)
+	claims, err := util.ParseRefreshToken(e.RefreshTokens)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -166,26 +158,24 @@ func RefreshToken(c *gin.Context, s *services.Servers) {
 		return
 	}
 
-	var employee models.RefreshToken
-	result := s.DB.Model(models.RefreshToken{}).
-		Where("user_id=?", claims.UserId).First(&employee)
-	if result.Error != nil {
+	refreshToken, err := s.RDB.Get(c, fmt.Sprintf("%d", claims.UserId)).Result()
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "token无效",
 		})
 		return
 	}
-	result2 := s.DB.Model(models.RefreshToken{}).
-		Where("user_id=?", claims.UserId).
-		Where("token=?", e.RefreshToken).
-		Delete(models.RefreshToken{})
-	if result2.Error != nil {
-		log.Println("token删除错误", result2.Error)
+
+	if refreshToken != e.RefreshTokens {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "token无效",
+		})
 		return
 	}
 
-	accessToken, refreshToken, err := util.GenerateTokenPair(employee.UserID, employee.UserName)
+	accessToken, refreshToken, err := util.GenerateTokenPair(claims.UserId, claims.UserName)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,

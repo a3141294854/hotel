@@ -16,10 +16,12 @@ type AccessClaims struct {
 }
 
 type RefreshClaims struct {
-	UserId uint `json:"user_id"`
+	UserId   uint   `json:"user_id"`
+	UserName string `json:"user_name"`
 	jwt.RegisteredClaims
 }
 
+// GenerateAccessToken 生成访问令牌
 func GenerateAccessToken(userId uint, userName string) (string, error) {
 	claims := AccessClaims{
 		UserId:   userId,
@@ -37,11 +39,13 @@ func GenerateAccessToken(userId uint, userName string) (string, error) {
 
 }
 
-func GenerateRefreshToken(userId uint) (string, error) {
+// GenerateRefreshToken 生成刷新令牌
+func GenerateRefreshToken(userId uint, userName string) (string, error) {
 	claims := RefreshClaims{
-		UserId: userId,
+		UserId:   userId,
+		UserName: userName,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -53,18 +57,20 @@ func GenerateRefreshToken(userId uint) (string, error) {
 
 }
 
+// GenerateTokenPair 生成访问令牌和刷新令牌
 func GenerateTokenPair(userId uint, userName string) (accessToken string, refreshToken string, err error) {
 	accessToken, err = GenerateAccessToken(userId, userName)
 	if err != nil {
 		return "", "", err
 	}
-	refreshToken, err = GenerateRefreshToken(userId)
+	refreshToken, err = GenerateRefreshToken(userId, userName)
 	if err != nil {
 		return "", "", err
 	}
 	return
 }
 
+// ParseAccessToken 解析访问令牌
 func ParseAccessToken(tokenString string) (*AccessClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &AccessClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return AccessSecret, nil
@@ -79,6 +85,7 @@ func ParseAccessToken(tokenString string) (*AccessClaims, error) {
 
 }
 
+// ParseRefreshToken 解析刷新令牌
 func ParseRefreshToken(tokenString string) (*RefreshClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return RefreshSecret, nil

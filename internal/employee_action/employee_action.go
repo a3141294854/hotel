@@ -12,7 +12,7 @@ import (
 )
 
 // Add 添加行李
-func Add(c *gin.Context, s *services.Servers) {
+func Add(c *gin.Context, s *services.Services) {
 
 	// 定义请求结构体，包含guest_name字段
 	type AddRequest struct {
@@ -98,7 +98,7 @@ func Add(c *gin.Context, s *services.Servers) {
 }
 
 // Delete 删除指定资源
-func Delete(c *gin.Context, s *services.Servers) {
+func Delete(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -151,7 +151,7 @@ func Delete(c *gin.Context, s *services.Servers) {
 
 }
 
-func Update(c *gin.Context, s *services.Servers) {
+func Update(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -229,7 +229,7 @@ func Update(c *gin.Context, s *services.Servers) {
 }
 
 // GetName 获取行李
-func GetName(c *gin.Context, s *services.Servers) {
+func GetName(c *gin.Context, s *services.Services) {
 	var luggage []models.Luggage
 
 	guestName := c.Query("guest_name")
@@ -271,7 +271,7 @@ func GetName(c *gin.Context, s *services.Servers) {
 }
 
 // GetAll 获取所有行李
-func GetAll(c *gin.Context, s *services.Servers) {
+func GetAll(c *gin.Context, s *services.Services) {
 	var luggage []models.Luggage
 	result := s.DB.
 		Preload("Guest").
@@ -296,7 +296,7 @@ func GetAll(c *gin.Context, s *services.Servers) {
 }
 
 // GetGuestID 获取行李
-func GetGuestID(c *gin.Context, s *services.Servers) {
+func GetGuestID(c *gin.Context, s *services.Services) {
 	guestID := c.Query("guest_id")
 	if guestID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -336,7 +336,7 @@ func GetGuestID(c *gin.Context, s *services.Servers) {
 }
 
 // GetLocation 获取行李
-func GetLocation(c *gin.Context, s *services.Servers) {
+func GetLocation(c *gin.Context, s *services.Services) {
 	location := c.Query("location")
 	if location == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -377,7 +377,7 @@ func GetLocation(c *gin.Context, s *services.Servers) {
 }
 
 // GetStatus 获取行李
-func GetStatus(c *gin.Context, s *services.Servers) {
+func GetStatus(c *gin.Context, s *services.Services) {
 	status := c.Query("status")
 	if status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -418,7 +418,7 @@ func GetStatus(c *gin.Context, s *services.Servers) {
 }
 
 // GetAdvance 高级查询
-func GetAdvance(c *gin.Context, s *services.Servers) {
+func GetAdvance(c *gin.Context, s *services.Services) {
 
 	type AdvanceRequest struct {
 		GuestName string  `json:"guest_name"`
@@ -499,7 +499,7 @@ func GetAdvance(c *gin.Context, s *services.Servers) {
 }
 
 // CountSum 获取总行李数量
-func CountSum(c *gin.Context, s *services.Servers) {
+func CountSum(c *gin.Context, s *services.Services) {
 	var count int64
 	s.DB.Model(&models.Luggage{}).Where("status = ?", "寄存中").Count(&count)
 
@@ -511,7 +511,7 @@ func CountSum(c *gin.Context, s *services.Servers) {
 }
 
 // CountToday 获取今日行李数量
-func CountToday(c *gin.Context, s *services.Servers) {
+func CountToday(c *gin.Context, s *services.Services) {
 	today := time.Now().Format("2006-01-02")
 
 	// 统计今天新增的行李
