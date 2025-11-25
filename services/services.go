@@ -8,8 +8,9 @@ import (
 )
 
 type Services struct {
-	DB  *gorm.DB
-	RDB *redis.Client
+	DB   *gorm.DB
+	RDB  *redis.Client
+	RDB1 *redis.Client
 }
 
 // NewDatabase 初始化数据库连接
@@ -19,14 +20,24 @@ func NewDatabase() *Services {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//访问令牌的
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
+	//刷新令牌的
+	rdb1 := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       1,
+	})
+
 	service := Services{
-		DB:  db,
-		RDB: rdb,
+		DB:   db,
+		RDB:  rdb,
+		RDB1: rdb1,
 	}
 	return &service
 }

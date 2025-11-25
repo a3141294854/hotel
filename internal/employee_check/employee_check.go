@@ -92,6 +92,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 			return
 		}
 	}
+
 	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -102,7 +103,8 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	s.RDB.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, 24*time.Hour)
+	s.RDB.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, 30*time.Second)
+	s.RDB1.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, 24*time.Hour)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -128,6 +130,7 @@ func EmployeeLogout(c *gin.Context, s *services.Services) {
 	}
 	e := claims.(*util.AccessClaims)
 	s.RDB.Del(c, fmt.Sprintf("%d", e.UserId))
+	s.RDB1.Del(c, fmt.Sprintf("%d", e.UserId))
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -183,6 +186,8 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+	s.RDB.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, 30*time.Second)
+	s.RDB1.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, 24*time.Hour)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
