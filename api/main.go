@@ -30,7 +30,7 @@ func main() {
 	})
 
 	e := r.Group("/employee")
-	e.Use(middleware.JwtCheck())
+	e.Use(middleware.JwtCheck(service))
 	{
 		e.POST("/refresh", func(c *gin.Context) {
 			employee_check.RefreshToken(c, service)

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"hotel/services"
 	"log"
 	"net"
 	"net/http"
@@ -74,7 +75,7 @@ func RateLimit(limiter *TokenBucketLimiter) gin.HandlerFunc {
 }
 
 // JwtCheck jwt检查中间件
-func JwtCheck() gin.HandlerFunc {
+func JwtCheck(s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -106,6 +107,17 @@ func JwtCheck() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		a := tokenString
+		b := s.RDB.Get(c, fmt.Sprintf("%d", claims.UserId)).Val()
+		if a != b {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "token无效",
+			})
+			c.Abort()
+			return
+		}
+
 		c.Set("claims", claims)
 		c.Next()
 	}

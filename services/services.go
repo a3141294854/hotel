@@ -23,13 +23,13 @@ func NewDatabase() *Services {
 
 	//访问令牌的
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "127.0.0.1:6379",
 		Password: "",
 		DB:       0,
 	})
 	//刷新令牌的
 	rdb1 := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "127.0.0.1:6379",
 		Password: "",
 		DB:       1,
 	})
