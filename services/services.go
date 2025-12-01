@@ -8,9 +8,11 @@ import (
 )
 
 type Services struct {
-	DB   *gorm.DB
-	RDB  *redis.Client
-	RDB1 *redis.Client
+	DB     *gorm.DB
+	RdbAcc *redis.Client
+	RdbRef *redis.Client
+	RdbCac *redis.Client
+	RdbLim *redis.Client
 }
 
 // NewDatabase 初始化数据库连接
@@ -33,11 +35,25 @@ func NewDatabase() *Services {
 		Password: "",
 		DB:       1,
 	})
+	//实现缓存的
+	rdb2 := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       2,
+	})
+	//限流的
+	rdb3 := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       3,
+	})
 
 	service := Services{
-		DB:   db,
-		RDB:  rdb,
-		RDB1: rdb1,
+		DB:     db,
+		RdbAcc: rdb,
+		RdbRef: rdb1,
+		RdbCac: rdb2,
+		RdbLim: rdb3,
 	}
 	return &service
 }

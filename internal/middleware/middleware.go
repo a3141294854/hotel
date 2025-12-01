@@ -2,67 +2,22 @@ package middleware
 
 import (
 	"fmt"
+
 	"hotel/services"
 	"log"
 	"net"
 	"net/http"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"hotel/internal/util"
 )
 
-// TokenBucketLimiter 令牌桶限流器
-type TokenBucketLimiter struct {
-	Capacity     int           // 桶容量
-	FillRate     time.Duration // 添加令牌速率，如每10ms加1个令牌
-	tokens       int           // 当前令牌数
-	lastFillTime time.Time     // 上次添加令牌时间
-	mutex        sync.Mutex
-}
-
-// NewTokenBucketLimiter 创建新的令牌桶限流器
-func NewTokenBucketLimiter(capacity int, fillRate time.Duration) *TokenBucketLimiter {
-	return &TokenBucketLimiter{
-		Capacity:     capacity,
-		FillRate:     fillRate,
-		tokens:       capacity,
-		lastFillTime: time.Now(),
-	}
-}
-
-// Allow 检查是否允许请求通过，返回布尔值
-func (l *TokenBucketLimiter) Allow() bool {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
-
-	now := time.Now()
-	// 计算应该添加的令牌数
-	elapsed := now.Sub(l.lastFillTime)
-	newTokens := int(elapsed / l.FillRate)
-
-	if newTokens > 0 {
-		l.tokens += newTokens
-		if l.tokens > l.Capacity {
-			l.tokens = l.Capacity
-		}
-		l.lastFillTime = now
-	}
-
-	if l.tokens <= 0 {
-		return false
-	}
-	l.tokens--
-	return true
-}
-
 // RateLimit 限流中间件
-func RateLimit(limiter *TokenBucketLimiter) gin.HandlerFunc {
+func RateLimit(name string, s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !limiter.Allow() {
+		if !util.LimiterAllow(name, s, c) {
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"success": false,
 				"message": "请求过于频繁，请稍后再试",
@@ -99,16 +54,24 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 
 		claims, err := util.ParseAccessToken(tokenString)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"success": false,
-				"message": "token无效",
-			})
-			log.Println("token无效", tokenString)
+
+			if strings.Contains(err.Error(), "token is expired") {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"success": false,
+					"message": "访问令牌已过期",
+				})
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"success": false,
+					"message": "token无效",
+				})
+			}
 			c.Abort()
 			return
 		}
+
 		a := tokenString
-		b := s.RDB.Get(c, fmt.Sprintf("%d", claims.UserId)).Val()
+		b := s.RdbAcc.Get(c, fmt.Sprintf("%d", claims.UserId)).Val()
 		if a != b {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,

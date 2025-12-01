@@ -1,6 +1,7 @@
 package employee_action
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -8,13 +9,13 @@ import (
 	"hotel/services"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 // Add 添加行李
 func Add(c *gin.Context, s *services.Services) {
 
-	// 定义请求结构体，包含guest_name字段
 	type AddRequest struct {
 		GuestName string  `json:"guest_name"`
 		Tag       string  `json:"tag"`
@@ -213,6 +214,8 @@ func Update(c *gin.Context, s *services.Services) {
 	var guest models.Guest
 	s.DB.First(&guest, existingLuggage.GuestID)
 
+	s.RdbCac.Set(c, strconv.Itoa(int(existingLuggage.ID)), guest.Name, time.Minute*15)
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李更新成功",
@@ -241,6 +244,21 @@ func GetName(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	if val, err := s.RdbCac.Get(c, guestName).Result(); err == nil {
+		var luggage []models.Luggage
+		val := json.Unmarshal([]byte(val), &luggage)
+		if val == nil {
+
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"message": "获取行李成功",
+				"data":    luggage,
+				"count":   len(luggage),
+			})
+			return
+		}
+	}
+
 	result := s.DB.Preload("Guest").
 		Joins("JOIN guests ON luggages.guest_id = guests.id").
 		Where("guests.guest_name = ? AND luggages.status = ?", guestName, "寄存中").
@@ -260,6 +278,13 @@ func GetName(c *gin.Context, s *services.Services) {
 			"message": "未找到该客户的行李",
 		})
 		return
+	}
+
+	val, err := json.Marshal(luggage)
+	if err != nil {
+		log.Println("json序列化失败:", err)
+	} else {
+		s.RdbCac.Set(c, guestName, val, time.Minute*15)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -305,6 +330,22 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+
+	if val, err := s.RdbCac.Get(c, guestID).Result(); err == nil {
+		var luggage []models.Luggage
+		val := json.Unmarshal([]byte(val), &luggage)
+		if val == nil {
+
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"message": "获取行李成功",
+				"data":    luggage,
+				"count":   len(luggage),
+			})
+			return
+		}
+	}
+
 	var luggage []models.Luggage
 	result := s.DB.
 		Preload("Guest").
@@ -325,6 +366,13 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 			"message": "未找到该客户的行李",
 		})
 		return
+	}
+
+	val, err := json.Marshal(luggage)
+	if err != nil {
+		log.Println("json序列化失败:", err)
+	} else {
+		s.RdbCac.Set(c, guestID, val, time.Minute*15)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

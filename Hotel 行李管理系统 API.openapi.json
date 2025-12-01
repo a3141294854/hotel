@@ -2,8 +2,8 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供JWT双令牌认证、行李管理和统计功能。支持员工注册、登录、行李增删改查和统计功能。",
-    "version": "2.2.0",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、Redis缓存、行李管理和统计功能。支持员工注册、登录、行李增删改查和统计功能。系统使用Redis三层缓存架构提升性能，包含令牌桶限流和分布式锁机制。",
+    "version": "2.4.0",
     "contact": {
       "name": "Hotel Management System",
       "email": "support@hotel.com"
@@ -575,6 +575,36 @@
                           "example": "前台"
                         }
                       }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "429": {
+            "description": "请求过于频繁",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "请求过于频繁，请稍后再试"
+                    }
+                  }
+                },
+                "examples": {
+                  "1": {
+                    "summary": "限流触发",
+                    "value": {
+                      "success": false,
+                      "message": "请求过于频繁，请稍后再试"
                     }
                   }
                 }
@@ -1382,7 +1412,7 @@
       "post": {
         "summary": "高级查询（多条件组合查询）",
         "deprecated": false,
-        "description": "支持多条件组合查询行李，只有非空字段才会作为查询条件，如果不指定status默认查询寄存中的行李",
+        "description": "支持多条件组合查询行李，只有非空字段才会作为查询条件，如果不指定status默认查询寄存中的行李。此接口支持Redis缓存，缓存时间15分钟，可显著提升查询性能。",
         "tags": [
           "行李查询"
         ],
@@ -1763,6 +1793,46 @@
       }
     }
   },
-  "servers": [],
-  "security": []
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "本地开发服务器"
+    }
+  ],
+  "security": [],
+  "x-extensions": {
+    "cache-system": {
+      "description": "Redis三层缓存架构",
+      "databases": {
+        "RDB": {
+          "db": 0,
+          "purpose": "访问令牌缓存",
+          "description": "存储JWT访问令牌，用于快速验证"
+        },
+        "RDB1": {
+          "db": 1,
+          "purpose": "刷新令牌缓存", 
+          "description": "存储JWT刷新令牌，用于令牌刷新"
+        },
+        "RDB2": {
+          "db": 2,
+          "purpose": "数据缓存",
+          "description": "存储查询结果数据，提升查询性能"
+        }
+      },
+      "cached-endpoints": [
+        {
+          "endpoint": "/employee/get/guest_advance",
+          "cache-duration": "15分钟",
+          "description": "高级查询接口支持Redis缓存"
+        }
+      ],
+      "performance-features": [
+        "减少数据库查询压力",
+        "提升API响应速度",
+        "支持分布式部署",
+        "自动缓存过期管理"
+      ]
+    }
+  }
 }

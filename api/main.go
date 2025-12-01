@@ -1,9 +1,9 @@
 package main
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
+	"hotel/internal/util"
+	"time"
 
 	"hotel/internal/employee_action"
 	"hotel/internal/employee_check"
@@ -16,11 +16,11 @@ func main() {
 	service := services.NewDatabase()
 	table.Table(service.DB)
 
-	limiter := middleware.NewTokenBucketLimiter(10, time.Second)
+	util.NewTokenBucketLimiter("local", 10, time.Second, service)
 
 	r := gin.Default()
 
-	r.Use(middleware.RateLimit(limiter))
+	r.Use(middleware.RateLimit("local", service))
 
 	r.POST("/employee/register", func(c *gin.Context) {
 		employee_check.EmployeeRegister(c, service)
@@ -28,13 +28,13 @@ func main() {
 	r.POST("/employee/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
 	})
+	r.POST("/employee/refresh", func(c *gin.Context) {
+		employee_check.RefreshToken(c, service)
+	})
 
 	e := r.Group("/employee")
 	e.Use(middleware.JwtCheck(service))
 	{
-		e.POST("/refresh", func(c *gin.Context) {
-			employee_check.RefreshToken(c, service)
-		})
 		e.POST("/logout", middleware.AuthCheck(), func(c *gin.Context) {
 			employee_check.EmployeeLogout(c, service)
 		})

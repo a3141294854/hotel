@@ -29,3 +29,10 @@ type Guest struct {
 	ID   uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
 	Name string `json:"name" gorm:"column:guest_name"`
 }
+
+type TokenBucketLimiter struct {
+	Capacity     int           // 桶容量
+	FillRate     time.Duration // 添加令牌速率，如每10ms加1个令牌
+	Tokens       int           // 当前令牌数
+	LastFillTime time.Time     // 上次添加令牌时间
+}
