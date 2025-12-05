@@ -16,6 +16,8 @@ func main() {
 	service := services.NewDatabase()
 	table.Table(service.DB)
 
+	//message_queue.StartTaskProcessor(context.Background(), service)
+
 	util.NewTokenBucketLimiter("local", 10, time.Second, service)
 
 	r := gin.Default()

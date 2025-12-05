@@ -13,6 +13,7 @@ type Services struct {
 	RdbRef *redis.Client
 	RdbCac *redis.Client
 	RdbLim *redis.Client
+	RdbMq  *redis.Client
 }
 
 // NewDatabase 初始化数据库连接
@@ -47,6 +48,12 @@ func NewDatabase() *Services {
 		Password: "",
 		DB:       3,
 	})
+	//消息队列的
+	rdb4 := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       4,
+	})
 
 	service := Services{
 		DB:     db,
@@ -54,6 +61,7 @@ func NewDatabase() *Services {
 		RdbRef: rdb1,
 		RdbCac: rdb2,
 		RdbLim: rdb3,
+		RdbMq:  rdb4,
 	}
 	return &service
 }
