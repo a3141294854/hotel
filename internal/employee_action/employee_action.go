@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// Add 添加行李
-func Add(c *gin.Context, s *services.Services) {
+// AddLuggage 添加行李
+func AddLuggage(c *gin.Context, s *services.Services) {
 
 	type AddRequest struct {
 		GuestName string  `json:"guest_name"`

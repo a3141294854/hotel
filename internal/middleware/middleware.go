@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"hotel/models"
 
 	"hotel/services"
 	"log"
@@ -13,6 +14,22 @@ import (
 
 	"hotel/internal/util"
 )
+
+// CheckAction 检查权限中间件 查询上下文中是否有相应权限
+func CheckAction(name string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		_, ok := c.Get(name)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "没有权限",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
 
 // RateLimit 限流中间件
 func RateLimit(name string, s *services.Services) gin.HandlerFunc {
@@ -86,11 +103,10 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 	}
 }
 
-// AuthCheck 权限检查中间件
-func AuthCheck() gin.HandlerFunc {
+// AuthCheck 存权限的
+func AuthCheck(s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		_, ok := c.Get("claims")
+		claims, ok := c.Get("claims")
 		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
@@ -100,7 +116,14 @@ func AuthCheck() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		e := claims.(*util.AccessClaims)
+		var employee models.Employee
+		s.DB.Model(&models.Employee{}).Preload("Role").Where("id = ?", e.UserId).First(&employee)
+		var role models.Role
+		s.DB.Model(&models.Role{}).Preload("Permissions").Where("id = ?", employee.RoleID).First(&role)
+		for _, v := range role.Permissions {
+			c.Set(v.Name, 1)
+		}
 		c.Next()
 	}
 }

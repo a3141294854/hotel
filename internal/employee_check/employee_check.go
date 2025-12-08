@@ -41,7 +41,8 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	//员工默认角色为1，即普通员工
+	e.RoleID = 1
 	result := s.DB.Create(&e)
 	employee := models.Employee{}
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)

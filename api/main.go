@@ -36,53 +36,78 @@ func main() {
 
 	e := r.Group("/employee")
 	e.Use(middleware.JwtCheck(service))
+	e.Use(middleware.AuthCheck(service))
 	{
-		e.POST("/logout", middleware.AuthCheck(), func(c *gin.Context) {
+		e.POST("/logout", func(c *gin.Context) {
 			employee_check.EmployeeLogout(c, service)
 		})
-		e.POST("/add", middleware.AuthCheck(), func(c *gin.Context) {
-			employee_action.Add(c, service)
-		})
-		e.DELETE("/delete", middleware.AuthCheck(), func(c *gin.Context) {
-			employee_action.Delete(c, service)
-		})
-		e.PUT("/update", middleware.AuthCheck(), func(c *gin.Context) {
-			employee_action.Update(c, service)
-		})
+
+		a := e.Group("/add")
+		a.Use(middleware.CheckAction("创建行李"))
+		{
+			a.POST("/luggage", func(c *gin.Context) {
+				employee_action.AddLuggage(c, service)
+			})
+		}
+
+		d := e.Group("/delete")
+		d.Use(middleware.CheckAction("删除行李"))
+		{
+			d.DELETE("/luggage", func(c *gin.Context) {
+				employee_action.Delete(c, service)
+			})
+		}
+
+		u := e.Group("/update")
+		u.Use(middleware.CheckAction("更新行李"))
+		{
+			u.PUT("/luggage", func(c *gin.Context) {
+				employee_action.Update(c, service)
+			})
+		}
 
 		g := e.Group("/get")
+		g.Use(middleware.CheckAction("查看行李"))
 		{
-			g.GET("/name", middleware.AuthCheck(), func(c *gin.Context) {
+			g.GET("/name", func(c *gin.Context) {
 				employee_action.GetName(c, service)
 			})
-			g.GET("/all", middleware.AuthCheck(), func(c *gin.Context) {
+			g.GET("/all", func(c *gin.Context) {
 				employee_action.GetAll(c, service)
 			})
-			g.GET("/guest_id", middleware.AuthCheck(), func(c *gin.Context) {
+			g.GET("/guest_id", func(c *gin.Context) {
 				employee_action.GetGuestID(c, service)
 			})
-			g.GET("/location", middleware.AuthCheck(), func(c *gin.Context) {
+			g.GET("/location", func(c *gin.Context) {
 				employee_action.GetLocation(c, service)
 			})
-			g.GET("/status", middleware.AuthCheck(), func(c *gin.Context) {
+			g.GET("/status", func(c *gin.Context) {
 				employee_action.GetStatus(c, service)
 			})
-			g.POST("/guest_advance", middleware.AuthCheck(), func(c *gin.Context) {
+			g.POST("/guest_advance", func(c *gin.Context) {
 				employee_action.GetAdvance(c, service)
 			})
 		}
 
 		c := e.Group("/count")
 		{
-			c.GET("/sum", middleware.AuthCheck(), func(c *gin.Context) {
+			c.GET("/sum", func(c *gin.Context) {
 				employee_action.CountSum(c, service)
 			})
-			c.GET("/today", middleware.AuthCheck(), func(c *gin.Context) {
+			c.GET("/today", func(c *gin.Context) {
 				employee_action.CountToday(c, service)
 			})
 		}
 
 	}
+
+	t := r.Group("/tool")
+	{
+		t.POST("/add_permission", func(c *gin.Context) {
+			util.AddPermission(service, c)
+		})
+	}
+
 	middleware.FindIp()
 	r.Run("0.0.0.0:8080")
 

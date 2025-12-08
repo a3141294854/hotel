@@ -10,6 +10,20 @@ type Employee struct {
 	Name     string `json:"name" gorm:"column:name"`
 	User     string `json:"user" gorm:"column:user"`
 	Password string `json:"password" gorm:"column:password"`
+
+	RoleID uint `json:"role_id" gorm:"column:role_id"`
+	Role   Role `gorm:"foreignKey:RoleID"`
+}
+type Role struct {
+	ID   uint   `gorm:"primaryKey;autoIncrement"`
+	Name string `json:"name" gorm:"column:name"`
+
+	Permissions []Permission `gorm:"many2many:role_permission"`
+}
+
+type Permission struct {
+	ID   uint   `gorm:"primaryKey;autoIncrement"`
+	Name string `json:"name" gorm:"column:name"`
 }
 
 type Luggage struct {
