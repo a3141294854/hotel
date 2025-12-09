@@ -1,0 +1,79 @@
+package admin
+
+import (
+	"errors"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"hotel/models"
+	"hotel/services"
+	"log"
+	"net/http"
+)
+
+func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
+	var req struct {
+		EmployeeID uint `json:"employee_id" binding:"required"`
+		RoleID     uint `json:"role_id" binding:"required"`
+	}
+	err := c.ShouldBind(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		log.Println("请求数据格式错误:", err.Error())
+		return
+	}
+
+	var ex1 models.Employee
+	result := s.DB.Model(models.Employee{}).Where("id = ?", req.EmployeeID).First(&ex1)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "员工不存在",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		log.Println("员工数据库查询错误:", result.Error)
+		return
+	}
+
+	var ex2 models.Role
+	result = s.DB.Model(models.Role{}).Where("id = ?", req.RoleID).First(&ex2)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "角色不存在",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		log.Println("角色数据库查询错误:", result.Error)
+		return
+	}
+
+	result = s.DB.Model(models.Employee{}).Where("id = ?", req.EmployeeID).Update("role_id", req.RoleID)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		log.Println("员工角色数据库更新错误:", result.Error)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "角色修改成功",
+	})
+
+}

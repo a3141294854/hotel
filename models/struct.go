@@ -12,7 +12,7 @@ type Employee struct {
 	Password string `json:"password" gorm:"column:password"`
 
 	RoleID uint `json:"role_id" gorm:"column:role_id"`
-	Role   Role `gorm:"foreignKey:RoleID"`
+	Role   Role `json:"role" gorm:"foreignKey:RoleID"`
 }
 type Role struct {
 	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
@@ -38,7 +38,7 @@ type Luggage struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Guest Guest `gorm:"foreignKey:GuestID"`
+	Guest Guest `json:"guest" gorm:"foreignKey:GuestID"`
 }
 type Guest struct {
 	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement;type:int unsigned"`

@@ -26,9 +26,10 @@ func main() {
 
 	r.Use(middleware.RateLimit("local", service))
 
-	r.POST("/employee/register", func(c *gin.Context) {
+	/*r.POST("/employee/register", func(c *gin.Context) {
 		employee_check.EmployeeRegister(c, service)
-	})
+	})*/
+
 	r.POST("/employee/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
 	})
@@ -116,6 +117,12 @@ func main() {
 			a.POST("/role", func(c *gin.Context) {
 				admin.AddRole(service, c)
 			})
+			a.POST("/employee", func(c *gin.Context) {
+				employee_check.EmployeeRegister(c, service)
+			})
+			a.POST("/role_permission", func(c *gin.Context) {
+				admin.AddRolePermission(service, c)
+			})
 		}
 
 		g := t.Group("/get")
@@ -128,6 +135,13 @@ func main() {
 			})
 			g.GET("/role", func(c *gin.Context) {
 				admin.GetAllRole(service, c)
+			})
+		}
+
+		c := t.Group("/change")
+		{
+			c.POST("/employee_role", func(c *gin.Context) {
+				admin.ChangeEmployeeRole(service, c)
 			})
 		}
 
