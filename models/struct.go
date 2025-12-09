@@ -6,7 +6,7 @@ import (
 )
 
 type Employee struct {
-	ID       uint   `gorm:"primaryKey;autoIncrement"`
+	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name     string `json:"name" gorm:"column:name"`
 	User     string `json:"user" gorm:"column:user"`
 	Password string `json:"password" gorm:"column:password"`
@@ -15,24 +15,25 @@ type Employee struct {
 	Role   Role `gorm:"foreignKey:RoleID"`
 }
 type Role struct {
-	ID   uint   `gorm:"primaryKey;autoIncrement"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"column:name"`
 
-	Permissions []Permission `gorm:"many2many:role_permission"`
+	Permissions []Permission `json:"permissions" gorm:"many2many:role_permission"`
 }
 
 type Permission struct {
-	ID   uint   `gorm:"primaryKey;autoIncrement"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"column:name"`
 }
 
 type Luggage struct {
-	ID        uint           `gorm:"primaryKey;autoIncrement"`
-	GuestID   uint           `json:"guest_id" gorm:"column:guest_id"`
-	Tag       string         `json:"tag" gorm:"column:tag"`
-	Weight    float32        `json:"weight" gorm:"column:weight"`
-	Status    string         `json:"status" gorm:"column:status"`
-	Location  string         `json:"location" gorm:"column:location"`
+	ID       uint    `json:"id" gorm:"primaryKey;autoIncrement"`
+	GuestID  uint    `json:"guest_id" gorm:"column:guest_id"`
+	Tag      string  `json:"tag" gorm:"column:tag"`
+	Weight   float32 `json:"weight" gorm:"column:weight"`
+	Status   string  `json:"status" gorm:"column:status"`
+	Location string  `json:"location" gorm:"column:location"`
+
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
@@ -40,7 +41,7 @@ type Luggage struct {
 	Guest Guest `gorm:"foreignKey:GuestID"`
 }
 type Guest struct {
-	ID   uint   `gorm:"primaryKey;autoIncrement;type:int unsigned"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement;type:int unsigned"`
 	Name string `json:"name" gorm:"column:guest_name"`
 }
 

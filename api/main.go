@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"hotel/internal/admin"
 	"hotel/internal/util"
+	"log"
 	"time"
 
 	"hotel/internal/employee_action"
@@ -102,13 +104,40 @@ func main() {
 	}
 
 	t := r.Group("/tool")
+	t.Use(middleware.JwtCheck(service))
+	t.Use(middleware.AuthCheck(service))
+	t.Use(middleware.CheckAction("管理员"))
 	{
-		t.POST("/add_permission", func(c *gin.Context) {
-			util.AddPermission(service, c)
-		})
+		a := t.Group("/add")
+		{
+			a.POST("/permission", func(c *gin.Context) {
+				admin.AddPermission(service, c)
+			})
+			a.POST("/role", func(c *gin.Context) {
+				admin.AddRole(service, c)
+			})
+		}
+
+		g := t.Group("/get")
+		{
+			g.GET("/employee", func(c *gin.Context) {
+				admin.GetAllEmployee(service, c)
+			})
+			g.GET("/permission", func(c *gin.Context) {
+				admin.GetAllPermission(service, c)
+			})
+			g.GET("/role", func(c *gin.Context) {
+				admin.GetAllRole(service, c)
+			})
+		}
+
 	}
 
 	middleware.FindIp()
-	r.Run("0.0.0.0:8080")
+	err := r.Run("0.0.0.0:8080")
+	if err != nil {
+		log.Println("服务器启动失败:", err)
+		return
+	}
 
 }
