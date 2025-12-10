@@ -56,7 +56,7 @@ func main() {
 		d := e.Group("/delete")
 		d.Use(middleware.CheckAction("删除行李"))
 		{
-			d.DELETE("/luggage", func(c *gin.Context) {
+			d.POST("/luggage", func(c *gin.Context) {
 				employee_action.Delete(c, service)
 			})
 		}
@@ -64,7 +64,7 @@ func main() {
 		u := e.Group("/update")
 		u.Use(middleware.CheckAction("更新行李"))
 		{
-			u.PUT("/luggage", func(c *gin.Context) {
+			u.POST("/luggage", func(c *gin.Context) {
 				employee_action.Update(c, service)
 			})
 		}
@@ -142,6 +142,13 @@ func main() {
 		{
 			c.POST("/employee_role", func(c *gin.Context) {
 				admin.ChangeEmployeeRole(service, c)
+			})
+		}
+
+		d := t.Group("/delete")
+		{
+			d.POST("/employee", func(c *gin.Context) {
+				admin.DeleteEmployee(service, c)
 			})
 		}
 

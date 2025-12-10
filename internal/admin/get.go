@@ -65,3 +65,7 @@ func GetAllEmployee(s *services.Services, c *gin.Context) {
 	})
 
 }
+
+func GetEmployee() {
+
+}

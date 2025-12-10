@@ -35,7 +35,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 	var existingEmployee models.Employee
 	result2 := s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
 	if result2.Error == nil { // 如果没有错误，说明找到了用户
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusConflict, gin.H{
 			"success": false,
 			"message": "用户名已存在",
 		})
@@ -47,9 +47,13 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 	employee := models.Employee{}
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "注册失败",
+		})
 		log.Println("插入失败", e.User, result.Error)
 	} else {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "注册成功",
 			"data":    employee,
@@ -79,13 +83,13 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
 				"message": "没有这名员工",
 			})
 			return
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
 				"message": "登录失败",
 			})
@@ -96,7 +100,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 
 	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "登录失败",
 		})
@@ -123,7 +127,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 func EmployeeLogout(c *gin.Context, s *services.Services) {
 	claims, ok := c.Get("claims")
 	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "token无效",
 		})
@@ -156,7 +160,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 
 	claims, err := util.ParseRefreshToken(e.RefreshTokens)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "token无效",
 		})
@@ -165,7 +169,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 
 	refreshToken, err := s.RdbRef.Get(c, fmt.Sprintf("%d", claims.UserId)).Result()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "token无效",
 		})
@@ -173,7 +177,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 	}
 
 	if refreshToken != e.RefreshTokens {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "token无效",
 		})

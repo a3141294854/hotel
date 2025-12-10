@@ -25,7 +25,7 @@ func AddPermission(s *services.Services, c *gin.Context) {
 	var ex models.Permission
 	result := s.DB.Model(models.Permission{}).Where("name = ?", p.Name).First(&ex)
 	if result.Error == nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusConflict, gin.H{
 			"success": false,
 			"message": "权限已存在",
 		})
@@ -64,7 +64,7 @@ func AddRole(s *services.Services, c *gin.Context) {
 	var ex models.Role
 	result := s.DB.Model(models.Role{}).Where("name = ?", r.Name).First(&ex)
 	if result.Error == nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusConflict, gin.H{
 			"success": false,
 			"message": "角色已存在",
 		})
@@ -109,7 +109,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 	result := s.DB.Model(models.Role{}).Where("id = ?", req.RoleID).First(&ex1)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"message": "角色不存在",
 			})
@@ -127,7 +127,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 	result = s.DB.Model(models.Permission{}).Where("id = ?", req.PermissionID).First(&ex2)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"message": "权限不存在",
 			})

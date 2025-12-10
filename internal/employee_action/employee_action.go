@@ -102,7 +102,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 func Delete(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
 		})
@@ -145,7 +145,7 @@ func Delete(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusNoContent, gin.H{
 		"success": true,
 		"message": "行李删除成功",
 	})
