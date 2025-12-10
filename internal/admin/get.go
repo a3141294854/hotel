@@ -48,7 +48,7 @@ func GetAllPermission(s *services.Services, c *gin.Context) {
 
 func GetAllEmployee(s *services.Services, c *gin.Context) {
 	var employees []models.Employee
-	result := s.DB.Model(models.Employee{}).Preload("Role").Find(&employees)
+	result := s.DB.Model(models.Employee{}).Preload("Role").Preload("Role.Permissions").Find(&employees)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

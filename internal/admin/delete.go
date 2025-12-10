@@ -130,7 +130,7 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 
 func DeletePermission(s *services.Services, c *gin.Context) {
 	var req struct {
-		PermissionID uint `json:"permission-id" binding:"required"`
+		PermissionID uint `json:"permission_id" binding:"required"`
 	}
 
 	err := c.ShouldBind(&req)
@@ -145,7 +145,7 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 
 	var ex models.Permission
 	result := s.DB.Model(models.Permission{}).Where("id = ?", req.PermissionID).First(&ex)
-	if result != nil {
+	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
@@ -162,7 +162,7 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 	}
 
 	result = s.DB.Model(models.Permission{}).Delete(&ex)
-	if result != nil {
+	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "内部错误",

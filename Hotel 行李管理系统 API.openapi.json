@@ -3,7 +3,7 @@
   "info": {
     "title": "Hotel 行李管理系统 API",
     "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。新增完整的管理员权限管理功能。",
-    "version": "2.6.2",
+    "version": "2.6.3",
     "contact": {
       "name": "Hotel Management System",
       "email": "support@hotel.com"
@@ -27,92 +27,7 @@
     }
   ],
   "paths": {
-    "/employee/register": {
-      "post": {
-        "summary": "员工注册",
-        "deprecated": false,
-        "description": "注册新员工账号，包含用户名、密码和姓名。系统会检查用户名是否已存在并自动分配员工角色。",
-        "tags": [
-          "认证管理"
-        ],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "user",
-                  "password",
-                  "name"
-                ],
-                "properties": {
-                  "user": {
-                    "type": "string",
-                    "description": "用户名（唯一）",
-                    "minLength": 3,
-                    "maxLength": 50,
-                    "example": "zhangsan"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "密码",
-                    "minLength": 6,
-                    "maxLength": 100,
-                    "example": "123456"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "员工真实姓名",
-                    "minLength": 2,
-                    "maxLength": 50,
-                    "example": "张三"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "注册成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/SuccessResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/Employee"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          },
-          "400": {
-            "description": "注册失败",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": []
-      }
-    },
+
     "/employee/login": {
       "post": {
         "summary": "员工登录",
@@ -378,25 +293,35 @@
       }
     },
     "/employee/delete/luggage": {
-      "delete": {
+      "post": {
         "summary": "删除行李",
         "deprecated": false,
-        "description": "删除指定的行李记录。需要'删除行李'权限。",
+        "description": "删除指定的行李记录。只能删除状态为'寄存中'的行李，删除操作会先将行李状态更新为'已取出'，然后进行软删除。需要'删除行李'权限。",
         "tags": [
           "行李管理"
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "description": "行李ID",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "example": 1
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李ID（必填）",
+                    "minimum": 1,
+                    "example": 1
+                  }
+                }
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "删除成功",
@@ -547,7 +472,7 @@
       }
     },
     "/employee/update/luggage": {
-      "put": {
+      "post": {
         "summary": "更新行李",
         "deprecated": false,
         "description": "更新指定行李记录的信息。需要'更新行李'权限。",
@@ -653,7 +578,7 @@
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "guest_name",
             "in": "query",
             "description": "客户姓名",
             "required": true,
@@ -774,7 +699,7 @@
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "guest_id",
             "in": "query",
             "description": "客户ID",
             "required": true,
