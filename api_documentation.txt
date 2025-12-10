@@ -124,7 +124,7 @@ Authorization: Bearer <access_token>
 ## 🔧 权限管理 API
 
 ### 5. 添加权限
-**POST** `/tool/add_permission`
+**POST** `/tool/add/permission`
 ```json
 请求体:
 {
@@ -161,6 +161,331 @@ Authorization: Bearer <access_token>
 }
 ```
 
+### 6. 添加角色
+**POST** `/tool/add/role`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "name": "行李管理员"        // 角色名称
+}
+
+响应:
+{
+  "success": true,
+  "message": "添加成功",
+  "data": {
+    "id": 1,
+    "name": "行李管理员"
+  }
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "角色已存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 此接口用于添加新的系统角色
+- 角色名称应该具有描述性，如"员工"、"经理"、"管理员"等
+- 需要管理员权限才能访问
+- 重复的角色名称会返回409冲突错误
+```
+
+### 7. 添加角色权限关联
+**POST** `/tool/add/role_permission`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "role_id": 1,              // 角色ID（必填）
+  "permission_id": 1         // 权限ID（必填）
+}
+
+响应:
+{
+  "success": true,
+  "message": "关联成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "角色不存在" 或 "权限不存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 此接口用于为角色分配权限
+- 如果角色已经拥有该权限，GORM会自动处理，不会重复添加
+- 需要管理员权限才能访问
+- 必须提供有效的角色ID和权限ID
+```
+
+### 8. 更改员工角色
+**POST** `/tool/change/employee_role`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "employee_id": 1,           // 员工ID（必填）
+  "role_id": 2                // 新角色ID（必填）
+}
+
+响应:
+{
+  "success": true,
+  "message": "角色修改成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "员工不存在" 或 "角色不存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 此接口用于更改员工的角色
+- 更改会影响员工的权限访问范围
+- 需要管理员权限才能访问
+- 必须提供有效的员工ID和角色ID
+```
+
+### 9. 删除员工
+**POST** `/tool/delete/employee`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "employee_id": 1            // 员工ID（必填）
+}
+
+响应:
+{
+  "success": true,
+  "message": "删除成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "员工不存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 此接口用于删除员工账号（硬删除）
+- 删除后员工无法再登录系统
+- 需要管理员权限才能访问
+- 删除操作不可逆，请谨慎操作
+- 系统会验证员工存在性但缺少删除成功验证
+- 当前未检查result.RowsAffected，可能返回假阳性结果
+```
+
+### 10. 删除角色
+**POST** `/tool/delete/role`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "role_id": 1                // 角色ID（必填）
+}
+
+响应:
+{
+  "success": true,
+  "message": "删除成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "角色不存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 此接口用于删除系统角色
+- 删除角色前会将使用该角色的员工角色ID改为3（硬编码默认角色）
+- 使用事务确保数据一致性
+- 需要管理员权限才能访问
+- 当前实现使用硬编码角色ID，存在潜在风险
+- 删除角色使用Model查询方式而非直接删除已查询的对象
+- 删除角色会自动清理相关权限关联
+- 删除操作不可逆，请谨慎操作
+```
+
+### 11. 删除权限
+**POST** `/tool/delete/permission`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "permission-id": 1            // 权限ID（必填，注意字段名是permission-id而不是permission_id）
+}
+
+响应:
+{
+  "success": true,
+  "message": "删除成功"
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "权限不存在" 或 "请求数据格式错误" 或 "内部错误"
+}
+
+注意:
+- 删除权限时GORM会自动清理role_permission关联表中的相关记录
+- 需要管理员权限才能访问
+- 删除操作不可逆，请谨慎操作
+- 当前实现存在bug：错误判断逻辑不正确（result != nil 应该是 result.Error != nil）
+- 请求字段名为permission-id，与常规下划线命名不一致
+```
+
+### 12. 获取所有员工
+**GET** `/tool/get/employee`
+**需要权限**: "管理员"
+```
+响应:
+{
+  "success": true,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "name": "张三",
+      "user": "zhangsan",
+      "role_id": 2,
+      "role": {
+        "id": 2,
+        "name": "员工"
+      }
+    }
+  ]
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "内部错误"
+}
+
+注意:
+- 返回所有员工信息，包含角色关联信息
+- 需要管理员权限才能访问
+- 数据包含员工的基本信息和角色详情
+```
+
+### 12. 获取所有权限
+**GET** `/tool/get/permission`
+**需要权限**: "管理员"
+```
+响应:
+{
+  "success": true,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "name": "增加行李"
+    },
+    {
+      "id": 2,
+      "name": "更新行李"
+    }
+  ]
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "内部错误"
+}
+
+注意:
+- 返回系统中所有可用的权限列表
+- 需要管理员权限才能访问
+- 用于角色权限分配和管理
+```
+
+### 13. 获取所有角色
+**GET** `/tool/get/role`
+**需要权限**: "管理员"
+```
+响应:
+{
+  "success": true,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "name": "管理员",
+      "permissions": [
+        {
+          "id": 1,
+          "name": "增加行李"
+        },
+        {
+          "id": 2,
+          "name": "更新行李"
+        }
+      ]
+    }
+  ]
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "内部错误"
+}
+
+注意:
+- 返回所有角色信息，包含每个角色对应的权限
+- 需要管理员权限才能访问
+- 展示完整的权限分配情况
+```
+
+### 14. 员工注册
+**POST** `/tool/add/employee`
+**需要权限**: "管理员"
+```json
+请求体:
+{
+  "user": "zhangsan",         // 用户名（必填）
+  "password": "123456",       // 密码（必填）
+  "name": "张三"              // 员工姓名（必填）
+}
+
+响应:
+{
+  "success": true,
+  "message": "注册成功",
+  "data": {
+    "id": 1,
+    "name": "张三",
+    "user": "zhangsan",
+    "role_id": 2,             // 自动分配员工角色ID
+    "role": {
+      "id": 2,
+      "name": "员工",
+      "permissions": [...]     // 员工角色对应的权限
+    }
+  }
+}
+
+失败响应:
+{
+  "success": false,
+  "message": "用户名已存在" 或 "请求数据格式错误"
+}
+
+注意:
+- 此接口需要管理员权限才能使用
+- 新注册用户自动分配"员工"角色
+- 与公开注册接口功能相同，但需要管理员权限
+```
+
 ## 🧳 行李管理 API (需要JWT认证和相应权限)
 
 **认证方式**: 所有行李管理API都需要在请求头中包含有效的Access Token
@@ -171,7 +496,7 @@ Authorization: Bearer <access_token>
 
 **权限控制**: 每个操作都需要相应的权限，系统会自动检查用户角色所包含的权限
 
-### 6. 添加行李
+### 15. 添加行李
 **POST** `/employee/add/luggage`
 **需要权限**: "增加行李"
 ```json
@@ -206,8 +531,8 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 7. 删除行李
-**DELETE** `/employee/delete/luggage`
+### 16. 删除行李
+**POST** `/employee/delete/luggage`
 **需要权限**: "删除行李"
 ```json
 请求体:
@@ -233,8 +558,8 @@ Authorization: Bearer <access_token>
 - 软删除的记录不会出现在普通查询中，但会包含在统计中
 ```
 
-### 8. 更新行李
-**PUT** `/employee/update/update`
+### 17. 更新行李
+**POST** `/employee/update/luggage`
 **需要权限**: "更新行李"
 ```json
 请求体:
@@ -271,7 +596,7 @@ Authorization: Bearer <access_token>
 
 ## 🔍 行李查询 API (需要JWT认证和相应权限)
 
-### 9. 查询行李（按客户姓名）
+### 18. 按客户姓名查询
 **GET** `/employee/get/name?guest_name=张三`
 **需要权限**: "查询行李"
 ```
@@ -317,7 +642,7 @@ Authorization: Bearer <access_token>
 - 返回数据已排除系统时间字段（created_at, updated_at, deleted_at）
 ```
 
-### 10. 查询所有行李
+### 19. 查询所有行李
 **GET** `/employee/get/all`
 **需要权限**: "查询行李"
 ```
@@ -353,7 +678,7 @@ Authorization: Bearer <access_token>
 - 返回数据已排除系统时间字段
 ```
 
-### 11. 查询行李（按客户ID）
+### 20. 按客户ID查询
 **GET** `/employee/get/guest_id?guest_id=1`
 **需要权限**: "查询行李"
 ```
@@ -382,7 +707,7 @@ Authorization: Bearer <access_token>
 - 只返回状态为"寄存中"的行李记录
 ```
 
-### 12. 查询行李（按存放位置）
+### 21. 按存放位置查询
 **GET** `/employee/get/location?location=前台`
 **需要权限**: "查询行李"
 ```
@@ -408,7 +733,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 13. 查询行李（按状态）
+### 22. 按状态查询
 **GET** `/employee/get/status?status=寄存中`
 **需要权限**: "查询行李"
 ```
@@ -438,7 +763,7 @@ Authorization: Bearer <access_token>
 - 支持查询"寄存中"、"已取出"等所有状态
 ```
 
-### 14. 高级查询（多条件组合查询）
+### 23. 高级查询（多条件组合查询）
 **POST** `/employee/get/guest_advance`
 **需要权限**: "查询行李"
 ```json
@@ -482,7 +807,7 @@ Authorization: Bearer <access_token>
 
 **注意**: 统计功能目前不需要特定权限检查，只需要登录认证
 
-### 15. 获取总行李数量
+### 24. 获取总行李数量
 **GET** `/employee/count/sum`
 ```
 响应:
@@ -497,7 +822,7 @@ Authorization: Bearer <access_token>
 - 不包含已取出或已删除的行李
 ```
 
-### 16. 获取今日行李统计
+### 25. 获取今日行李统计
 **GET** `/employee/count/today`
 ```
 响应:
@@ -746,21 +1071,18 @@ go run api/main.go
 
 ```
 /                           # 公开路由（无需认证）
-├── POST /employee/register  # 员工注册
 ├── POST /employee/login     # 员工登录
-├── POST /employee/refresh   # 刷新令牌
-└── /tool                    # 工具路由组
-    └── POST /add_permission # 添加权限
+└── POST /employee/refresh   # 刷新令牌
 
 /employee                   # 需要JWT认证的路由组
 ├── POST /logout           # 员工退出
-├── /add                   # 需要权限：增加行李
+├── /add                   # 需要权限：创建行李
 │   └── POST /luggage      # 添加行李
 ├── /delete                # 需要权限：删除行李
-│   └── DELETE /luggage    # 删除行李
+│   └── POST /luggage      # 删除行李
 ├── /update                # 需要权限：更新行李
-│   └── PUT /update        # 更新行李
-├── /get                   # 需要权限：查询行李
+│   └── POST /luggage      # 更新行李
+├── /get                   # 需要权限：查看行李
 │   ├── GET /name          # 按客户姓名查询
 │   ├── GET /all           # 查询所有行李
 │   ├── GET /guest_id      # 按客户ID查询
@@ -770,6 +1092,22 @@ go run api/main.go
 └── /count                 # 统计功能（无需特定权限）
     ├── GET /sum           # 获取总行李数量
     └── GET /today         # 获取今日统计
+
+/tool                       # 管理员工具路由组（需要JWT认证+管理员权限）
+├── /add                    # 添加功能
+│   ├── POST /permission    # 添加权限
+│   ├── POST /role          # 添加角色
+│   ├── POST /employee      # 员工注册（管理员操作）
+│   └── POST /role_permission # 添加角色权限关联
+├── /get                    # 获取功能
+│   ├── GET /employee       # 获取所有员工
+│   ├── GET /permission     # 获取所有权限
+│   └── GET /role           # 获取所有角色
+├── /change                 # 修改功能
+│   └── POST /employee_role # 更改员工角色
+└── /delete                 # 删除功能
+    ├── POST /employee      # 删除员工
+    └── POST /role          # 删除角色
 ```
 
 ## 🔒 认证和权限中间件
@@ -917,10 +1255,35 @@ localStorage.setItem('access_token', newData.access_token);
 ```
 
 ---
-文档生成时间: 2025-12-08
-项目版本: 2.5.1
+文档生成时间: 2025-12-10
+项目版本: 2.6.2
 
 ## 🔄 更新日志
+
+### v2.6.2 (2025-12-10)
+- 📝 **文档同步**: 根据实际代码实现更新API文档，反映真实状态
+- 🐛 **问题记录**: 记录删除功能中存在的bug和待修复问题
+- 📋 **新增删除权限**: 添加删除权限接口的API文档说明
+- 🔍 **代码审查**: 同步代码分析结果，标注潜在问题点
+
+### v2.6.1 (2025-12-10)
+- 🔧 **删除接口优化**: 修复删除员工和删除角色接口的错误处理
+- 🛡️ **状态码标准化**: 统一使用正确的HTTP状态码（404表示资源不存在）
+- 🔄 **事务处理改进**: 完善删除角色的事务处理，避免硬编码角色ID
+- ✅ **删除验证增强**: 添加删除操作的执行验证，确保数据一致性
+
+### v2.6.0 (2025-12-10)
+- 🔧 **API接口更新**: 根据实际代码实现更新所有API接口，修正HTTP方法和路由
+- 🛠️ **删除功能完善**: 新增删除角色功能，包含完整的事务处理和员工角色迁移
+- 📋 **路由结构同步**: 完全同步main.go中的实际路由配置，包含所有管理员工具接口
+- 🔄 **HTTP方法修正**: 修正删除和更新接口的HTTP方法（DELETE→POST, PUT→POST）
+- 📊 **接口编号重组**: 重新组织所有API接口编号，按功能模块分组
+- 🔍 **OpenAPI文档同步**: 完整更新OpenAPI JSON文档，包含所有管理员工具接口
+- ⚡ **响应格式统一**: 统一所有接口的响应格式，包含success、message和data字段
+- 🔐 **权限要求明确**: 明确标注每个接口所需的权限要求
+- 📈 **数据一致性**: 确保删除角色时的数据完整性，使用事务处理
+- 🛡️ **错误处理优化**: 完善错误处理逻辑，区分不同类型的错误状态码
+- 🔄 **接口描述完善**: 为新增接口添加详细的描述、参数说明和使用示例
 
 ### v2.5.1 (2025-12-08)
 - 📚 **文档全面更新**: 基于最新代码结构完全更新API文档和OpenAPI规范

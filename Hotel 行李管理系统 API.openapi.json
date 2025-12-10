@@ -2,8 +2,8 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。",
-    "version": "2.5.1",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。新增完整的管理员权限管理功能。",
+    "version": "2.6.2",
     "contact": {
       "name": "Hotel Management System",
       "email": "support@hotel.com"
@@ -1515,6 +1515,394 @@
           },
           "500": {
             "description": "内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/role_permission": {
+      "post": {
+        "summary": "添加角色权限关联",
+        "deprecated": false,
+        "description": "为指定角色分配权限。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role_id",
+                  "permission_id"
+                ],
+                "properties": {
+                  "role_id": {
+                    "type": "integer",
+                    "description": "角色ID",
+                    "example": 1
+                  },
+                  "permission_id": {
+                    "type": "integer",
+                    "description": "权限ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "关联成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "关联成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "角色或权限不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求数据格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/change/employee_role": {
+      "post": {
+        "summary": "更改员工角色",
+        "deprecated": false,
+        "description": "更改指定员工的角色。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id",
+                  "role_id"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "integer",
+                    "description": "员工ID",
+                    "example": 1
+                  },
+                  "role_id": {
+                    "type": "integer",
+                    "description": "新角色ID",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "角色修改成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "角色修改成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "员工或角色不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求数据格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/delete/employee": {
+      "post": {
+        "summary": "删除员工",
+        "deprecated": false,
+        "description": "删除指定员工账号（硬删除）。需要'管理员'权限。删除后员工无法再登录系统。系统会检查员工是否存在并验证删除是否成功执行。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "integer",
+                    "description": "员工ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "员工不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求数据格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/delete/role": {
+      "post": {
+        "summary": "删除角色",
+        "deprecated": false,
+        "description": "删除指定的系统角色。需要'管理员'权限。删除角色前会将使用该角色的员工角色ID改为3（硬编码默认角色），使用事务确保数据一致性。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role_id"
+                ],
+                "properties": {
+                  "role_id": {
+                    "type": "integer",
+                    "description": "角色ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "角色不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求数据格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    
+    "/tool/delete/permission": {
+      "post": {
+        "summary": "删除权限",
+        "deprecated": false,
+        "description": "删除指定的系统权限。需要'管理员'权限。由于GORM多对多关系，删除权限时会自动清理role_permission关联表中的相关记录。注意：当前实现存在bug，错误判断逻辑不正确。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "permission-id"
+                ],
+                "properties": {
+                  "permission-id": {
+                    "type": "integer",
+                    "description": "权限ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "权限不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {

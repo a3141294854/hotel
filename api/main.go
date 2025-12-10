@@ -150,6 +150,12 @@ func main() {
 			d.POST("/employee", func(c *gin.Context) {
 				admin.DeleteEmployee(service, c)
 			})
+			d.POST("/role", func(c *gin.Context) {
+				admin.DeleteRole(service, c)
+			})
+			d.POST("/permission", func(c *gin.Context) {
+				admin.DeletePermission(service, c)
+			})
 		}
 
 	}

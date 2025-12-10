@@ -69,6 +69,12 @@ func AddRole(s *services.Services, c *gin.Context) {
 			"message": "角色已存在",
 		})
 		return
+	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		log.Println("角色数据库查询错误:", result.Error)
 	}
 
 	result = s.DB.Create(&r)
