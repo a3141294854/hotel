@@ -1,38 +1,50 @@
 package table
 
 import (
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"hotel/internal/util/logger"
+
 	"hotel/models"
-	"log"
 )
 
 func Table(db *gorm.DB) {
 	err := db.AutoMigrate(&models.Employee{})
 	if err != nil {
-		log.Println("创建员工表失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建员工表失败")
 	}
 
 	err = db.AutoMigrate(&models.Guest{})
 	if err != nil {
-		log.Println("创建客户表失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建客户表失败")
 	}
 
 	err = db.AutoMigrate(&models.Luggage{})
 	if err != nil {
-		log.Println("创建行李表失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建行李表失败")
 	}
 
 	err = db.AutoMigrate(&models.Role{})
 	if err != nil {
-		log.Println("创建角色表失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建角色表失败")
 	}
 
 	err = db.AutoMigrate(&models.Permission{})
 	if err != nil {
-		log.Println("创建权限表失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建权限表失败")
 	}
 
-	log.Println("创建表成功")
+	logger.Logger.Info("数据库表创建成功")
 	/*
 		p1 := models.Permission{
 			Name: "查看行李",

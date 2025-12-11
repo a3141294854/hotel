@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"hotel/services"
-	"log"
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
+	"hotel/internal/util/logger"
+	"hotel/services"
 )
 
 type Task struct {
@@ -75,7 +76,10 @@ func GetTaskStatus(ctx context.Context, s *services.Services, taskID string) (*T
 func UpdateTaskStatus(ctx context.Context, s *services.Services, taskID, status string, result interface{}, errMsg string) {
 	task, err := GetTaskStatus(ctx, s, taskID)
 	if err != nil {
-		log.Println("获取任务失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   err.Error(),
+			"task_id": taskID,
+		}).Error("获取任务失败")
 		return
 	}
 
@@ -91,7 +95,10 @@ func UpdateTaskStatus(ctx context.Context, s *services.Services, taskID, status 
 
 	taskBytes, _ := json.Marshal(task)
 	if err := s.RdbMq.Set(ctx, "task:"+taskID, taskBytes, time.Hour*24).Err(); err != nil {
-		log.Println("更新任务状态失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   err.Error(),
+			"task_id": taskID,
+		}).Error("更新任务状态失败")
 	}
 }
 
@@ -125,7 +132,11 @@ func GetNextTask(ctx context.Context, s *services.Services, group, consumer stri
 	// 确认消息
 	msgID := result[0].Messages[0].ID
 	if err := s.RdbMq.XAck(ctx, "task_queue", group, msgID).Err(); err != nil {
-		log.Println("确认任务消息失败:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error":  err.Error(),
+			"msg_id": msgID,
+			"group":  group,
+		}).Error("确认任务消息失败")
 	}
 
 	return taskID, nil

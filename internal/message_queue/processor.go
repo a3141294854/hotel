@@ -3,29 +3,32 @@ package message_queue
 import (
 	"context"
 	"errors"
-	"hotel/models"
-	"hotel/services"
-	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"hotel/internal/util/logger"
+	"hotel/models"
+	"hotel/services"
 )
 
 // StartTaskProcessor 启动任务处理器
 func StartTaskProcessor(ctx context.Context, s *services.Services) {
-	log.Println("启动任务处理器...")
+	logger.Logger.Info("启动任务处理器")
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
-				log.Println("任务处理器停止")
+				logger.Logger.Info("任务处理器停止")
 				return
 			default:
 				// 获取下一个任务
 				taskID, err := GetNextTask(ctx, s, "processor", "processor_1")
 				if err != nil {
-					log.Println("获取任务失败:", err)
+					logger.Logger.WithFields(logrus.Fields{
+						"error": err,
+					}).Error("获取任务失败")
 					continue
 				}
 
@@ -36,7 +39,9 @@ func StartTaskProcessor(ctx context.Context, s *services.Services) {
 				}
 
 				// 处理任务
-				log.Println("开始处理任务:", taskID)
+				logger.Logger.WithFields(logrus.Fields{
+					"task_id": taskID,
+				}).Info("开始处理任务")
 				ProcessTask(ctx, s, taskID)
 			}
 		}
@@ -73,10 +78,15 @@ func ProcessTask(ctx context.Context, s *services.Services, taskID string) {
 	// 更新任务状态
 	if processErr != nil {
 		UpdateTaskStatus(ctx, s, taskID, "failed", nil, processErr.Error())
-		log.Printf("任务 %s 处理失败: %v", taskID, processErr)
+		logger.Logger.WithFields(logrus.Fields{
+			"task_id": taskID,
+			"error":   processErr,
+		}).Error("任务处理失败")
 	} else {
 		UpdateTaskStatus(ctx, s, taskID, "completed", result, "")
-		log.Printf("任务 %s 处理成功", taskID)
+		logger.Logger.WithFields(logrus.Fields{
+			"task_id": taskID,
+		}).Info("任务处理成功")
 	}
 }
 

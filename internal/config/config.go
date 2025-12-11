@@ -15,6 +15,7 @@ type Config struct {
 	Server       ServerConfig       `yaml:"server"`
 	JWT          JWTConfig          `yaml:"jwt"`
 	RateLimiting RateLimitingConfig `yaml:"rate_limiting"`
+	Log          LogConfig          `yaml:"log"`
 }
 
 // DatabaseConfig 数据库配置
@@ -79,11 +80,20 @@ type location struct {
 	FillRate time.Duration `yaml:"fill_rate"`
 }
 
+type LogConfig struct {
+	Level      string `yaml:"level"`       // 日志等级: debug, info, warn, error, fatal
+	Output     string `yaml:"output"`      // 输出方式: console, file, both
+	FilePath   string `yaml:"file_path"`   // 日志文件路径
+	MaxSize    int    `yaml:"max_size"`    // 单个日志文件最大大小(MB)
+	MaxBackups int    `yaml:"max_backups"` // 保留的旧日志文件数量
+	MaxAge     int    `yaml:"max_age"`     // 保留日志文件的最大天数
+}
+
 // LoadConfig 加载配置文件
 func LoadConfig(configPath string) (*Config, error) {
 	// 默认配置路径
 	if configPath == "" {
-		configPath = "configs/config.yaml"
+		configPath = "configs/dev.yaml"
 	}
 
 	// 检查文件是否存在

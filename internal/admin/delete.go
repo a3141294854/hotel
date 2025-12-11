@@ -2,12 +2,14 @@ package admin
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
-	"log"
-	"net/http"
 )
 
 func DeleteEmployee(s *services.Services, c *gin.Context) {
@@ -21,7 +23,9 @@ func DeleteEmployee(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("请求数据格式错误:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("请求数据格式错误")
 		return
 	}
 	var ex models.Employee
@@ -38,7 +42,10 @@ func DeleteEmployee(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("员工数据库查询错误:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":       result.Error,
+			"employee_id": req.EmployeeID,
+		}).Error("员工数据库查询错误")
 		return
 	}
 
@@ -48,7 +55,10 @@ func DeleteEmployee(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("员工数据库删除错误:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":       result.Error,
+			"employee_id": req.EmployeeID,
+		}).Error("员工数据库删除错误")
 		return
 	}
 
@@ -69,7 +79,9 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("请求数据格式错误:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("请求数据格式错误")
 		return
 	}
 
@@ -87,7 +99,10 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("角色数据库查询错误", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   result.Error,
+			"role_id": req.RoleID,
+		}).Error("角色数据库查询错误")
 		return
 	}
 
@@ -100,7 +115,10 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("员工数据库更新错误", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   result.Error,
+			"role_id": req.RoleID,
+		}).Error("员工数据库更新错误")
 		return
 	}
 	result = tx.Model(models.Role{}).Delete(&ex)
@@ -110,7 +128,10 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("角色数据库删除错误", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   result.Error,
+			"role_id": req.RoleID,
+		}).Error("角色数据库删除错误")
 		return
 	}
 	err = tx.Commit().Error
@@ -119,7 +140,9 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("事务提交错误", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("事务提交错误")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -139,7 +162,9 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("请求数据格式错误:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("请求数据格式错误")
 		return
 	}
 
@@ -157,7 +182,10 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("权限数据库查询错误", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":         result.Error,
+			"permission_id": req.PermissionID,
+		}).Error("权限数据库查询错误")
 		return
 	}
 
@@ -167,7 +195,10 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("权限数据库删除错误", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":         result.Error,
+			"permission_id": req.PermissionID,
+		}).Error("权限数据库删除错误")
 		return
 	}
 

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"hotel/internal/admin"
 	"hotel/internal/config"
 	"hotel/internal/employee_action"
@@ -10,27 +12,31 @@ import (
 	"hotel/internal/middleware"
 	"hotel/internal/table"
 	"hotel/internal/util"
+	"hotel/internal/util/logger"
 	"hotel/services"
-	"log"
 )
 
 func main() {
 	cfg, err := config.LoadConfig("")
 	if err != nil {
-		log.Println("加载配置文件失败:", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("加载配置文件失败")
 		return
 	}
+	logger.InitLogger(cfg.Log.Level, cfg.Log.Output, cfg.Log.FilePath, cfg.Log.MaxSize, cfg.Log.MaxBackups, cfg.Log.MaxAge)
 
 	service := services.NewDatabase(cfg)
 	table.Table(service.DB)
 
 	//message_queue.StartTaskProcessor(context.Background(), service)
-
 	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service)
 	util.ConfigJwt(cfg)
 
 	r := gin.Default()
 
+	r.Use(middleware.RequestIDMiddleware())
+	r.Use(middleware.LogRequest())
 	r.Use(middleware.RateLimit("local", service))
 
 	r.POST("/employee/login", func(c *gin.Context) {
@@ -164,11 +170,16 @@ func main() {
 	}
 
 	middleware.FindIp()
-	log.Println("服务器启动", cfg.Server.Mode)
+	logger.Logger.WithFields(logrus.Fields{
+		"mode": cfg.Server.Mode,
+	}).Info("服务器启动")
 	err = r.Run(cfg.Server.Host + fmt.Sprintf(":%d", cfg.Server.Port))
 
 	if err != nil {
-		log.Println("服务器启动失败:", err, cfg.Server.Mode)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+			"mode":  cfg.Server.Mode,
+		}).Error("服务器启动失败")
 		return
 	}
 

@@ -2,17 +2,18 @@ package middleware
 
 import (
 	"fmt"
-	"hotel/models"
-
-	"hotel/services"
-	"log"
+	"github.com/sirupsen/logrus"
+	"hotel/internal/util/logger"
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
-
+	"github.com/google/uuid"
 	"hotel/internal/util"
+	"hotel/models"
+	"hotel/services"
 )
 
 // CheckAction 检查权限中间件 查询上下文中是否有相应权限
@@ -112,7 +113,9 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 				"success": false,
 				"message": "请先登录",
 			})
-			log.Println("没找到声明")
+			logger.Logger.WithFields(logrus.Fields{
+				"client_ip": c.ClientIP(),
+			}).Warn("JWT令牌中未找到声明")
 			c.Abort()
 			return
 		}
@@ -125,6 +128,47 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 			c.Set(v.Name, 1)
 		}
 		c.Next()
+	}
+}
+
+// RequestIDMiddleware 请求ID中间件
+func RequestIDMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		requestID := c.GetHeader("X-Request-ID")
+		if requestID == "" {
+			requestID = generateRequestID()
+		}
+
+		c.Set("request_id", requestID)
+
+		c.Header("X-Request-ID", requestID)
+
+		c.Next()
+	}
+}
+
+func generateRequestID() string {
+	// 生成UUID v4
+	return uuid.New().String()
+}
+
+// LogRequest 在日志中使用请求ID
+func LogRequest() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+
+		c.Next()
+
+		requestID, _ := c.Get("request_id")
+		logger.Logger.WithFields(logrus.Fields{
+			"request_id": requestID,
+			"method":     c.Request.Method,
+			"path":       c.Request.URL.Path,
+			"status":     c.Writer.Status(),
+			"duration":   time.Since(start),
+		}).Info("请求处理完成")
+
 	}
 }
 

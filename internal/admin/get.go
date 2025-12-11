@@ -1,11 +1,13 @@
 package admin
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
-	"log"
-	"net/http"
 )
 
 func GetAllRole(s *services.Services, c *gin.Context) {
@@ -16,7 +18,9 @@ func GetAllRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("角色数据库查询错误:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("角色数据库查询错误")
 		return
 
 	}
@@ -36,7 +40,9 @@ func GetAllPermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("权限数据库查询错误:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("权限数据库查询错误")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -54,7 +60,9 @@ func GetAllEmployee(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		log.Println("员工数据库查询错误:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("员工数据库查询错误")
 		return
 	}
 

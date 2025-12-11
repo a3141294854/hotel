@@ -3,14 +3,16 @@ package employee_action
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"hotel/models"
-	"hotel/services"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+	"hotel/internal/util/logger"
+	"hotel/models"
+	"hotel/services"
 )
 
 // AddLuggage 添加行李
@@ -30,7 +32,9 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("行李数据绑定错误:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("行李数据绑定错误")
 		return
 	}
 
@@ -48,7 +52,10 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 					"success": false,
 					"message": "创建客户记录失败",
 				})
-				log.Println("创建客户记录失败:", err)
+				logger.Logger.WithFields(logrus.Fields{
+					"error":      err,
+					"guest_name": req.GuestName,
+				}).Error("创建客户记录失败")
 				return
 			}
 		} else {
@@ -57,7 +64,10 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询客户失败",
 			})
-			log.Println("查询客户失败:", result.Error)
+			logger.Logger.WithFields(logrus.Fields{
+				"error":      result.Error,
+				"guest_name": req.GuestName,
+			}).Error("查询客户失败")
 			return
 		}
 	}
@@ -77,11 +87,14 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "添加行李失败",
 		})
-		log.Println("添加行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":    result.Error,
+			"guest_id": guest.ID,
+			"tag":      req.Tag,
+		}).Error("添加行李失败")
 		return
 	}
 
-	// 返回成功响应，包含客户信息
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李添加成功",
@@ -120,7 +133,10 @@ func Delete(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询行李失败",
 			})
-			log.Println("查询行李失败:", err)
+			logger.Logger.WithFields(logrus.Fields{
+				"error":      err,
+				"luggage_id": luggage.ID,
+			}).Error("查询行李失败")
 		}
 		return
 	}
@@ -133,7 +149,10 @@ func Delete(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
-		log.Println("删除行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":      result.Error,
+			"luggage_id": luggage.ID,
+		}).Error("删除行李失败")
 		return
 	}
 
@@ -145,6 +164,7 @@ func Delete(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+
 	c.JSON(http.StatusNoContent, gin.H{
 		"success": true,
 		"message": "行李删除成功",
@@ -159,7 +179,9 @@ func Update(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("行李数据绑定错误:", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("行李数据绑定错误")
 		return
 	}
 
@@ -185,7 +207,10 @@ func Update(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询行李失败",
 			})
-			log.Println("查询行李失败:", err)
+			logger.Logger.WithFields(logrus.Fields{
+				"error":      err,
+				"luggage_id": luggage.ID,
+			}).Error("查询行李失败")
 		}
 		return
 	}
@@ -197,7 +222,10 @@ func Update(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "更新行李失败",
 		})
-		log.Println("更新行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":      result.Error,
+			"luggage_id": luggage.ID,
+		}).Error("更新行李失败")
 		return
 	}
 
@@ -268,7 +296,9 @@ func GetName(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 
@@ -282,7 +312,10 @@ func GetName(c *gin.Context, s *services.Services) {
 
 	val, err := json.Marshal(luggage)
 	if err != nil {
-		log.Println("json序列化失败:", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":      err,
+			"guest_name": guestName,
+		}).Error("JSON序列化失败")
 	} else {
 		s.RdbCac.Set(c, guestName, val, time.Minute*15)
 	}
@@ -307,7 +340,9 @@ func GetAll(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 
@@ -356,7 +391,9 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 
@@ -370,7 +407,10 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 
 	val, err := json.Marshal(luggage)
 	if err != nil {
-		log.Println("json序列化失败:", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"error":    err,
+			"guest_id": guestID,
+		}).Error("JSON序列化失败")
 	} else {
 		s.RdbCac.Set(c, guestID, val, time.Minute*15)
 	}
@@ -404,7 +444,9 @@ func GetLocation(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 
@@ -445,7 +487,9 @@ func GetStatus(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 
@@ -484,7 +528,9 @@ func GetAdvance(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		log.Println("获取行李信息绑定错误", err.Error())
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("获取行李信息绑定错误")
 		return
 	}
 
@@ -525,7 +571,9 @@ func GetAdvance(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		log.Println("获取行李失败:", result.Error)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
 		return
 	}
 

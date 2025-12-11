@@ -3,11 +3,15 @@ package util
 import (
 	"context"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
-	"hotel/models"
-	"hotel/services"
-	"log"
+	"github.com/sirupsen/logrus"
 	"time"
+
+	"github.com/gin-gonic/gin"
+
+	"hotel/models"
+
+	"hotel/internal/util/logger"
+	"hotel/services"
 )
 
 func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, s *services.Services) {
@@ -19,7 +23,10 @@ func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, s 
 	}
 	insert, err := json.Marshal(limiter)
 	if err != nil {
-		log.Println(name, "限流器序列化失败", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"name":  name,
+			"error": err,
+		}).Error("限流器序列化失败")
 		return
 	}
 	s.RdbLim.Set(context.Background(), name, string(insert), 0)
@@ -28,7 +35,10 @@ func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, s 
 func CreatLock(name string, s *services.Services) bool {
 	lock, err := s.RdbLim.SetNX(context.Background(), name+"locked", true, 100*time.Millisecond).Result()
 	if err != nil {
-		log.Println(name, "锁创建失败", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"name":  name,
+			"error": err,
+		}).Error("锁创建失败")
 		return false
 	}
 	if lock {
@@ -51,7 +61,10 @@ func LimiterAllow(Name string, s *services.Services, c *gin.Context) bool {
 	var limiter models.TokenBucketLimiter
 	err := json.Unmarshal([]byte(temp), &limiter)
 	if err != nil {
-		log.Println(Name, "限流器反序列化失败", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"name":  Name,
+			"error": err,
+		}).Error("限流器反序列化失败")
 		return false
 	}
 	now := time.Now()
@@ -68,10 +81,16 @@ func LimiterAllow(Name string, s *services.Services, c *gin.Context) bool {
 
 	insert, err := json.Marshal(limiter)
 	if err != nil {
-		log.Println(Name, "限流器序列化失败", err)
+		logger.Logger.WithFields(logrus.Fields{
+			"name":  Name,
+			"error": err,
+		}).Error("限流器序列化失败")
 		return false
 	}
 	s.RdbLim.Set(c, Name, string(insert), 0)
-	log.Println(Name, "限流器", limiter.Tokens)
+	logger.Logger.WithFields(logrus.Fields{
+		"name":   Name,
+		"tokens": limiter.Tokens,
+	}).Debug("限流器状态")
 	return flag
 }

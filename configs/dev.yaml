@@ -1,0 +1,61 @@
+# 数据库配置
+database:
+  driver: mysql
+  host: 127.0.0.1
+  port: 3306
+  username: root
+  password: "@furenjie321"
+  name: study
+  charset: utf8mb4
+  parse_time: true
+  loc: Local
+
+# Redis配置
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+
+  # Redis数据库配置
+  databases:
+    access_token: 0  # 访问令牌
+    refresh_token: 1  # 刷新令牌
+    cache: 2         # 缓存
+    rate_limit: 3    # 限流
+    message_queue: 4 # 消息队列
+
+# 服务器配置
+server:
+  host: 0.0.0.0
+  port: 8080
+  mode: debug  # debug, release, test
+
+# JWT配置
+jwt:
+  secret_key: "your-super-secret-jwt-key-change-in-production"
+  access_token_duration: 900s  # 15分钟 (秒)
+  refresh_token_duration: 604800s  # 7天 (秒)
+
+# 限流配置
+rate_limiting:
+  # 默认配置（当特定位置未配置时使用）
+  default:
+    name: "local"
+    capacity: 100
+    fill_rate: 10ms
+
+  # 不同位置的限流配置
+  locations:
+    - name: "local"           # 本地API限流
+      capacity: 100
+      fill_rate: 10ms
+
+
+# 日志配置
+logging:
+  level: debug  # debug, info, warn, error, fatal
+  output: both  # console, file, both
+  file_path: logs/app.log
+  max_size: 100  # MB
+  max_backups: 3
+  max_age: 28  # days

@@ -1,68 +1,33 @@
-# Hotel 管理系统 API 文档
+# Hotel 行李管理系统 API 文档
 
 ## 项目概述
 酒店行李管理系统，提供员工认证、权限管理和行李管理功能
 
 ## 基础信息
-- 服务器地址: http://localhost:8080
-- 认证方式: JWT 双令牌认证 (Access Token + Refresh Token)
-- 权限系统: RBAC (基于角色的访问控制)
-- 限流策略: 令牌桶限流，桶容量10个令牌，每秒补充1个令牌
-- 数据库: MySQL (study数据库)
-- Go版本: 1.25.3
+- **服务器地址**: http://localhost:8080
+- **认证方式**: JWT 双令牌认证 (Access Token + Refresh Token)
+- **权限系统**: RBAC (基于角色的访问控制)
+- **限流策略**: 令牌桶限流，桶容量100个令牌，每10ms补充1个令牌
+- **数据库**: MySQL (study数据库)
+- **Redis**: 多数据库分离存储（访问令牌DB0、刷新令牌DB1、缓存DB2、限流DB3）
+- **响应性能**: 登录接口平均响应时间3-10ms
 
 ## 🔐 认证相关 API
 
 ### 1. 员工登录
 **POST** `/employee/login`
-```json
-请求头:
-Authorization: Bearer <access_token>
 
-响应:
-{
-  "success": true,
-  "message": "退出成功"
-}
-
-失败响应:
-{
-  "success": false,
-  "message": "token无效"
-}
-```
-
-### 2. 员工退出
-**POST** `/employee/logout`
-```json
-请求头:
-Authorization: Bearer <access_token>
-
-响应:
-{
-  "success": true,
-  "message": "退出成功"
-}
-
-失败响应:
-{
-  "success": false,
-  "message": "token无效"
-}
-```
-
-### 3. 刷新令牌
-**POST** `/employee/refresh`
 ```json
 请求体:
 {
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "user": "zhangsan",        // 用户名
+  "password": "123456"        // 密码
 }
 
-响应:
+成功响应:
 {
   "success": true,
-  "message": "token刷新成功",
+  "message": "登录成功",
   "data": {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -74,20 +39,34 @@ Authorization: Bearer <access_token>
 失败响应:
 {
   "success": false,
-  "message": "token无效"
+  "message": "用户名或密码错误"
 }
+
+注意:
+- 此接口不需要JWT认证
+- 登录成功后返回双令牌
+- 新用户自动分配"员工"角色
 ```
 
-### 4. 员工退出
-**POST** `/employee/logout`
-```json
-请求头:
-Authorization: Bearer <access_token>
+### 2. 刷新令牌
+**POST** `/employee/refresh`
 
-响应:
+```json
+请求体:
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+成功响应:
 {
   "success": true,
-  "message": "退出成功"
+  "message": "token刷新成功",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expires_in": 900,
+    "token_type": "Bearer"
+  }
 }
 
 失败响应:
@@ -97,24 +76,17 @@ Authorization: Bearer <access_token>
 }
 ```
 
-### 4. 刷新令牌
-**POST** `/employee/refresh`
+### 3. 员工退出
+**POST** `/employee/logout`
+
 ```json
-请求体:
-{
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
+请求头:
+Authorization: Bearer <access_token>
 
 响应:
 {
   "success": true,
-  "message": "token刷新成功",
-  "data": {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "expires_in": 900,         // Access Token 过期时间（秒）
-    "token_type": "Bearer"
-  }
+  "message": "退出成功"
 }
 
 失败响应:
@@ -126,8 +98,11 @@ Authorization: Bearer <access_token>
 
 ## 🔧 权限管理 API
 
-### 5. 添加权限
+**注意**: 以下所有接口都需要JWT认证 + "管理员"权限
+
+### 4. 添加权限
 **POST** `/tool/add/permission`
+
 ```json
 请求体:
 {
@@ -143,30 +118,11 @@ Authorization: Bearer <access_token>
     "name": "查看行李"
   }
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "请求数据格式错误",
-  "data": "具体错误信息"
-}
-
-注意:
-- 此接口用于添加新的系统权限
-- 权限名称应该具有描述性，如"查看行李"、"创建行李"等
-- 通常由系统管理员使用
-- 请求体错误时会在服务端记录详细错误日志
-
-数据模型:
-{
-  "id": 1,
-  "name": "查看行李"
-}
 ```
 
-### 6. 添加角色
+### 5. 添加角色
 **POST** `/tool/add/role`
-**需要权限**: "管理员"
+
 ```json
 请求体:
 {
@@ -182,28 +138,16 @@ Authorization: Bearer <access_token>
     "name": "行李管理员"
   }
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "角色已存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 此接口用于添加新的系统角色
-- 角色名称应该具有描述性，如"员工"、"经理"、"管理员"等
-- 需要管理员权限才能访问
-- 重复的角色名称会返回409冲突错误
 ```
 
-### 7. 添加角色权限关联
+### 6. 添加角色权限关联
 **POST** `/tool/add/role_permission`
-**需要权限**: "管理员"
+
 ```json
 请求体:
 {
-  "role_id": 1,              // 角色ID（必填）
-  "permission_id": 1         // 权限ID（必填）
+  "role_id": 1,              // 角色ID
+  "permission_id": 1         // 权限ID
 }
 
 响应:
@@ -211,28 +155,16 @@ Authorization: Bearer <access_token>
   "success": true,
   "message": "关联成功"
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "角色不存在" 或 "权限不存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 此接口用于为角色分配权限
-- 如果角色已经拥有该权限，GORM会自动处理，不会重复添加
-- 需要管理员权限才能访问
-- 必须提供有效的角色ID和权限ID
 ```
 
-### 8. 更改员工角色
+### 7. 更改员工角色
 **POST** `/tool/change/employee_role`
-**需要权限**: "管理员"
+
 ```json
 请求体:
 {
-  "employee_id": 1,           // 员工ID（必填）
-  "role_id": 2                // 新角色ID（必填）
+  "employee_id": 1,           // 员工ID
+  "role_id": 2                // 新角色ID
 }
 
 响应:
@@ -240,119 +172,40 @@ Authorization: Bearer <access_token>
   "success": true,
   "message": "角色修改成功"
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "员工不存在" 或 "角色不存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 此接口用于更改员工的角色
-- 更改会影响员工的权限访问范围
-- 需要管理员权限才能访问
-- 必须提供有效的员工ID和角色ID
 ```
 
-### 9. 删除员工
-**POST** `/tool/delete/employee`
-**需要权限**: "管理员"
+### 8. 员工注册（管理员操作）
+**POST** `/tool/add/employee`
+
 ```json
 请求体:
 {
-  "employee_id": 1            // 员工ID（必填）
+  "name": "张三",            // 员工姓名
+  "user": "zhangsan",         // 用户名
+  "password": "123456"       // 密码
 }
 
 响应:
 {
   "success": true,
-  "message": "删除成功"
+  "message": "注册成功",
+  "data": {
+    "id": 1,
+    "name": "张三",
+    "user": "zhangsan",
+    "role_id": 1,
+    "role": {
+      "id": 1,
+      "name": "员工"
+    }
+  }
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "员工不存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 此接口用于删除员工账号（硬删除）
-- 删除后员工无法再登录系统
-- 需要管理员权限才能访问
-- 删除操作不可逆，请谨慎操作
-- 系统会验证员工存在性但缺少删除成功验证
-- 当前未检查result.RowsAffected，可能返回假阳性结果
 ```
 
-### 10. 删除角色
-**POST** `/tool/delete/role`
-**需要权限**: "管理员"
-```json
-请求体:
-{
-  "role_id": 1                // 角色ID（必填）
-}
-
-响应:
-{
-  "success": true,
-  "message": "删除成功"
-}
-
-失败响应:
-{
-  "success": false,
-  "message": "角色不存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 此接口用于删除系统角色
-- 删除角色前会将使用该角色的员工角色ID改为3（硬编码默认角色）
-- 使用事务确保数据一致性
-- 需要管理员权限才能访问
-- 当前实现使用硬编码角色ID，存在潜在风险
-- 删除角色使用Model查询方式而非直接删除已查询的对象
-- 删除角色会自动清理相关权限关联
-- 删除操作不可逆，请谨慎操作
-```
-
-### 11. 删除权限
-**POST** `/tool/delete/permission`
-**需要权限**: "管理员"
-```json
-请求体:
-{
-  "permission-id": 1            // 权限ID（必填，注意字段名是permission-id而不是permission_id）
-}
-
-响应:
-{
-  "success": true,
-  "message": "删除成功"
-}
-
-失败响应:
-{
-  "success": false,
-  "message": "权限不存在" 或 "请求数据格式错误" 或 "内部错误"
-}
-
-注意:
-- 删除权限时GORM会自动清理role_permission关联表中的相关记录
-- 需要管理员权限才能访问
-- 删除操作不可逆，请谨慎操作
-- 请求字段名为permission-id，与常规下划线命名不一致
-- ⚠️ **代码Bug**: 当前实现存在严重的错误判断逻辑错误：
-  - 第143行: `if result != nil` 应该是 `if result.Error != nil`
-  - 第161行: `if result != nil` 应该是 `if result.Error != nil`
-  - 这会导致删除操作在数据库操作失败时仍然返回成功
-  - 建议立即修复此安全漏洞
-```
-
-### 12. 获取所有员工
+### 9. 获取所有员工
 **GET** `/tool/get/employee`
-**需要权限**: "管理员"
-```
+
+```json
 响应:
 {
   "success": true,
@@ -362,31 +215,20 @@ Authorization: Bearer <access_token>
       "id": 1,
       "name": "张三",
       "user": "zhangsan",
-      "role_id": 2,
+      "role_id": 1,
       "role": {
-        "id": 2,
+        "id": 1,
         "name": "员工"
       }
     }
   ]
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "内部错误"
-}
-
-注意:
-- 返回所有员工信息，包含角色关联信息
-- 需要管理员权限才能访问
-- 数据包含员工的基本信息和角色详情
 ```
 
-### 13. 获取所有权限
+### 10. 获取所有权限
 **GET** `/tool/get/permission`
-**需要权限**: "管理员"
-```
+
+```json
 响应:
 {
   "success": true,
@@ -394,31 +236,28 @@ Authorization: Bearer <access_token>
   "data": [
     {
       "id": 1,
-      "name": "增加行李"
+      "name": "创建行李"
     },
     {
       "id": 2,
+      "name": "查看行李"
+    },
+    {
+      "id": 3,
       "name": "更新行李"
+    },
+    {
+      "id": 4,
+      "name": "删除行李"
     }
   ]
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "内部错误"
-}
-
-注意:
-- 返回系统中所有可用的权限列表
-- 需要管理员权限才能访问
-- 用于角色权限分配和管理
 ```
 
-### 13. 获取所有角色
+### 11. 获取所有角色
 **GET** `/tool/get/role`
-**需要权限**: "管理员"
-```
+
+```json
 响应:
 {
   "success": true,
@@ -426,71 +265,78 @@ Authorization: Bearer <access_token>
   "data": [
     {
       "id": 1,
-      "name": "管理员",
+      "name": "员工",
       "permissions": [
         {
           "id": 1,
-          "name": "增加行李"
+          "name": "创建行李"
         },
         {
           "id": 2,
-          "name": "更新行李"
+          "name": "查看行李"
         }
       ]
     }
   ]
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "内部错误"
-}
-
-注意:
-- 返回所有角色信息，包含每个角色对应的权限
-- 需要管理员权限才能访问
-- 展示完整的权限分配情况
 ```
 
-### 14. 员工注册
-**POST** `/tool/add/employee`
-**需要权限**: "管理员"
+### 12. 删除员工
+**POST** `/tool/delete/employee`
+
 ```json
-请求头:
-Authorization: Bearer <access_token>
+请求体:
+{
+  "employee_id": 1            // 员工ID
+}
 
 响应:
 {
   "success": true,
-  "message": "退出成功"
+  "message": "删除成功"
 }
-
-失败响应:
-{
-  "success": false,
-  "message": "token无效"
-}
-
-注意:
-- 此接口需要管理员权限才能使用
-- 新注册用户自动分配"员工"角色
-- 与公开注册接口功能相同，但需要管理员权限
 ```
 
-## 🧳 行李管理 API (需要JWT认证和相应权限)
+### 13. 删除角色
+**POST** `/tool/delete/role`
 
-**认证方式**: 所有行李管理API都需要在请求头中包含有效的Access Token
 ```json
-请求头格式:
-Authorization: Bearer <access_token>
+请求体:
+{
+  "role_id": 1                // 角色ID
+}
+
+响应:
+{
+  "success": true,
+  "message": "删除成功"
+}
 ```
 
-**权限控制**: 每个操作都需要相应的权限，系统会自动检查用户角色所包含的权限
+### 14. 删除权限
+**POST** `/tool/delete/permission`
+
+```json
+请求体:
+{
+  "permission_id": 1            // 权限ID
+}
+
+响应:
+{
+  "success": true,
+  "message": "删除成功"
+}
+```
+
+## 🧳 行李管理 API
+
+**注意**: 以下所有接口都需要JWT认证和相应权限
 
 ### 15. 添加行李
-**POST** `/employee/add/luggage`
+**POST** `/employee/add/luggage`  
 **需要权限**: "创建行李"
+
 ```json
 请求体:
 {
@@ -507,7 +353,7 @@ Authorization: Bearer <access_token>
   "message": "行李添加成功",
   "data": {
     "id": 1,
-    "guest_id": 1,           // 系统自动生成的客户ID
+    "guest_id": 1,
     "guest_name": "张三",
     "tag": "红色行李箱",
     "weight": 15.5,
@@ -524,8 +370,9 @@ Authorization: Bearer <access_token>
 ```
 
 ### 16. 删除行李
-**POST** `/employee/delete/luggage`
+**POST** `/employee/delete/luggage`  
 **需要权限**: "删除行李"
+
 ```json
 请求体:
 {
@@ -541,18 +388,14 @@ Authorization: Bearer <access_token>
 失败响应:
 {
   "success": false,
-  "message": "行李记录不存在" 或 "请求数据格式错误"
+  "message": "行李记录不存在"
 }
-
-注意:
-- 只能删除状态为"寄存中"的行李
-- 删除操作会先将行李状态更新为"已取出"，然后进行软删除
-- 软删除的记录不会出现在普通查询中，但会包含在统计中
 ```
 
 ### 17. 更新行李
-**POST** `/employee/update/luggage`
+**POST** `/employee/update/luggage`  
 **需要权限**: "更新行李"
+
 ```json
 请求体:
 {
@@ -577,106 +420,15 @@ Authorization: Bearer <access_token>
     "location": "已取出"
   }
 }
-
-失败响应:
-- 行李记录不存在: {"success": false, "message": "行李记录不存在"}
-- 未提供行李ID: {"success": false, "message": "请提供行李ID"}
-- 没有数据需要更新: {"success": false, "message": "没有数据需要更新"}
-- 请求数据格式错误: {"success": false, "message": "请求数据格式错误"}
-- 权限不足: {"success": false, "message": "没有权限"}
 ```
 
-## 🔍 行李查询 API (需要JWT认证和相应权限)
+## 🔍 行李查询 API
 
 ### 18. 按客户姓名查询
-**GET** `/employee/get/name?guest_name=张三`
-**需要权限**: "查询行李"
-```
-请求参数:
-- guest_name: 客户姓名（必填）
+**GET** `/employee/get/name?guest_name=张三`  
+**需要权限**: "查看行李"
 
-成功响应:
-{
-  "success": true,
-  "message": "行李获取成功",
-  "data": [
-    {
-      "id": 1,
-      "guest_id": 1,
-      "guest_name": "张三",
-      "tag": "红色行李箱",
-      "weight": 15.5,
-      "status": "寄存中",
-      "location": "前台"
-    },
-    {
-      "id": 2,
-      "guest_id": 1,
-      "guest_name": "张三",
-      "tag": "黑色背包",
-      "weight": 8.2,
-      "status": "寄存中",
-      "location": "前台"
-    }
-  ],
-  "count": 2
-}
-
-权限不足响应:
-{
-  "success": false,
-  "message": "没有权限"
-}
-
-注意:
-- 只返回状态为"寄存中"的行李记录
-- 已取出的行李不会出现在查询结果中
-- 返回数据已排除系统时间字段（created_at, updated_at, deleted_at）
-```
-
-### 19. 查询所有行李
-**GET** `/employee/get/all`
-**需要权限**: "查询行李"
-```
-响应:
-{
-  "success": true,
-  "message": "行李获取成功",
-  "data": [
-    {
-      "id": 1,
-      "guest_id": 1,
-      "guest_name": "张三",
-      "tag": "红色行李箱",
-      "weight": 15.5,
-      "status": "寄存中",
-      "location": "前台"
-    },
-    {
-      "id": 3,
-      "guest_id": 2,
-      "guest_name": "李四",
-      "tag": "蓝色手提箱",
-      "weight": 10.0,
-      "status": "寄存中",
-      "location": "前台"
-    }
-  ],
-  "count": 2
-}
-
-注意:
-- 返回所有状态为"寄存中"的行李记录
-- 返回数据已排除系统时间字段
-```
-
-### 20. 按客户ID查询
-**GET** `/employee/get/guest_id?guest_id=1`
-**需要权限**: "查询行李"
-```
-请求参数:
-- guest_id: 客户ID（必填）
-
+```json
 响应:
 {
   "success": true,
@@ -694,18 +446,61 @@ Authorization: Bearer <access_token>
   ],
   "count": 1
 }
+```
 
-注意:
-- 只返回状态为"寄存中"的行李记录
+### 19. 查询所有行李
+**GET** `/employee/get/all`  
+**需要权限**: "查看行李"
+
+```json
+响应:
+{
+  "success": true,
+  "message": "行李获取成功",
+  "data": [
+    {
+      "id": 1,
+      "guest_id": 1,
+      "guest_name": "张三",
+      "tag": "红色行李箱",
+      "weight": 15.5,
+      "status": "寄存中",
+      "location": "前台"
+    }
+  ],
+  "count": 1
+}
+```
+
+### 20. 按客户ID查询
+**GET** `/employee/get/guest_id?guest_id=1`  
+**需要权限**: "查看行李"
+
+```json
+响应:
+{
+  "success": true,
+  "message": "行李获取成功",
+  "data": [
+    {
+      "id": 1,
+      "guest_id": 1,
+      "guest_name": "张三",
+      "tag": "红色行李箱",
+      "weight": 15.5,
+      "status": "寄存中",
+      "location": "前台"
+    }
+  ],
+  "count": 1
+}
 ```
 
 ### 21. 按存放位置查询
-**GET** `/employee/get/location?location=前台`
-**需要权限**: "查询行李"
-```
-请求参数:
-- location: 存放位置（必填）
+**GET** `/employee/get/location?location=前台`  
+**需要权限**: "查看行李"
 
+```json
 响应:
 {
   "success": true,
@@ -726,12 +521,10 @@ Authorization: Bearer <access_token>
 ```
 
 ### 22. 按状态查询
-**GET** `/employee/get/status?status=寄存中`
-**需要权限**: "查询行李"
-```
-请求参数:
-- status: 行李状态（必填）
+**GET** `/employee/get/status?status=寄存中`  
+**需要权限**: "查看行李"
 
+```json
 响应:
 {
   "success": true,
@@ -749,15 +542,12 @@ Authorization: Bearer <access_token>
   ],
   "count": 1
 }
-
-注意:
-- 可以查询任意状态的行李记录，不限制为"寄存中"
-- 支持查询"寄存中"、"已取出"等所有状态
 ```
 
 ### 23. 高级查询（多条件组合查询）
-**POST** `/employee/get/guest_advance`
-**需要权限**: "查询行李"
+**POST** `/employee/get/guest_advance`  
+**需要权限**: "查看行李"
+
 ```json
 请求体:
 {
@@ -786,53 +576,38 @@ Authorization: Bearer <access_token>
   ],
   "count": 1
 }
-
-说明:
-- 支持多条件组合查询，只有非空字段才会作为查询条件
-- 如果不指定status，默认查询状态为"寄存中"的行李
-- 所有条件都是AND关系
-- 适用于复杂的搜索场景
-- 此接口支持Redis缓存，缓存时间15分钟
 ```
 
-## 📊 统计功能 API (需要JWT认证)
+## 📊 统计功能 API
 
-**注意**: 统计功能目前不需要特定权限检查，只需要登录认证
+**注意**: 统计功能只需要JWT认证，无需特定权限
 
 ### 24. 获取总行李数量
 **GET** `/employee/count/sum`
-```
+
+```json
 响应:
 {
   "success": true,
   "message": "行李数量获取成功",
   "count": 25
 }
-
-说明:
-- 只统计状态为"寄存中"的行李数量
-- 不包含已取出或已删除的行李
 ```
 
 ### 25. 获取今日行李统计
 **GET** `/employee/count/today`
-```
+
+```json
 响应:
 {
   "success": true,
   "message": "获取今日统计成功",
   "data": {
-    "date": "2025-11-17",
+    "date": "2025-12-11",
     "today_added": 8,    // 今日新增行李数量
     "today_taken": 3      // 今日取出行李数量
   }
 }
-
-说明:
-- today_added: 今日创建的行李记录数量
-- today_taken: 今日状态更新为"已取出"的行李数量
-- 包含软删除的记录统计
-- 此接口不需要特定权限，只需要JWT认证
 ```
 
 ## 📊 数据模型
@@ -890,95 +665,35 @@ type Guest struct {
 }
 ```
 
-### RefreshToken (刷新令牌表)
-```go
-type RefreshToken struct {
-    UserID    uint      `json:"user_id" gorm:"primaryKey"`
-    UserName  string    `json:"user_name" gorm:"column:user_name"`
-    Token     string    `json:"token" gorm:"column:token;size:255"`
-    CreatedAt time.Time `json:"-"`
-}
-```
-
-## 🔗 权限系统设计
+## 🔒 权限系统设计
 
 ### RBAC权限模型
-系统采用基于角色的访问控制(RBAC)模型：
-
 1. **用户(User)** → **角色(Role)**: 一对多关系
-   - 一个用户只能属于一个角色
-   - 一个角色可以包含多个用户
-
 2. **角色(Role)** → **权限(Permission)**: 多对多关系
-   - 一个角色可以拥有多个权限
-   - 一个权限可以分配给多个角色
-
-### 权限检查流程
-1. 用户请求时，中间件`JwtCheck`验证JWT令牌
-2. `AuthCheck`中间件查询用户角色和权限
-3. 将用户权限存储到Gin上下文中
-4. `CheckAction`中间件检查用户是否具备特定权限
-5. 权限检查通过则执行业务逻辑，否则返回403错误
 
 ### 默认角色和权限
+- **员工**: 创建行李、查看行李、更新行李、删除行李
+- **管理员**: 管理员权限（包含所有员工权限 + 用户管理权限）
 
-系统启动时自动创建以下角色和权限：
+### 权限检查流程
+1. JwtCheck() 验证JWT令牌
+2. AuthCheck() 加载用户权限到上下文  
+3. CheckAction() 检查特定权限
+4. 权限通过则执行业务逻辑
 
-**权限类型**:
-- 查询行李
-- 增加行李  
-- 更新行李
-- 删除行李
+### 权限检查流程
+1. JwtCheck() 验证JWT令牌
+2. AuthCheck() 加载用户权限到上下文
+3. CheckAction() 检查特定权限
+4. 权限通过则执行业务逻辑
 
-**角色类型**:
-- 员工: 具有查询、增加、更新、删除行李权限
-- 经理: 具有所有权限（扩展用）
-- 管理员: 具有所有权限（扩展用）
+## ⚡ 限流配置
 
-### 权限中间件使用
-```go
-// 检查特定权限
-router.Use(middleware.CheckAction("查询行李"))
-router.Use(middleware.CheckAction("增加行李"))
-router.Use(middleware.CheckAction("更新行李"))
-router.Use(middleware.CheckAction("删除行李"))
-```
-
-## 🔗 数据库关系说明
-
-### 外键关联
-- `Employee.role_id` → `Role.id` (多对一关系)
-- `Role.id` ↔ `Permission.id` (多对多关系，通过role_permission中间表)
-- `Luggage.guest_id` → `Guest.id` (一对多关系)
-- 一个客户可以有多个行李记录
-- 客户姓名只存储在Guest表中，避免数据冗余
-
-### 中间表 (role_permission)
-```sql
-CREATE TABLE role_permission (
-    role_id       INT,
-    permission_id INT,
-    PRIMARY KEY (role_id, permission_id)
-);
-```
-
-### 查询优化
-- 使用GORM的Preload功能进行关联查询
-- 支持JOIN查询获取完整的客户信息和权限信息
-- 查询时自动加载关联数据
-
-## 🔒 安全特性
-
-1. **JWT双令牌认证**: 
-   - Access Token: 15分钟有效期，用于API访问
-   - Refresh Token: 7天有效期，用于刷新Access Token
-2. **令牌验证**: 自动验证令牌有效性和用户身份
-3. **权限控制**: 基于RBAC的细粒度权限控制
-4. **限流保护**: 令牌桶限流，每秒最多10个请求
-5. **令牌撤销**: 登出时自动撤销刷新令牌
-6. **三层中间件**: RateLimit()限流 + JwtCheck()认证 + AuthCheck()权限加载 + CheckAction()权限检查
-7. **密钥分离**: Access Token和Refresh Token使用不同的签名密钥
-8. **Redis缓存安全**: 令牌存储在Redis中，支持分布式部署和快速验证
+- **令牌桶容量**: 100个令牌
+- **补充速率**: 每10ms补充1个令牌
+- **每个请求**: 消耗1个令牌
+- **超出限制**: 返回429状态码
+- **锁机制**: Redis分布式锁，锁超时100ms
 
 ## 📈 状态码说明
 
@@ -990,384 +705,20 @@ CREATE TABLE role_permission (
 - `429`: 请求过于频繁
 - `500`: 服务器内部错误
 
-## 🚀 缓存系统
-
-### Redis配置
-系统使用Redis作为缓存层，配置了多个独立的数据库：
-- **RdbAcc (DB 0)**: 用于存储访问令牌
-- **RdbRef (DB 1)**: 用于存储刷新令牌
-- **RdbCac (DB 2)**: 用于数据缓存
-- **RdbLim**: 用于限流器状态存储和分布式锁
-
-### Redis配置注意事项
-在高并发场景下，可能会遇到Redis配置问题：
-```
-MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk.
-```
-
-**解决方案**：
-```bash
-# 临时修复
-redis-cli CONFIG SET stop-writes-on-bgsave-error no
-
-# 永久修复：修改redis.conf
-stop-writes-on-bgsave-error no
-```
-
-**常见原因**：
-- 磁盘空间不足（如Apifox高并发测试占用大量资源）
-- 磁盘权限问题
-- Redis进程无写入权限
-
-### 缓存实现范围
-
-#### 1. 令牌缓存（完整实现）
-- **登录缓存**: 登录成功后将访问令牌和刷新令牌存储到Redis
-- **令牌验证**: JWT中间件验证时会从Redis中获取令牌进行比对
-- **令牌刷新**: 刷新令牌功能会更新Redis中的令牌
-- **令牌撤销**: 退出登录时清除Redis中的令牌
-
-#### 2. 数据缓存（部分实现）
-目前仅在高级查询接口中实现了数据缓存：
-- **GetAdvance接口**: 支持Redis缓存，缓存时间15分钟
-- **缓存策略**: 
-  - 首先尝试从Redis获取数据
-  - 缓存命中直接返回
-  - 缓存未命中从数据库查询并缓存结果
-
-### 缓存特性
-- **高性能**: 减少数据库查询，提升响应速度
-- **数据一致性**: 缓存时间适中，保证数据相对实时
-- **自动管理**: 缓存自动过期，无需手动清理
-
-### 未使用缓存的接口
-以下接口目前未实现缓存，直接查询数据库：
-- 行李的添加、删除、更新操作
-- 按姓名、位置、状态等单一条件查询
-- 统计功能（总数统计、今日统计等）
-- 权限检查相关查询
-
 ## 🚀 启动方式
 
 ```bash
 cd c:/Users/傅仁杰/Desktop/hotel
-# 确保数据库连接配置正确
-# 确保Redis服务已启动
 go run api/main.go
 ```
 
-服务器将在 `http://0.0.0.0:8080` 启动，支持本地和网络访问。
+服务器将在 `http://0.0.0.0:8080` 启动
 
-## 📋 路由结构
-
-根据 `main.go` 的实际配置，API路由结构如下：
-
+### 系统日志示例
 ```
-/                           # 公开路由（无需认证）
-├── POST /employee/login     # 员工登录
-└── POST /employee/refresh   # 刷新令牌
-
-/employee                   # 需要JWT认证的路由组
-├── POST /logout           # 员工退出
-├── /add                   # 需要权限：创建行李
-│   └── POST /luggage      # 添加行李
-├── /delete                # 需要权限：删除行李
-│   └── POST /luggage      # 删除行李
-├── /update                # 需要权限：更新行李
-│   └── POST /luggage      # 更新行李
-├── /get                   # 需要权限：查看行李
-│   ├── GET /name          # 按客户姓名查询
-│   ├── GET /all           # 查询所有行李
-│   ├── GET /guest_id      # 按客户ID查询
-│   ├── GET /location      # 按存放位置查询
-│   ├── GET /status        # 按状态查询
-│   └── POST /guest_advance# 高级查询
-└── /count                 # 统计功能（无需特定权限）
-    ├── GET /sum           # 获取总行李数量
-    └── GET /today         # 获取今日统计
-
-/tool                       # 管理员工具路由组（需要JWT认证+管理员权限）
-├── /add                    # 添加功能
-│   ├── POST /permission    # 添加权限
-│   ├── POST /role          # 添加角色
-│   ├── POST /employee      # 员工注册（管理员操作）
-│   └── POST /role_permission # 添加角色权限关联
-├── /get                    # 获取功能
-│   ├── GET /employee       # 获取所有员工
-│   ├── GET /permission     # 获取所有权限
-│   └── GET /role           # 获取所有角色
-├── /change                 # 修改功能
-│   └── POST /employee_role # 更改员工角色
-└── /delete                 # 删除功能
-    ├── POST /employee      # 删除员工
-    ├── POST /role          # 删除角色
-    └── POST /permission   # 删除权限
+2025/12/11 17:10:52 local 限流器 9
+[GIN] 2025/12/11 - 17:10:52 | 200 |      7.3677ms |             ::1 | POST     "/employee/login"
 ```
-
-## 🔒 认证和权限中间件
-
-系统使用多层中间件进行认证和权限控制：
-
-1. **RateLimit()**: 全局限流中间件，防止过度请求
-2. **JwtCheck()**: JWT令牌验证中间件，验证用户身份
-3. **AuthCheck()**: 权限加载中间件，从数据库加载用户权限到上下文
-4. **CheckAction()**: 权限检查中间件，验证用户是否具备特定权限
-
-## ⚡ 限流配置
-
-- 令牌桶限流器：桶容量10个令牌，每秒补充1个令牌
-- 每个请求消耗1个令牌
-- 超出限制返回429状态码
-- 锁机制：使用Redis分布式锁，锁超时时间100毫秒
-- 高并发优化：建议在高并发场景下减少锁超时时间或使用Lua脚本实现原子操作
-
-## 📁 项目结构
-
-```
-hotel/
-├── api/main.go                        # 主程序入口
-├── models/struct.go                  # 数据模型定义
-├── services/services.go              # 数据库连接服务
-├── internal/
-│   ├── employee_check/employee_check.go  # 员工认证逻辑
-│   ├── employee_action/employee_action.go # 行李操作逻辑
-│   ├── middleware/middleware.go          # 中间件（JWT、限流、权限）
-│   ├── util/util.go                      # JWT工具函数
-│   ├── util/rabc.go                      # 权限管理工具
-│   └── table/table.go                    # 数据库表创建
-├── go.mod                            # 依赖管理
-├── go.sum                            # 依赖版本锁定
-├── api_documentation.txt             # API文档
-└── Hotel 行李管理系统 API.openapi.json # OpenAPI规范文档
-```
-
-## 💡 使用说明
-
-### 权限系统使用
-1. 系统启动时自动创建基础角色和权限
-2. 新注册用户自动分配"员工"角色
-3. 每个API请求都会检查用户权限
-4. 权限不足时返回403错误
-
-### 基本操作流程
-1. 先启动服务器
-2. 注册员工账号（自动分配员工角色）
-3. 登录获取JWT双令牌
-4. 使用Access Token访问API（系统自动检查权限）
-5. Token过期时使用Refresh Token刷新
-6. 登出时撤销所有令牌
-
-### 权限管理
-1. 使用`/tool/add_permission`添加新权限
-2. 在数据库中管理角色权限关联
-3. 修改权限后需要重启服务或清理Redis缓存
-
-## 🚀 高并发测试指南
-
-### 测试注意事项
-在使用Apifox等工具进行高并发测试时，请注意：
-
-1. **系统资源监控**：
-   - 监控磁盘空间使用情况
-   - 监控内存使用情况
-   - 监控Redis连接状态
-
-2. **推荐测试参数**：
-   - 初次测试：1秒10个请求
-   - 压力测试：1秒50个请求
-   - 极限测试：1秒100个请求（需确保系统资源充足）
-
-3. **权限检查优化**：
-   - 高并发下权限查询可能成为瓶颈
-   - 建议使用Redis缓存用户权限信息
-   - 考虑权限预加载或本地缓存策略
-
-4. **常见问题及解决方案**：
-   - **Redis写入失败**：检查磁盘空间，修复Redis配置
-   - **锁竞争激烈**：减少锁超时时间或使用Lua脚本优化
-   - **权限查询慢**：优化数据库查询，添加索引
-
-### 性能优化建议
-
-1. **权限缓存优化**：
-   ```go
-   // 缓存用户权限信息，减少数据库查询
-   cacheKey := fmt.Sprintf("user_perms:%d", userID)
-   // 权限变更时清理缓存
-   ```
-
-2. **限流器优化**：
-   ```go
-   // 减少锁超时时间
-   s.RdbLim.SetNX(context.Background(), name+"locked", true, 1*time.Millisecond)
-   ```
-
-3. **数据库索引优化**：
-   ```sql
-   -- 为权限查询添加索引
-   CREATE INDEX idx_employee_role_id ON employees(role_id);
-   CREATE INDEX idx_role_permission_role_id ON role_permission(role_id);
-   CREATE INDEX idx_role_permission_permission_id ON role_permission(permission_id);
-   ```
-
-## 🔧 JWT令牌使用示例
-
-### JavaScript/前端示例
-```javascript
-// 登录获取令牌
-const loginResponse = await fetch('/employee/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ user: 'zhangsan', password: '123456' })
-});
-const { data } = await loginResponse.json();
-localStorage.setItem('access_token', data.access_token);
-localStorage.setItem('refresh_token', data.refresh_token);
-
-// 使用Access Token访问API（会自动检查权限）
-const apiCall = await fetch('/employee/add/luggage', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-  },
-  body: JSON.stringify({ guest_name: '张三', tag: '红色行李箱' })
-});
-
-if (apiCall.status === 403) {
-  console.log('权限不足');
-}
-
-// 刷新令牌
-const refreshResponse = await fetch('/employee/refresh', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ refresh_token: localStorage.getItem('refresh_token') })
-});
-const { data: newData } = await refreshResponse.json();
-localStorage.setItem('access_token', newData.access_token);
-```
-
 ---
-文档生成时间: 2025-12-10
-项目版本: 2.6.4
-
-## 🔄 更新日志
-
-### v2.6.4 (2025-12-10)
-- 🔧 **API同步更新**: 根据main.go实际代码更新所有API接口
-- 📝 **HTTP方法修正**: 删除和更新接口统一使用POST方法
-- 🔐 **权限名称修正**: 修正权限名称为"创建行李"而非"增加行李"
-- 🗑️ **员工注册移除**: 移除公开的员工注册接口（代码中已注释）
-- 📋 **参数名称修正**: 更新查询接口参数名与代码一致
-- 📚 **文档结构优化**: 重新整理API接口编号和分组结构
-
-### v2.6.3 (2025-12-10)
-- 📝 **文档同步**: 根据实际代码实现更新API文档，反映真实状态
-- 🐛 **问题记录**: 记录删除功能中存在的bug和待修复问题
-- 📋 **新增删除权限**: 添加删除权限接口的API文档说明
-- 🔍 **代码审查**: 同步代码分析结果，标注潜在问题点
-
-### v2.6.1 (2025-12-10)
-- 🔧 **删除接口优化**: 修复删除员工和删除角色接口的错误处理
-- 🛡️ **状态码标准化**: 统一使用正确的HTTP状态码（404表示资源不存在）
-- 🔄 **事务处理改进**: 完善删除角色的事务处理，避免硬编码角色ID
-- ✅ **删除验证增强**: 添加删除操作的执行验证，确保数据一致性
-
-### v2.6.0 (2025-12-10)
-- 🔧 **API接口更新**: 根据实际代码实现更新所有API接口，修正HTTP方法和路由
-- 🛠️ **删除功能完善**: 新增删除角色功能，包含完整的事务处理和员工角色迁移
-- 📋 **路由结构同步**: 完全同步main.go中的实际路由配置，包含所有管理员工具接口
-- 🔄 **HTTP方法修正**: 修正删除和更新接口的HTTP方法（DELETE→POST, PUT→POST）
-- 📊 **接口编号重组**: 重新组织所有API接口编号，按功能模块分组
-- 🔍 **OpenAPI文档同步**: 完整更新OpenAPI JSON文档，包含所有管理员工具接口
-- ⚡ **响应格式统一**: 统一所有接口的响应格式，包含success、message和data字段
-- 🔐 **权限要求明确**: 明确标注每个接口所需的权限要求
-- 📈 **数据一致性**: 确保删除角色时的数据完整性，使用事务处理
-- 🛡️ **错误处理优化**: 完善错误处理逻辑，区分不同类型的错误状态码
-- 🔄 **接口描述完善**: 为新增接口添加详细的描述、参数说明和使用示例
-
-### v2.5.1 (2025-12-08)
-- 📚 **文档全面更新**: 基于最新代码结构完全更新API文档和OpenAPI规范
-- 🔧 **权限管理完善**: 更新AddPermission接口的响应格式，增加完整的错误处理
-- 📊 **响应格式统一**: 统一所有API的响应格式，包含success、message和data字段
-- 🛡️ **错误处理增强**: 完善权限添加接口的错误日志记录和数据验证
-- 📝 **数据模型验证**: 验证所有数据模型定义与实际代码的一致性
-- 🔍 **OpenAPI文档同步**: 确保OpenAPI JSON文档与实际API实现完全匹配
-
-### v2.5.0 (2025-12-08)
-- 🔐 **RBAC权限系统**: 全新实现基于角色的访问控制系统
-- 👥 **角色管理**: 新增员工、经理、管理员三种默认角色
-- 🔧 **权限管理**: 新增细粒度权限控制，支持查询、增加、更新、删除四种权限
-- 🛡️ **中间件升级**: 完善权限检查中间件，支持动态权限验证
-- 📊 **数据库结构**: 新增Role、Permission表和role_permission中间表
-- 🔄 **注册优化**: 新用户注册自动分配员工角色
-- 📝 **文档更新**: 全面更新API文档，包含权限系统说明
-- 🔍 **API新增**: 添加权限管理工具接口
-
-### v2.4.0 (2025-12-01)
-- ⚡ **限流配置优化**: 更新限流器配置说明，桶容量10个令牌，每秒补充1个令牌
-- 🔒 **锁机制说明**: 新增Redis分布式锁机制详细说明
-- 🚀 **高并发优化**: 添加高并发场景下的性能优化建议
-- 🐛 **错误处理改进**: 更新锁创建失败的处理说明和解决方案
-- 📊 **性能分析**: 补充1秒100个请求场景下的性能分析
-
-### v2.3.0 (2025-11-28)
-- 🚀 **缓存系统文档**: 新增Redis缓存系统完整说明
-- 📊 **缓存实现分析**: 详细说明当前缓存实现范围和使用情况
-- 🔧 **缓存配置说明**: 补充Redis三数据库配置和用途说明
-- ⚡ **性能优化说明**: 添加缓存对系统性能提升的说明
-- 🔐 **缓存安全增强**: 补充Redis缓存在安全认证中的作用
-
-### v2.2.0 (2025-11-24)
-- 📚 **文档全面更新**: 基于实际代码完全重写API文档
-- 🔧 **字段精确匹配**: 所有接口字段定义与代码实现完全一致
-- 📝 **数据模型更新**: 使用Go结构体定义展示真实数据模型
-- 🏗️ **项目结构完善**: 详细展示完整的项目目录结构
-- 🔐 **安全特性增强**: 补充JWT密钥分离和双重中间件说明
-- 📊 **依赖信息**: 添加Go版本和主要依赖包信息
-- ✅ **接口验证**: 所有API接口描述经过实际代码验证
-
-### v2.1.1 (2025-11-21)
-- 🔧 **接口文档修复**: 修复删除和更新接口的请求体字段定义
-- 📝 **字段匹配**: 确保所有接口字段与实际代码完全匹配
-- ✅ **状态查询修正**: 修正GetStatus接口的描述，支持查询任意状态
-- 🔄 **请求体完善**: 删除和更新接口支持完整的Luggage结构体字段
-- 📚 **文档同步**: 文档与代码实现保持完全一致
-
-### v2.1.0 (2025-11-21)
-- 🔧 **注册功能修复**: 修复重复用户名检查逻辑错误
-- 📝 **字段完善**: 注册接口新增name字段，支持员工姓名
-- ✅ **验证增强**: 完善注册数据验证和错误处理
-- 🔄 **响应优化**: 注册成功后返回完整的用户信息
-- 🛡️ **安全性提升**: 修复用户ID可能为0的安全隐患
-
-### v2.0.0 (2025-11-20)
-- 🔐 **JWT双令牌认证**: 全面升级认证系统，使用Access Token + Refresh Token
-- 🛡️ **安全性提升**: 替换Session认证，提供更安全的无状态认证
-- ⏰ **令牌管理**: Access Token 15分钟过期，Refresh Token 7天有效期
-- 🔄 **自动刷新**: 支持令牌自动刷新机制
-- 🚫 **令牌撤销**: 登出时自动撤销刷新令牌
-- 📱 **前端友好**: 提供完整的JavaScript使用示例
-- 🔧 **中间件升级**: 新增JWT认证中间件，自动验证令牌
-
-### v1.4.0 (2025-11-19)
-- 🔧 **数据库结构优化**: 移除Luggage表中的冗余GuestName字段
-- 🔗 **外键关联**: 使用标准的外键关系连接Luggage和Guest表
-- ⚡ **查询优化**: 使用GORM Preload功能替代手动JOIN查询
-- 🐛 **表名修正**: 修复查询中的表名错误（luggage → luggages）
-- 📊 **关联查询**: 支持通过客户姓名查询时自动关联客户信息
-- 🛡️ **数据一致性**: 客户姓名统一存储，避免数据不一致问题
-
-### v1.3.0 (2025-11-17)
-- ✅ 新增按客户ID查询行李功能
-- ✅ 新增按存放位置查询行李功能  
-- ✅ 新增按状态查询行李功能
-- ✅ 新增高级多条件组合查询功能
-- ✅ 完善API响应状态码说明
-- ✅ 优化查询逻辑，支持动态条件构建
-
-### v1.2.0
-- ✅ 完善基础CRUD功能
-- ✅ 添加统计功能
-- ✅ 完善错误处理机制
+文档生成时间: 2025-12-11  
+项目版本: 2.8.0

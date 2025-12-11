@@ -28,7 +28,7 @@ redis:
 server:
   host: 0.0.0.0
   port: 8080
-  mode: debug  # debug, release, test
+  mode: release  # debug, release, test
 
 # JWT配置
 jwt:
@@ -49,3 +49,13 @@ rate_limiting:
     - name: "local"           # 本地API限流
       capacity: 100
       fill_rate: 10ms
+
+
+# 日志配置
+logging:
+  level: debug  # debug, info, warn, error, fatal
+  output: both  # console, file, both
+  file_path: logs/app.log
+  max_size: 100  # MB
+  max_backups: 3
+  max_age: 28  # days

@@ -2,11 +2,13 @@ package services
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"hotel/internal/config"
+	"hotel/internal/util/logger"
+
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"hotel/internal/config"
-	"log"
 )
 
 type Services struct {
@@ -23,7 +25,9 @@ func NewDatabase(cfg *config.Config) *Services {
 	dsn := cfg.Database.GetDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Fatal("数据库连接失败")
 	}
 
 	//访问令牌的
