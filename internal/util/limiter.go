@@ -72,6 +72,6 @@ func LimiterAllow(Name string, s *services.Services, c *gin.Context) bool {
 		return false
 	}
 	s.RdbLim.Set(c, Name, string(insert), 0)
-	//log.Println(Name, "限流器", limiter.Tokens)
+	log.Println(Name, "限流器", limiter.Tokens)
 	return flag
 }

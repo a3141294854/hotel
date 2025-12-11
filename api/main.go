@@ -1,34 +1,37 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"hotel/internal/admin"
-	"hotel/internal/util"
-	"log"
-	"time"
-
+	"hotel/internal/config"
 	"hotel/internal/employee_action"
 	"hotel/internal/employee_check"
 	"hotel/internal/middleware"
 	"hotel/internal/table"
+	"hotel/internal/util"
 	"hotel/services"
+	"log"
 )
 
 func main() {
-	service := services.NewDatabase()
+	cfg, err := config.LoadConfig("")
+	if err != nil {
+		log.Println("加载配置文件失败:", err)
+		return
+	}
+
+	service := services.NewDatabase(cfg)
 	table.Table(service.DB)
 
 	//message_queue.StartTaskProcessor(context.Background(), service)
 
-	util.NewTokenBucketLimiter("local", 10, time.Second, service)
+	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service)
+	util.ConfigJwt(cfg)
 
 	r := gin.Default()
 
 	r.Use(middleware.RateLimit("local", service))
-
-	/*r.POST("/employee/register", func(c *gin.Context) {
-		employee_check.EmployeeRegister(c, service)
-	})*/
 
 	r.POST("/employee/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
@@ -161,9 +164,11 @@ func main() {
 	}
 
 	middleware.FindIp()
-	err := r.Run("0.0.0.0:8080")
+	log.Println("服务器启动", cfg.Server.Mode)
+	err = r.Run(cfg.Server.Host + fmt.Sprintf(":%d", cfg.Server.Port))
+
 	if err != nil {
-		log.Println("服务器启动失败:", err)
+		log.Println("服务器启动失败:", err, cfg.Server.Mode)
 		return
 	}
 

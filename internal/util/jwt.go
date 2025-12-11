@@ -4,10 +4,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+
+	"hotel/internal/config"
 )
 
-var AccessSecret = []byte("hotel_access_secret_key_2025_jwt")
-var RefreshSecret = []byte("hotel_refresh_secret_key_2025_jwt")
+var Secret []byte
+
+var AccessExpireTime time.Duration
+var RefreshExpireTime time.Duration
 
 type AccessClaims struct {
 	UserId   uint   `json:"user_id"`
@@ -21,17 +25,23 @@ type RefreshClaims struct {
 	jwt.RegisteredClaims
 }
 
+func ConfigJwt(cfg *config.Config) {
+	Secret = []byte(cfg.JWT.SecretKey)
+	AccessExpireTime = cfg.JWT.AccessTokenDuration
+	RefreshExpireTime = cfg.JWT.RefreshTokenDuration
+}
+
 // GenerateAccessToken 生成访问令牌
 func GenerateAccessToken(userId uint, userName string) (string, error) {
 	claims := AccessClaims{
 		UserId:   userId,
 		UserName: userName,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 5)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessExpireTime)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(AccessSecret)
+	tokenString, err := token.SignedString(Secret)
 	if err != nil {
 		return "", err
 	}
@@ -45,11 +55,11 @@ func GenerateRefreshToken(userId uint, userName string) (string, error) {
 		UserId:   userId,
 		UserName: userName,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(RefreshExpireTime)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(RefreshSecret)
+	tokenString, err := token.SignedString(Secret)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +83,7 @@ func GenerateTokenPair(userId uint, userName string) (accessToken string, refres
 // ParseAccessToken 解析访问令牌
 func ParseAccessToken(tokenString string) (*AccessClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &AccessClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return AccessSecret, nil
+		return Secret, nil
 	})
 	if err != nil {
 		return nil, err
@@ -88,7 +98,7 @@ func ParseAccessToken(tokenString string) (*AccessClaims, error) {
 // ParseRefreshToken 解析刷新令牌
 func ParseRefreshToken(tokenString string) (*RefreshClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return RefreshSecret, nil
+		return Secret, nil
 	})
 	if err != nil {
 		return nil, err
