@@ -24,6 +24,8 @@ type Role struct {
 type Permission struct {
 	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name string `json:"name" gorm:"column:name"`
+
+	Roles []Role `json:"roles" gorm:"many2many:role_permission"`
 }
 
 type Luggage struct {

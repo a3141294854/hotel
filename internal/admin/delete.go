@@ -108,6 +108,20 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 
 	tx := s.DB.Begin()
 
+	err = tx.Model(&ex).Association("Permissions").Clear()
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error":   err,
+			"role_id": req.RoleID,
+		}).Error("员工数据库更新错误")
+		return
+	}
+
 	result = tx.Model(models.Employee{}).Where("role_id = ?", req.RoleID).Update("role_id", 3)
 	if result.Error != nil {
 		tx.Rollback()
@@ -189,12 +203,29 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 		return
 	}
 
-	result = s.DB.Model(models.Permission{}).Delete(&ex)
-	if result.Error != nil {
+	tx := s.DB.Begin()
+
+	err = tx.Model(&ex).Association("Roles").Clear()
+	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "内部错误",
 		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error":         err,
+			"permission_id": req.PermissionID,
+		}).Error("员工数据库更新错误")
+		return
+	}
+	result = tx.Model(models.Permission{}).Delete(&ex)
+	if result.Error != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+
 		logger.Logger.WithFields(logrus.Fields{
 			"error":         result.Error,
 			"permission_id": req.PermissionID,
@@ -202,6 +233,17 @@ func DeletePermission(s *services.Services, c *gin.Context) {
 		return
 	}
 
+	err = tx.Commit().Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("事务提交错误")
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "删除成功",

@@ -2,8 +2,8 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。新增完整的管理员权限管理功能。",
-    "version": "2.6.3",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。",
+    "version": "2.5.1",
     "contact": {
       "name": "Hotel Management System",
       "email": "support@hotel.com"
@@ -27,7 +27,6 @@
     }
   ],
   "paths": {
-
     "/employee/login": {
       "post": {
         "summary": "员工登录",
@@ -58,6 +57,10 @@
                     "example": "123456"
                   }
                 }
+              },
+              "example": {
+                "user": "zhangsan",
+                "password": "123456"
               }
             }
           },
@@ -292,72 +295,11 @@
         ]
       }
     },
-    "/employee/delete/luggage": {
-      "post": {
-        "summary": "删除行李",
-        "deprecated": false,
-        "description": "删除指定的行李记录。只能删除状态为'寄存中'的行李，删除操作会先将行李状态更新为'已取出'，然后进行软删除。需要'删除行李'权限。",
-        "tags": [
-          "行李管理"
-        ],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "id"
-                ],
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "行李ID（必填）",
-                    "minimum": 1,
-                    "example": 1
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "删除成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
-                }
-              }
-            },
-            "headers": {}
-          },
-          "403": {
-            "description": "权限不足",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/employee/update/update": {
+    "/employee/update/luggage": {
       "put": {
         "summary": "更新行李",
         "deprecated": false,
-        "description": "更新行李信息，需要提供行李ID。系统会验证记录是否存在，然后更新指定的字段。需要'更新行李'权限。",
+        "description": "更新指定行李记录的信息。需要'更新行李'权限。",
         "tags": [
           "行李管理"
         ],
@@ -373,35 +315,33 @@
                 "properties": {
                   "id": {
                     "type": "integer",
-                    "description": "行李ID（必填）",
-                    "minimum": 1,
+                    "description": "行李ID",
                     "example": 1
                   },
-                  "status": {
+                  "guest_name": {
                     "type": "string",
-                    "description": "行李状态（可选）",
-                    "enum": [
-                      "寄存中",
-                      "已取出",
-                      "丢失"
-                    ],
-                    "example": "已取出"
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "行李位置（可选）",
-                    "example": "已取出"
+                    "description": "客户姓名",
+                    "example": "张三"
                   },
                   "tag": {
                     "type": "string",
-                    "description": "行李标签（可选）",
-                    "example": "新标签"
+                    "description": "行李标签",
+                    "example": "红色行李箱"
                   },
                   "weight": {
                     "type": "number",
-                    "description": "行李重量（可选）",
-                    "minimum": 0,
-                    "example": 12.5
+                    "description": "行李重量",
+                    "example": 15.5
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态",
+                    "example": "已取件"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "存放位置",
+                    "example": "前台"
                   }
                 }
               }
@@ -433,31 +373,12 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求参数错误",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "success": false,
-                  "message": "请提供行李ID"
-                }
-              }
-            },
-            "headers": {}
-          },
           "403": {
             "description": "权限不足",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "success": false,
-                  "message": "没有权限"
                 }
               }
             },
@@ -469,9 +390,7 @@
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/employee/update/luggage": {
+      },
       "post": {
         "summary": "更新行李",
         "deprecated": false,
@@ -544,6 +463,67 @@
                       }
                     }
                   ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "权限不足",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/delete/luggage": {
+      "post": {
+        "summary": "删除行李",
+        "deprecated": false,
+        "description": "删除指定的行李记录。只能删除状态为'寄存中'的行李，删除操作会先将行李状态更新为'已取出'，然后进行软删除。需要'删除行李'权限。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李ID（必填）",
+                    "minimum": 1,
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             },
@@ -1060,6 +1040,102 @@
         ]
       }
     },
+    "/tool/add/employee": {
+      "post": {
+        "summary": "员工注册",
+        "deprecated": false,
+        "description": "注册新员工账号，包含用户名、密码和姓名。系统会检查用户名是否已存在并自动分配员工角色。",
+        "tags": [
+          "管理员工具",
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user",
+                  "password",
+                  "name"
+                ],
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "用户名（唯一）",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "example": "zhangsan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "minLength": 6,
+                    "maxLength": 100,
+                    "example": "123456"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "员工真实姓名",
+                    "minLength": 2,
+                    "maxLength": 50,
+                    "example": "张三"
+                  }
+                }
+              },
+              "example": {
+                "user": "zhangsan",
+                "password": "123456",
+                "name": "张三"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "注册失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/tool/add/permission": {
       "post": {
         "summary": "添加权限",
@@ -1086,6 +1162,9 @@
                     "example": "查看行李"
                   }
                 }
+              },
+              "example": {
+                "name": "测试"
               }
             }
           },
@@ -1326,6 +1405,17 @@
           "管理员工具"
         ],
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              },
+              "example": ""
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "获取成功",
@@ -1508,8 +1598,8 @@
             },
             "headers": {}
           },
-          "404": {
-            "description": "角色或权限不存在",
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {
@@ -1519,8 +1609,8 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求数据格式错误",
+          "404": {
+            "description": "角色或权限不存在",
             "content": {
               "application/json": {
                 "schema": {
@@ -1589,8 +1679,8 @@
             },
             "headers": {}
           },
-          "404": {
-            "description": "员工或角色不存在",
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {
@@ -1600,8 +1690,8 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求数据格式错误",
+          "404": {
+            "description": "员工或角色不存在",
             "content": {
               "application/json": {
                 "schema": {
@@ -1664,8 +1754,8 @@
             },
             "headers": {}
           },
-          "404": {
-            "description": "员工不存在",
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {
@@ -1675,8 +1765,8 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求数据格式错误",
+          "404": {
+            "description": "员工不存在",
             "content": {
               "application/json": {
                 "schema": {
@@ -1739,8 +1829,8 @@
             },
             "headers": {}
           },
-          "404": {
-            "description": "角色不存在",
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {
@@ -1750,8 +1840,8 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求数据格式错误",
+          "404": {
+            "description": "角色不存在",
             "content": {
               "application/json": {
                 "schema": {
@@ -1769,7 +1859,6 @@
         ]
       }
     },
-    
     "/tool/delete/permission": {
       "post": {
         "summary": "删除权限",
@@ -1794,6 +1883,9 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "permission-id": 6
               }
             }
           },
@@ -1815,8 +1907,8 @@
             },
             "headers": {}
           },
-          "404": {
-            "description": "权限不存在",
+          "400": {
+            "description": "请求数据格式错误",
             "content": {
               "application/json": {
                 "schema": {
@@ -1826,8 +1918,8 @@
             },
             "headers": {}
           },
-          "400": {
-            "description": "请求数据格式错误",
+          "404": {
+            "description": "权限不存在",
             "content": {
               "application/json": {
                 "schema": {
@@ -1955,10 +2047,6 @@
             "type": "integer",
             "description": "客户ID"
           },
-          "guest_name": {
-            "type": "string",
-            "description": "客户姓名"
-          },
           "tag": {
             "type": "string",
             "description": "行李标签"
@@ -1979,7 +2067,6 @@
         "required": [
           "id",
           "guest_id",
-          "guest_name",
           "tag"
         ]
       },

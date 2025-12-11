@@ -178,6 +178,9 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "token无效",
 		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("JWT token解析错误")
 		return
 	}
 
@@ -200,10 +203,13 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 
 	accessToken, refreshToken, err := util.GenerateTokenPair(claims.UserId, claims.UserName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"message": "token无效",
+			"message": "内部错误",
 		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("JWT token生成错误")
 		return
 	}
 	s.RdbAcc.Set(c, fmt.Sprintf("%d", claims.UserId), accessToken, 5*time.Minute)

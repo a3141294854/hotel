@@ -149,6 +149,7 @@ func Delete(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
+
 		logger.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
@@ -165,7 +166,7 @@ func Delete(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李删除成功",
 	})
@@ -175,10 +176,12 @@ func Delete(c *gin.Context, s *services.Services) {
 func Update(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
 		})
+
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("行李数据绑定错误")
@@ -187,6 +190,7 @@ func Update(c *gin.Context, s *services.Services) {
 
 	// 检查ID是否提供
 	if luggage.ID == 0 {
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请提供行李ID",
@@ -203,10 +207,12 @@ func Update(c *gin.Context, s *services.Services) {
 				"message": "行李记录不存在",
 			})
 		} else {
+
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "查询行李失败",
 			})
+
 			logger.Logger.WithFields(logrus.Fields{
 				"error":      err,
 				"luggage_id": luggage.ID,
