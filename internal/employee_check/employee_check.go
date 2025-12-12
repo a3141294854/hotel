@@ -3,9 +3,6 @@ package employee_check
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -13,6 +10,7 @@ import (
 	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
+	"net/http"
 )
 
 // EmployeeRegister 员工注册
@@ -120,8 +118,8 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	s.RdbAcc.Set(c, fmt.Sprintf("%d", user.ID), accessToken, 5*time.Minute)
-	s.RdbRef.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, 24*time.Hour)
+	s.RdbAcc.Set(c, fmt.Sprintf("%d", user.ID), accessToken, util.AccessExpireTime)
+	s.RdbRef.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, util.RefreshExpireTime)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -212,8 +210,8 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		}).Error("JWT token生成错误")
 		return
 	}
-	s.RdbAcc.Set(c, fmt.Sprintf("%d", claims.UserId), accessToken, 5*time.Minute)
-	s.RdbRef.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, 24*time.Hour)
+	s.RdbAcc.Set(c, fmt.Sprintf("%d", claims.UserId), accessToken, util.AccessExpireTime)
+	s.RdbRef.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, util.RefreshExpireTime)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

@@ -19,9 +19,7 @@ import (
 func main() {
 	cfg, err := config.LoadConfig("")
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
-			"error": err,
-		}).Error("加载配置文件失败")
+		fmt.Println("配置文件加载失败:", err.Error())
 		return
 	}
 	logger.InitLogger(cfg.Log.Level, cfg.Log.Output, cfg.Log.FilePath, cfg.Log.MaxSize, cfg.Log.MaxBackups, cfg.Log.MaxAge)

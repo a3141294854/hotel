@@ -40,6 +40,9 @@ func RateLimit(name string, s *services.Services) gin.HandlerFunc {
 				"success": false,
 				"message": "请求过于频繁，请稍后再试",
 			})
+			logger.Logger.WithFields(logrus.Fields{
+				"client_ip": c.ClientIP(),
+			}).Warn("请求过于频繁")
 			c.Abort()
 			return
 		}
@@ -148,6 +151,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
+// generateRequestID() 上面的id
 func generateRequestID() string {
 	// 生成UUID v4
 	return uuid.New().String()
@@ -161,12 +165,13 @@ func LogRequest() gin.HandlerFunc {
 		c.Next()
 
 		requestID, _ := c.Get("request_id")
+		duration := time.Since(start)
 		logger.Logger.WithFields(logrus.Fields{
 			"request_id": requestID,
 			"method":     c.Request.Method,
 			"path":       c.Request.URL.Path,
 			"status":     c.Writer.Status(),
-			"duration":   time.Since(start),
+			"duration":   duration.String(),
 		}).Info("请求处理完成")
 
 	}

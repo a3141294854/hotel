@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -38,7 +39,10 @@ func InitLogger(logLevel, output, filePath string, maxSize, maxBackups, maxAge i
 		//0755 是权限设置，表示所有者有读写执行权限，组和其他用户有读执行权限
 		dir := filepath.Dir(filePath)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			os.MkdirAll(dir, 0755)
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				fmt.Println("创建日志目录失败:", err.Error())
+			}
 		}
 
 		// 日志轮转
@@ -59,7 +63,10 @@ func InitLogger(logLevel, output, filePath string, maxSize, maxBackups, maxAge i
 		// 同时输出到文件和控制台
 		dir := filepath.Dir(filePath)
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			os.MkdirAll(dir, 0755)
+			err = os.MkdirAll(dir, 0755)
+			if err != nil {
+				fmt.Println("创建日志目录失败:", err.Error())
+			}
 		}
 
 		fileWriter := &lumberjack.Logger{

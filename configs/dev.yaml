@@ -52,7 +52,7 @@ rate_limiting:
 
 
 # 日志配置
-logging:
+log:
   level: debug  # debug, info, warn, error, fatal
   output: both  # console, file, both
   file_path: logs/app.log
