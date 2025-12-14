@@ -44,6 +44,27 @@ func Table(db *gorm.DB) {
 		}).Error("创建权限表失败")
 	}
 
+	err = db.AutoMigrate(&models.Location{})
+	if err != nil {
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建位置表失败")
+	}
+
+	err = db.AutoMigrate(&models.LuggageStorage{})
+	if err != nil {
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建行李存储表失败")
+	}
+
+	err = db.AutoMigrate(&models.Hotel{})
+	if err != nil {
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建酒店表失败")
+	}
+
 	logger.Logger.Info("数据库表创建成功")
 	/*
 		p1 := models.Permission{
@@ -58,16 +79,24 @@ func Table(db *gorm.DB) {
 		p4 := models.Permission{
 			Name: "删除行李",
 		}
+		p5 := models.Permission{
+			Name: "管理员",
+		}
 		db.Create(&p1)
 		db.Create(&p2)
 		db.Create(&p3)
 		db.Create(&p4)
+		db.Create(&p5)
 
 		insert := models.Role{
 			Name:        "员工",
 			Permissions: []models.Permission{p1, p2, p3, p4},
 		}
 		db.Create(&insert)
-
+		insert = models.Role{
+			Name:        "管理员",
+			Permissions: []models.Permission{p1, p2, p3, p4, p5},
+		}
+		db.Create(&insert)
 	*/
 }

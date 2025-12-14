@@ -22,7 +22,7 @@ redis:
     refresh_token: 1  # 刷新令牌
     cache: 2         # 缓存
     rate_limit: 3    # 限流
-    message_queue: 4 # 消息队列
+    random: 4 # 随机数
 
 # 服务器配置
 server:

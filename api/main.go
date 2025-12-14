@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"hotel/internal/employee/employee_action"
+	"hotel/internal/employee/employee_check"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"hotel/internal/admin"
 	"hotel/internal/config"
-	"hotel/internal/employee_action"
-	"hotel/internal/employee_check"
 	"hotel/internal/middleware"
 	"hotel/internal/table"
 	"hotel/internal/util"
@@ -27,7 +27,6 @@ func main() {
 	service := services.NewDatabase(cfg)
 	table.Table(service.DB)
 
-	//message_queue.StartTaskProcessor(context.Background(), service)
 	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service)
 	util.ConfigJwt(cfg)
 

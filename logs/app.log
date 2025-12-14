@@ -507,3 +507,102 @@
 {"duration":"2.2128ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"07e092ae-7203-4cf2-84f2-38ca04ba66e5","status":200,"time":"2025-12-12 10:41:56"}
 {"duration":"2.7664ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"ccaf6464-f747-4160-a860-85a05d2f5a18","status":200,"time":"2025-12-12 10:41:56"}
 {"duration":"2.9655ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"c059ec64-dcd9-4496-868d-e0a9084c8801","status":200,"time":"2025-12-12 10:41:56"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 16:04:28"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 16:04:30"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 17:48:47"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 17:48:49"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 17:49:07","tokens":99}
+{"duration":"6.9659ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"612bd7e1-1476-4603-9446-40457b8d3d07","status":401,"time":"2025-12-14 17:49:07"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 17:51:53"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 17:51:53"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 17:52:04","tokens":99}
+{"duration":"2.0004ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"6b341ee0-5894-4702-8a74-14f4802cd6ff","status":401,"time":"2025-12-14 17:52:04"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 17:52:06","tokens":99}
+{"duration":"2.3911ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"9313a618-4c56-4e04-b550-faeeb7510e9d","status":401,"time":"2025-12-14 17:52:06"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 17:55:40"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 17:55:42"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 17:59:25"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 17:59:27"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 18:01:48"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 18:01:50"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 18:02:03","tokens":99}
+{"duration":"5.0003ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"f33fefa5-0237-475a-8ef2-16cad3c2890b","status":200,"time":"2025-12-14 18:02:03"}
+{"error":"failed to parse field: LuggageStorage, error: failed to parse field: PhotoUrl, error: unsupported data type: \u0026[]","level":"error","msg":"创建行李表失败","time":"2025-12-14 21:15:35"}
+{"error":"failed to parse field: PhotoUrl, error: unsupported data type: \u0026[]","level":"error","msg":"创建行李存储表失败","time":"2025-12-14 21:15:35"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 21:15:35"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 21:15:37"}
+{"error":"failed to parse field: LuggageStorage, error: failed to parse field: PhotoUrl, error: unsupported data type: \u0026[]","level":"error","msg":"创建行李表失败","time":"2025-12-14 21:23:50"}
+{"error":"failed to parse field: PhotoUrl, error: unsupported data type: \u0026[]","level":"error","msg":"创建行李存储表失败","time":"2025-12-14 21:23:50"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 21:23:50"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 21:23:52"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 21:27:19"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 21:27:21"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 21:41:12"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 21:41:12"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 21:41:39","tokens":99}
+{"duration":"7.4857ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"7b316961-4271-42e2-abb2-2ce5ac77557b","status":200,"time":"2025-12-14 21:41:39"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:23:41"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:23:41"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:23:44","tokens":99}
+{"duration":"4.2361ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"147e7453-98f3-45de-b539-6d214076ab11","status":200,"time":"2025-12-14 22:23:44"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:25:08","tokens":99}
+{"error":"Error 1054 (42S22): Unknown column 'guest_name' in 'where clause'","guest_name":"","level":"error","msg":"查询客户失败","time":"2025-12-14 22:25:08"}
+{"duration":"11.0934ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"6488345b-304a-4848-9d67-e84507cc64de","status":400,"time":"2025-12-14 22:25:08"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:26:03","tokens":99}
+{"error":"Error 1054 (42S22): Unknown column 'guest_name' in 'where clause'","guest_name":"","level":"error","msg":"查询客户失败","time":"2025-12-14 22:26:03"}
+{"duration":"6.5066ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"1d449110-72aa-41b6-8aae-1806d8438dcb","status":400,"time":"2025-12-14 22:26:03"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:26:08"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:26:08"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:26:10","tokens":99}
+{"duration":"3.4264ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"e07b6920-362b-4901-9696-223a1d3cc7d4","status":400,"time":"2025-12-14 22:26:10"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:27:27"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:27:27"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:27:29","tokens":99}
+{"duration":"5.3893ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"c0c9856c-d316-4bf7-bb84-49930d37fbd8","status":400,"time":"2025-12-14 22:27:29"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:28:10"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:28:10"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:28:11","tokens":99}
+{"duration":"4.7022ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"4caea3cf-c417-4868-8032-18bbdaf20495","status":400,"time":"2025-12-14 22:28:11"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:29:45"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:29:45"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:29:48","tokens":99}
+{"duration":"4.0862ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"17404d57-9692-4557-b06d-337cccbe62bc","status":400,"time":"2025-12-14 22:29:48"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:30:25","tokens":99}
+{"error":"json: cannot unmarshal string into Go struct field LuggageStorage.operator_id of type uint","level":"error","msg":"行李数据绑定错误","time":"2025-12-14 22:30:25"}
+{"duration":"2.6608ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"56f02e32-20e8-4323-923b-9594601b02dd","status":400,"time":"2025-12-14 22:30:25"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:30:57","tokens":99}
+{"error":"json: cannot unmarshal string into Go struct field LuggageStorage.operator_id of type uint","level":"error","msg":"行李数据绑定错误","time":"2025-12-14 22:30:57"}
+{"duration":"3.0029ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"34667ca9-2e08-457a-b209-e4b4611fbd60","status":400,"time":"2025-12-14 22:30:57"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:31:26"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:31:26"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:31:29","tokens":99}
+{"error":"json: cannot unmarshal string into Go struct field LuggageStorage.operator_id of type uint","level":"error","msg":"行李数据绑定错误","time":"2025-12-14 22:31:29"}
+{"duration":"4.9747ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"60b614ff-1c43-4ca1-bf79-d876d0792afd","status":400,"time":"2025-12-14 22:31:29"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:33:02","tokens":99}
+{"error":"invalid character '}' looking for beginning of object key string","level":"error","msg":"行李数据绑定错误","time":"2025-12-14 22:33:02"}
+{"duration":"4.9053ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"ecfa0d92-69eb-48e8-ab9b-ac64b38ad186","status":400,"time":"2025-12-14 22:33:02"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:33:08","tokens":99}
+{"error":"Error 1054 (42S22): Unknown column 'guest_name' in 'where clause'","guest_name":"李四","level":"error","msg":"查询客户失败","time":"2025-12-14 22:33:08"}
+{"duration":"3.3866ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"818973e4-acc7-480e-9e75-54cefca56747","status":500,"time":"2025-12-14 22:33:08"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:33:42"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:33:42"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:33:44","tokens":99}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:37:19"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:37:19"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:37:22","tokens":99}
+{"duration":"12.4058ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"b78a51d5-5bd2-4fc8-8804-cca3f1887a99","status":201,"time":"2025-12-14 22:37:22"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:43:07"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:43:07"}
+{"error":"MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.","level":"error","msg":"限流器执行脚本失败","name":"local","time":"2025-12-14 22:43:11"}
+{"client_ip":"::1","level":"warning","msg":"请求过于频繁","time":"2025-12-14 22:43:11"}
+{"duration":"915.9µs","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"9b21d680-8a13-4859-9b0d-ecc38b4e3b11","status":429,"time":"2025-12-14 22:43:11"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:43:49"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:43:49"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-14 22:44:13"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-14 22:44:13"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:44:19","tokens":99}
+{"duration":"5.5217ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"c4734cdb-81f0-48b2-b63e-e0ff16fda0bd","status":200,"time":"2025-12-14 22:44:19"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:44:23","tokens":99}
+{"duration":"40.3075ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/add/luggage","request_id":"0a1b79a7-9b12-4536-abf8-74f3dd156898","status":201,"time":"2025-12-14 22:44:23"}
+{"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-14 22:44:35","tokens":99}
+{"duration":"3.1839ms","level":"info","method":"GET","msg":"请求处理完成","path":"/tool/get/employee","request_id":"0602d632-28d4-4ef9-8570-cf4865fd1d2f","status":200,"time":"2025-12-14 22:44:35"}

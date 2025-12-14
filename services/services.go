@@ -12,12 +12,12 @@ import (
 )
 
 type Services struct {
-	DB     *gorm.DB
-	RdbAcc *redis.Client
-	RdbRef *redis.Client
-	RdbCac *redis.Client
-	RdbLim *redis.Client
-	RdbMq  *redis.Client
+	DB      *gorm.DB
+	RdbAcc  *redis.Client
+	RdbRef  *redis.Client
+	RdbCac  *redis.Client
+	RdbLim  *redis.Client
+	RdbRand *redis.Client
 }
 
 // NewDatabase 初始化数据库连接
@@ -42,7 +42,7 @@ func NewDatabase(cfg *config.Config) *Services {
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.RefreshToken,
 	})
-	//实现缓存的
+	//缓存的
 	rdb2 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
@@ -54,20 +54,20 @@ func NewDatabase(cfg *config.Config) *Services {
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.RateLimit,
 	})
-	//消息队列的
+	//随机取数的
 	rdb4 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
-		DB:       cfg.Redis.Databases.MessageQueue,
+		DB:       cfg.Redis.Databases.Random,
 	})
 
 	service := Services{
-		DB:     db,
-		RdbAcc: rdb,
-		RdbRef: rdb1,
-		RdbCac: rdb2,
-		RdbLim: rdb3,
-		RdbMq:  rdb4,
+		DB:      db,
+		RdbAcc:  rdb,
+		RdbRef:  rdb1,
+		RdbCac:  rdb2,
+		RdbLim:  rdb3,
+		RdbRand: rdb4,
 	}
 	return &service
 }

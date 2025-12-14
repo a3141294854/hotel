@@ -51,7 +51,7 @@ type RedisDatabasesConfig struct {
 	RefreshToken int `yaml:"refresh_token"`
 	Cache        int `yaml:"cache"`
 	RateLimit    int `yaml:"rate_limit"`
-	MessageQueue int `yaml:"message_queue"`
+	Random       int `yaml:"random"`
 }
 
 // ServerConfig 服务器配置

@@ -26,25 +26,31 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		}).Error("员工注册失败")
 		return
 	}
-	if e.User == "" || e.Password == "" || e.Name == "" {
+
+	if e.User == "" || e.Password == "" || e.Name == "" || e.HotelID == 0 || e.Phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
 		})
 		return
 	}
+
 	var existingEmployee models.Employee
 	result2 := s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
-	if result2.Error == nil { // 如果没有错误，说明找到了用户
+	if result2.Error == nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"success": false,
 			"message": "用户名已存在",
 		})
 		return
 	}
-	//员工默认角色为1，即普通员工
-	e.RoleID = 1
+
+	if e.RoleID == 0 {
+		e.RoleID = 1
+	}
+	e.Status = "有效"
 	result := s.DB.Create(&e)
+
 	employee := models.Employee{}
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
@@ -106,7 +112,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		}
 	}
 
-	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name)
+	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name, user.HotelID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -199,7 +205,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	accessToken, refreshToken, err := util.GenerateTokenPair(claims.UserId, claims.UserName)
+	accessToken, refreshToken, err := util.GenerateTokenPair(claims.UserId, claims.UserName, claims.HotelID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

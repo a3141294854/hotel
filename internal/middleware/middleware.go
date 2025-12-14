@@ -107,7 +107,7 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 	}
 }
 
-// AuthCheck 存权限的
+// AuthCheck 解析的
 func AuthCheck(s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims, ok := c.Get("claims")
@@ -123,11 +123,16 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 			return
 		}
 		e := claims.(*util.AccessClaims)
+
+		c.Set("employee_id", e.UserId)
+		c.Set("employee_name", e.UserName)
+		c.Set("hotel_id", e.HotelId)
+
 		var employee models.Employee
 		s.DB.Model(&models.Employee{}).Preload("Role").Where("id = ?", e.UserId).First(&employee)
 		var role models.Role
 		s.DB.Model(&models.Role{}).Preload("Permissions").Where("id = ?", employee.RoleID).First(&role)
-		for _, v := range role.Permissions {
+		for _, v := range *role.Permissions {
 			c.Set(v.Name, 1)
 		}
 		c.Next()

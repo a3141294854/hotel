@@ -47,10 +47,11 @@ local limiter = cjson.decode(data)
 local elapsed = tonumber(ARGV[1]) - limiter.LastFillTime 
 local count = math.floor(elapsed / limiter.FillRate)
 limiter.Tokens = math.min(limiter.Tokens + count, limiter.Capacity)
-limiter.LastFillTime = tonumber(ARGV[1])
+
 --检查
 local flag = 0
 if limiter.Tokens > 0 then
+    limiter.LastFillTime = tonumber(ARGV[1])
 	limiter.Tokens = limiter.Tokens - 1
 	flag = 1
 end

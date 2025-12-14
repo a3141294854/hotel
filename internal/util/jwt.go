@@ -15,12 +15,14 @@ var RefreshExpireTime time.Duration
 type AccessClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
+	HotelId  uint   `json:"hotel_id"`
 	jwt.RegisteredClaims
 }
 
 type RefreshClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
+	HotelID  uint   `json:"hotel_id"`
 	jwt.RegisteredClaims
 }
 
@@ -31,10 +33,11 @@ func ConfigJwt(cfg *config.Config) {
 }
 
 // GenerateAccessToken 生成访问令牌
-func GenerateAccessToken(userId uint, userName string) (string, error) {
+func GenerateAccessToken(userId uint, userName string, HotelID uint) (string, error) {
 	claims := AccessClaims{
 		UserId:   userId,
 		UserName: userName,
+		HotelId:  HotelID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessExpireTime)),
 		},
@@ -49,10 +52,11 @@ func GenerateAccessToken(userId uint, userName string) (string, error) {
 }
 
 // GenerateRefreshToken 生成刷新令牌
-func GenerateRefreshToken(userId uint, userName string) (string, error) {
+func GenerateRefreshToken(userId uint, userName string, HotelID uint) (string, error) {
 	claims := RefreshClaims{
 		UserId:   userId,
 		UserName: userName,
+		HotelID:  HotelID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(RefreshExpireTime)),
 		},
@@ -67,12 +71,12 @@ func GenerateRefreshToken(userId uint, userName string) (string, error) {
 }
 
 // GenerateTokenPair 生成访问令牌和刷新令牌
-func GenerateTokenPair(userId uint, userName string) (accessToken string, refreshToken string, err error) {
-	accessToken, err = GenerateAccessToken(userId, userName)
+func GenerateTokenPair(userId uint, userName string, HotelID uint) (accessToken string, refreshToken string, err error) {
+	accessToken, err = GenerateAccessToken(userId, userName, HotelID)
 	if err != nil {
 		return "", "", err
 	}
-	refreshToken, err = GenerateRefreshToken(userId, userName)
+	refreshToken, err = GenerateRefreshToken(userId, userName, HotelID)
 	if err != nil {
 		return "", "", err
 	}
