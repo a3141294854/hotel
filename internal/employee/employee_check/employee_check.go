@@ -11,6 +11,7 @@ import (
 	"hotel/models"
 	"hotel/services"
 	"net/http"
+	"time"
 )
 
 // EmployeeRegister 员工注册
@@ -49,6 +50,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		e.RoleID = 1
 	}
 	e.Status = "有效"
+	e.LastActiveTime = time.Now()
 	result := s.DB.Create(&e)
 
 	employee := models.Employee{}
