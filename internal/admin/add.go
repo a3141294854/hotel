@@ -36,6 +36,8 @@ func AddPermission(s *services.Services, c *gin.Context) {
 		return
 	}
 
+	p.Status = "有效"
+
 	result = s.DB.Create(&p)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -86,6 +88,8 @@ func AddRole(s *services.Services, c *gin.Context) {
 			"error": result.Error,
 		}).Error("角色数据库查询错误")
 	}
+
+	r.Status = "有效"
 
 	result = s.DB.Create(&r)
 	if result.Error != nil {
@@ -182,5 +186,68 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 		}).Error("角色权限数据库插入错误")
 		return
 	}
+}
 
+func AddHotel(s *services.Services, c *gin.Context) {
+
+	var req struct {
+		Name   string `json:"name" binding:"required"`
+		Place  string `json:"place" binding:"required"`
+		Remark string `json:"remark"`
+	}
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("请求数据格式错误")
+		return
+	}
+
+	var ex models.Hotel
+	result := s.DB.Model(models.Hotel{}).Where("name = ?", req.Name).First(&ex)
+
+	if result.Error == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"success": false,
+			"message": "酒店已存在",
+		})
+		return
+	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("酒店数据库查询错误")
+	}
+
+	insert := models.Hotel{
+		Name:   req.Name,
+		Place:  req.Place,
+		Remark: req.Remark,
+	}
+
+	result = s.DB.Model(models.Hotel{}).Create(&insert)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("酒店数据库插入错误")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "添加成功",
+		"data":    req,
+	})
 }

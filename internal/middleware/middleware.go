@@ -127,12 +127,16 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 		c.Set("employee_id", e.UserId)
 		c.Set("employee_name", e.UserName)
 		c.Set("hotel_id", e.HotelId)
+		insert := models.Employee{
+			LastActiveTime: time.Now(),
+		}
+		s.DB.Model(&models.Employee{}).Where("id = ?", e.UserId).Updates(insert)
 
 		var employee models.Employee
 		s.DB.Model(&models.Employee{}).Preload("Role").Where("id = ?", e.UserId).First(&employee)
 		var role models.Role
 		s.DB.Model(&models.Role{}).Preload("Permissions").Where("id = ?", employee.RoleID).First(&role)
-		for _, v := range *role.Permissions {
+		for _, v := range role.Permissions {
 			c.Set(v.Name, 1)
 		}
 		c.Next()

@@ -27,7 +27,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	if e.User == "" || e.Password == "" || e.Name == "" || e.HotelID == 0 || e.Phone == "" {
+	if e.User == "" || e.Password == "" || e.Name == "" || e.HotelID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",

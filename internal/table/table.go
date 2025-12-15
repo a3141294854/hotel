@@ -51,13 +51,6 @@ func Table(db *gorm.DB) {
 		}).Error("创建位置表失败")
 	}
 
-	err = db.AutoMigrate(&models.LuggageStorage{})
-	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
-			"error": err.Error(),
-		}).Error("创建行李存储表失败")
-	}
-
 	err = db.AutoMigrate(&models.Hotel{})
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{

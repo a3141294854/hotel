@@ -90,9 +90,6 @@ func main() {
 			g.GET("/location", func(c *gin.Context) {
 				employee_action.GetLocation(c, service)
 			})
-			g.GET("/status", func(c *gin.Context) {
-				employee_action.GetStatus(c, service)
-			})
 			g.POST("/guest_advance", func(c *gin.Context) {
 				employee_action.GetAdvance(c, service)
 			})
