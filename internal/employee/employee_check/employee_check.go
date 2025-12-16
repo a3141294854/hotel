@@ -76,6 +76,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 // EmployeeLogin 员工登录
 func EmployeeLogin(c *gin.Context, s *services.Services) {
 	var e struct {
+		HotelID  int    `json:"hotel_id"`
 		User     string `json:"user"`
 		Password string `json:"password"`
 	}
@@ -89,11 +90,22 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		}).Error("员工登录信息绑定错误")
 		return
 	}
+	if e.User == "" || e.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		return
+	}
+	if e.HotelID == 0 {
+		e.HotelID = 1
+	}
 
 	var user models.Employee
 	result := s.DB.Model(models.Employee{}).
 		Where("user=?", e.User).
 		Where("password=?", e.Password).
+		Where("hotel_id=?", e.HotelID).
 		First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

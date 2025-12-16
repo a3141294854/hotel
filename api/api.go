@@ -37,24 +37,30 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 		a := e.Group("/add")
 		a.Use(middleware.CheckAction("创建行李"))
 		{
-			a.POST("/luggage", func(c *gin.Context) {
+			a.POST("/luggageStorage", func(c *gin.Context) {
 				employee_action.AddLuggage(c, service)
+			})
+			a.POST("/mac", func(c *gin.Context) {
+				employee_action.AddMac(c, service)
 			})
 		}
 
 		d := e.Group("/delete")
 		d.Use(middleware.CheckAction("删除行李"))
 		{
-			d.POST("/luggage", func(c *gin.Context) {
-				employee_action.Delete(c, service)
+			d.POST("/luggageStorage", func(c *gin.Context) {
+				employee_action.DeleteStorage(c, service)
 			})
 		}
 
 		u := e.Group("/update")
 		u.Use(middleware.CheckAction("更新行李"))
 		{
+			u.POST("/luggageStorage", func(c *gin.Context) {
+				employee_action.UpdateLuggageStorage(c, service)
+			})
 			u.POST("/luggage", func(c *gin.Context) {
-				employee_action.Update(c, service)
+				employee_action.UpdateLuggage(c, service)
 			})
 		}
 
@@ -75,6 +81,9 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 			g.POST("/guest_advance", func(c *gin.Context) {
 				employee_action.GetAdvance(c, service)
+			})
+			g.POST("/pick_up_code", func(c *gin.Context) {
+				employee_action.GetPickUpCode(c, service)
 			})
 		}
 

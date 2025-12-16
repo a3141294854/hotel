@@ -23,11 +23,11 @@ func Table(db *gorm.DB) {
 		}).Error("创建客户表失败")
 	}
 
-	err = db.AutoMigrate(&models.Luggage{})
+	err = db.AutoMigrate(&models.LuggageStorage{})
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
-		}).Error("创建行李表失败")
+		}).Error("创建行李存储表失败")
 	}
 
 	err = db.AutoMigrate(&models.Role{})
@@ -56,6 +56,20 @@ func Table(db *gorm.DB) {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建酒店表失败")
+	}
+
+	err = db.AutoMigrate(&models.Luggage{})
+	if err != nil {
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建行李表失败")
+	}
+
+	err = db.AutoMigrate(&models.Tag{})
+	if err != nil {
+		logger.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建标签表失败")
 	}
 
 	logger.Logger.Info("数据库表创建成功")
