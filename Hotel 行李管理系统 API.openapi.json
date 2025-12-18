@@ -1,0 +1,3340 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Hotel 行李管理系统 API",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。",
+    "version": "2.5.1",
+    "contact": {
+      "name": "Hotel Management System",
+      "email": "support@hotel.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "认证管理"
+    },
+    {
+      "name": "行李管理"
+    },
+    {
+      "name": "行李查询"
+    },
+    {
+      "name": "统计功能"
+    },
+    {
+      "name": "管理员工具"
+    }
+  ],
+  "paths": {
+    "/employee/login": {
+      "post": {
+        "summary": "员工登录",
+        "deprecated": false,
+        "description": "员工登录验证，成功后返回JWT双令牌（Access Token和Refresh Token）。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user",
+                  "password"
+                ],
+                "properties": {
+                  "hotel_id": {
+                    "type": "integer",
+                    "description": "酒店ID，可选，默认为1",
+                    "example": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "description": "用户名",
+                    "example": "zhangsan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "example": "123456"
+                  }
+                }
+              },
+              "example": {
+                "hotel_id": 1,
+                "user": "admin",
+                "password": "admin123"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponse"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "登录成功",
+                  "data": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "expires_in": 900,
+                    "token_type": "Bearer"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": ""
+          }
+        },
+        "security": []
+      }
+    },
+    "/employee/refresh": {
+      "post": {
+        "summary": "刷新令牌",
+        "deprecated": false,
+        "description": "使用Refresh Token获取新的Access Token。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refresh_token"
+                ],
+                "properties": {
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "刷新令牌",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "令牌刷新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponse"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "token刷新成功",
+                  "data": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "expires_in": 900,
+                    "token_type": "Bearer"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "令牌无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "2": {
+                    "summary": "请求数据格式错误",
+                    "value": {
+                      "success": false,
+                      "message": "请求数据格式错误"
+                    }
+                  },
+                  "3": {
+                    "summary": "token无效",
+                    "value": {
+                      "success": false,
+                      "message": "token无效"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/employee/logout": {
+      "post": {
+        "summary": "员工退出",
+        "deprecated": false,
+        "description": "员工退出登录，需要提供有效的Access Token。",
+        "tags": [
+          "认证管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "退出成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "退出成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "token无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "token无效"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/update/luggage": {
+      "post": {
+        "summary": "更新行李消息",
+        "deprecated": false,
+        "description": "更新行李的信息，行李寄存表下的行李信息,主要是取出和迁移",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "tag_id": {
+                    "type": "string",
+                    "example": "红色行李箱"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "寄存中"
+                  }
+                }
+              },
+              "example": {
+                "id": 1,
+                "status": "寄存中"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "操作成功"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "行李更新成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          },
+          "500": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/add/luggageStorage": {
+      "post": {
+        "summary": "添加行李寄存",
+        "deprecated": false,
+        "description": "为客户添加新的行李寄存记录。如果客户不存在，系统会自动创建客户记录。需要'创建行李'权限。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "guest_name",
+                  "guest_phone",
+                  "guest_room"
+                ],
+                "properties": {
+                  "bag_count": {
+                    "type": "integer",
+                    "description": "行李袋数量",
+                    "example": 2
+                  },
+                  "backpack_count": {
+                    "type": "integer",
+                    "description": "背包数量",
+                    "example": 1
+                  },
+                  "box_count": {
+                    "type": "integer",
+                    "description": "箱子数量",
+                    "example": 3
+                  },
+                  "other_count": {
+                    "type": "integer",
+                    "description": "其他物品数量",
+                    "example": 1
+                  },
+                  "guest_name": {
+                    "type": "string",
+                    "description": "客户姓名",
+                    "example": "张三"
+                  },
+                  "guest_phone": {
+                    "type": "string",
+                    "description": "客户电话",
+                    "example": "13800138000"
+                  },
+                  "guest_room": {
+                    "type": "string",
+                    "description": "客户房间号",
+                    "example": "808"
+                  },
+                  "luggage": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Luggage"
+                    },
+                    "description": "行李数组，可选"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "状态，可选，默认'寄存中'",
+                    "example": "寄存中"
+                  },
+                  "remark": {
+                    "type": "string",
+                    "description": "备注，可选",
+                    "example": "易碎品"
+                  }
+                }
+              },
+              "example": {
+                "bag_count": 2,
+                "backpack_count": 1,
+                "box_count": 3,
+                "other_count": 1,
+                "guest_name": "张三",
+                "guest_phone": "13800138000",
+                "guest_room": "808",
+                "luggage": [
+                  {
+                    "tag_id": 1,
+                    "status": "寄存中",
+                    "location_id": 1
+                  }
+                ],
+                "remark": "易碎品"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LuggageStorage"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李添加成功",
+                  "data": {
+                    "id": 1,
+                    "bag_count": 2,
+                    "backpack_count": 1,
+                    "box_count": 3,
+                    "other_count": 1,
+                    "guest_id": 1,
+                    "operator_id": 1,
+                    "operator_name": "张三",
+                    "pick_up_code": "ABC123",
+                    "status": "寄存中",
+                    "remark": "易碎品"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "2": {
+                    "summary": "请求数据格式错误",
+                    "value": {
+                      "success": false,
+                      "message": "请求数据格式错误"
+                    }
+                  },
+                  "3": {
+                    "summary": "客户信息不能为空",
+                    "value": {
+                      "success": false,
+                      "message": "客户信息不能为空"
+                    }
+                  },
+                  "4": {
+                    "summary": "行李数量不能为0",
+                    "value": {
+                      "success": false,
+                      "message": "行李数量不能为0"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "5": {
+                    "summary": "创建客户记录失败",
+                    "value": {
+                      "success": false,
+                      "message": "创建客户记录失败"
+                    }
+                  },
+                  "6": {
+                    "summary": "生成取件码失败",
+                    "value": {
+                      "success": false,
+                      "message": "生成取件码失败"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/update/luggageStorage": {
+      "post": {
+        "summary": "更新行李寄存信息",
+        "deprecated": false,
+        "description": "更新行李存储的所有信息，包括客户信息、位置、数量、状态等。可部分更新或全量更新。需要'更新行李'权限。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李寄存ID",
+                    "example": 1
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态",
+                    "example": "已取出"
+                  },
+                  "location_id": {
+                    "type": "integer",
+                    "description": "存放位置ID",
+                    "example": 2
+                  },
+                  "remark": {
+                    "type": "string",
+                    "description": "备注",
+                    "example": "客户已取走"
+                  },
+                  "bag_count": {
+                    "type": "integer",
+                    "description": "行李包数量",
+                    "example": 2
+                  },
+                  "backpack_count": {
+                    "type": "integer",
+                    "description": "背包数量",
+                    "example": 1
+                  },
+                  "box_count": {
+                    "type": "integer",
+                    "description": "箱子数量",
+                    "example": 3
+                  },
+                  "other_count": {
+                    "type": "integer",
+                    "description": "其他物品数量",
+                    "example": 1
+                  },
+                  "guest": {
+                    "type": "object",
+                    "description": "客户信息",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "张三"
+                      },
+                      "gender": {
+                        "type": "string",
+                        "example": "男"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "example": "13800138000"
+                      },
+                      "id_card": {
+                        "type": "string",
+                        "example": "110101199001011234"
+                      }
+                    }
+                  },
+                  "location": {
+                    "type": "object",
+                    "description": "位置信息",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 2
+                      },
+                      "place": {
+                        "type": "string",
+                        "example": "A区-2层-03号"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LuggageStorage"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "更新状态",
+                    "value": {
+                      "success": true,
+                      "message": "行李更新成功"
+                    }
+                  },
+                  "2": {
+                    "summary": "更新行李数量",
+                    "value": {
+                      "success": true,
+                      "message": "行李更新成功"
+                    }
+                  },
+                  "3": {
+                    "summary": "更新客户信息",
+                    "value": {
+                      "success": true,
+                      "message": "行李更新成功"
+                    }
+                  },
+                  "4": {
+                    "summary": "更新存储位置",
+                    "value": {
+                      "success": true,
+                      "message": "行李更新成功"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/delete/luggageStorage": {
+      "post": {
+        "summary": "删除行李寄存",
+        "deprecated": false,
+        "description": "删除指定的行李寄存记录。需要'删除行李'权限。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "行李寄存ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "行李记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "行李记录不存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/add/mac": {
+      "post": {
+        "summary": "添加行李MAC",
+        "deprecated": false,
+        "description": "添加新的行李MAC地址标签。需要'创建行李'权限。",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mac"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "标签名称，可选",
+                    "example": "红色行李箱"
+                  },
+                  "mac": {
+                    "type": "string",
+                    "description": "MAC地址，必填",
+                    "example": "AA:BB:CC:DD:EE:FF"
+                  }
+                }
+              },
+              "example": {
+                "name": "红色行李箱",
+                "mac": "AA:BB:CC:DD:EE:FF"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Tag"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李mac添加成功",
+                  "data": {
+                    "id": 1,
+                    "name": "红色行李箱",
+                    "mac": "AA:BB:CC:DD:EE:FF"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "2": {
+                    "summary": "请求数据格式错误",
+                    "value": {
+                      "success": false,
+                      "message": "请求数据格式错误"
+                    }
+                  },
+                  "3": {
+                    "summary": "mac不能为空",
+                    "value": {
+                      "success": false,
+                      "message": "mac不能为空"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "409": {
+            "description": "MAC已存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "mac已存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/name": {
+      "get": {
+        "summary": "按客户姓名查询",
+        "deprecated": false,
+        "description": "根据客户姓名查询行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "guest_name",
+            "in": "query",
+            "description": "客户姓名",
+            "required": true,
+            "example": "张三",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LuggageStorage"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李获取成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "bag_count": 2,
+                      "backpack_count": 1,
+                      "box_count": 3,
+                      "other_count": 1,
+                      "guest": {
+                        "id": 1,
+                        "name": "张三",
+                        "phone": "13800138000",
+                        "room": "808"
+                      },
+                      "location": {
+                        "id": 1,
+                        "name": "前台"
+                      },
+                      "operator_name": "张三",
+                      "pick_up_code": "ABC123",
+                      "status": "寄存中",
+                      "remark": "易碎品"
+                    }
+                  ],
+                  "count": 1
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请输入客户姓名"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/all": {
+      "get": {
+        "summary": "查询所有行李",
+        "deprecated": false,
+        "description": "查询所有行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LuggageStorage"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李获取成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "bag_count": 2,
+                      "backpack_count": 1,
+                      "box_count": 3,
+                      "other_count": 1,
+                      "guest": {
+                        "id": 1,
+                        "name": "张三",
+                        "phone": "13800138000",
+                        "room": "808"
+                      },
+                      "location": {
+                        "id": 1,
+                        "name": "前台"
+                      },
+                      "luggage": [
+                        {
+                          "id": 1,
+                          "tag": {
+                            "id": 1,
+                            "name": "红色行李箱",
+                            "mac": "AA:BB:CC:DD:EE:FF"
+                          },
+                          "status": "寄存中"
+                        }
+                      ],
+                      "operator_name": "张三",
+                      "pick_up_code": "ABC123",
+                      "status": "寄存中",
+                      "remark": "易碎品"
+                    }
+                  ],
+                  "count": 1
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "获取行李失败"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/guest_id": {
+      "get": {
+        "summary": "按客户ID查询",
+        "deprecated": false,
+        "description": "根据客户ID查询行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "guest_id",
+            "in": "query",
+            "description": "客户ID",
+            "required": true,
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LuggageStorage"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请输入客户ID"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/location": {
+      "get": {
+        "summary": "按存放位置查询",
+        "deprecated": false,
+        "description": "根据存放位置名称查询行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "description": "存放位置名称",
+            "required": true,
+            "example": "前台",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LuggageStorage"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请输入存放地点"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/status": {
+      "get": {
+        "summary": "按状态查询行李",
+        "deprecated": false,
+        "description": "根据状态查询行李记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "行李状态",
+            "required": true,
+            "example": "寄存中",
+            "schema": {
+              "type": "string",
+              "example": "寄存中"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Luggage"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "count": 5,
+                  "data": [
+                    {
+                      "id": 3,
+                      "guest_id": 2,
+                      "tag": "红色行李箱",
+                      "weight": 15.5,
+                      "status": "寄存中",
+                      "location": "前台",
+                      "guest": {
+                        "id": 2,
+                        "name": "李四"
+                      }
+                    },
+                    {
+                      "id": 4,
+                      "guest_id": 1,
+                      "tag": "红色行李箱",
+                      "weight": 0,
+                      "status": "寄存中",
+                      "location": "前台",
+                      "guest": {
+                        "id": 1,
+                        "name": "张三"
+                      }
+                    }
+                  ],
+                  "message": "行李获取成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "令牌无效或已过期",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "令牌无效或已过期"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          },
+          "500": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/guest_advance": {
+      "post": {
+        "summary": "高级查询",
+        "deprecated": false,
+        "description": "多条件组合查询行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guest_name": {
+                    "type": "string",
+                    "description": "客户姓名",
+                    "example": "张三"
+                  },
+                  "location_name": {
+                    "type": "string",
+                    "description": "存放位置名称",
+                    "example": "前台"
+                  },
+                  "operator_name": {
+                    "type": "string",
+                    "description": "操作员姓名",
+                    "example": "张三"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "行李状态，默认为'寄存中'",
+                    "example": "寄存中"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LuggageStorage"
+                          }
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/get/pick_up_code": {
+      "post": {
+        "summary": "按取件码查询",
+        "deprecated": false,
+        "description": "根据取件码查询行李寄存记录。需要'查看行李'权限。",
+        "tags": [
+          "行李查询"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "pick_up_code"
+                ],
+                "properties": {
+                  "pick_up_code": {
+                    "type": "string",
+                    "description": "取件码",
+                    "example": "ABC123"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LuggageStorage"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李获取成功",
+                  "data": {
+                    "id": 1,
+                    "bag_count": 2,
+                    "backpack_count": 1,
+                    "box_count": 3,
+                    "other_count": 1,
+                    "guest": {
+                      "id": 1,
+                      "name": "张三",
+                      "phone": "13800138000",
+                      "room": "808"
+                    },
+                    "location": {
+                      "id": 1,
+                      "name": "前台"
+                    },
+                    "luggage": [
+                      {
+                        "id": 1,
+                        "tag": {
+                          "id": 1,
+                          "name": "红色行李箱",
+                          "mac": "AA:BB:CC:DD:EE:FF"
+                        },
+                        "status": "寄存中"
+                      }
+                    ],
+                    "operator_name": "张三",
+                    "pick_up_code": "ABC123",
+                    "status": "寄存中",
+                    "remark": "易碎品"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "服务器内部错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/count/sum": {
+      "get": {
+        "summary": "获取总行李数量",
+        "deprecated": false,
+        "description": "统计系统中总的行李数量。",
+        "tags": [
+          "统计功能"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "description": "总数量"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "行李数量获取成功",
+                  "count": 25
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/count/today": {
+      "get": {
+        "summary": "获取今日行李统计",
+        "deprecated": false,
+        "description": "统计今日的行李操作数量。",
+        "tags": [
+          "统计功能"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "date": {
+                              "type": "string",
+                              "description": "日期"
+                            },
+                            "today_added": {
+                              "type": "integer",
+                              "description": "今日新增行李数量"
+                            },
+                            "today_taken": {
+                              "type": "integer",
+                              "description": "今日取出行李数量"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "获取今日统计成功",
+                  "data": {
+                    "date": "2025-12-16",
+                    "today_added": 8,
+                    "today_taken": 3
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/employee": {
+      "post": {
+        "summary": "员工注册",
+        "deprecated": false,
+        "description": "注册新员工账号。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "user",
+                  "password",
+                  "hotel_id"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "员工姓名",
+                    "example": "张三"
+                  },
+                  "user": {
+                    "type": "string",
+                    "description": "用户名",
+                    "example": "zhangsan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "密码",
+                    "example": "123456"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "电话号码",
+                    "example": "13800138000"
+                  },
+                  "hotel_id": {
+                    "type": "integer",
+                    "description": "酒店ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "注册成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "注册成功",
+                  "data": {
+                    "id": 1,
+                    "name": "张三",
+                    "user": "zhangsan",
+                    "phone": "13800138000",
+                    "hotel_id": 1,
+                    "role_id": 1,
+                    "status": "有效"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "2": {
+                    "summary": "请求数据格式错误",
+                    "value": {
+                      "success": false,
+                      "message": "请求数据格式错误"
+                    }
+                  },
+                  "3": {
+                    "summary": "用户名已存在",
+                    "value": {
+                      "success": false,
+                      "message": "用户名已存在"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/permission": {
+      "post": {
+        "summary": "添加权限",
+        "deprecated": false,
+        "description": "添加新的系统权限。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "权限名称",
+                    "example": "查看行李"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Permission"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "添加成功",
+                  "data": {
+                    "id": 1,
+                    "name": "查看行李",
+                    "status": "有效"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/role": {
+      "post": {
+        "summary": "添加角色",
+        "deprecated": false,
+        "description": "添加新的系统角色。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "角色名称",
+                    "example": "行李管理员"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Role"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "添加成功",
+                  "data": {
+                    "id": 1,
+                    "name": "行李管理员",
+                    "status": "有效"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/get/employee": {
+      "get": {
+        "summary": "获取所有员工",
+        "deprecated": false,
+        "description": "获取系统中所有员工信息。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Employee"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "获取成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "张三",
+                      "user": "zhangsan",
+                      "phone": "13800138000",
+                      "hotel_id": 1,
+                      "role_id": 1,
+                      "role": {
+                        "id": 1,
+                        "name": "员工",
+                        "status": "有效"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "内部错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/get/permission": {
+      "get": {
+        "summary": "获取所有权限",
+        "deprecated": false,
+        "description": "获取系统中所有可用权限列表。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Permission"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "获取成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "创建行李",
+                      "status": "有效"
+                    },
+                    {
+                      "id": 2,
+                      "name": "查看行李",
+                      "status": "有效"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "内部错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/get/role": {
+      "get": {
+        "summary": "获取所有角色",
+        "deprecated": false,
+        "description": "获取系统中所有角色列表，包含权限信息。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Role"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "获取成功",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "员工",
+                      "status": "有效",
+                      "permissions": [
+                        {
+                          "id": 1,
+                          "name": "创建行李",
+                          "status": "有效"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "内部错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/role_permission": {
+      "post": {
+        "summary": "添加角色权限关联",
+        "deprecated": false,
+        "description": "为指定角色分配权限。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role_id",
+                  "permission_id"
+                ],
+                "properties": {
+                  "role_id": {
+                    "type": "integer",
+                    "description": "角色ID",
+                    "example": 1
+                  },
+                  "permission_id": {
+                    "type": "integer",
+                    "description": "权限ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "关联成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "关联成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "角色或权限不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "3": {
+                    "summary": "角色不存在",
+                    "value": {
+                      "success": false,
+                      "message": "角色不存在"
+                    }
+                  },
+                  "4": {
+                    "summary": "权限不存在",
+                    "value": {
+                      "success": false,
+                      "message": "权限不存在"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/change/employee_role": {
+      "post": {
+        "summary": "更改员工角色",
+        "deprecated": false,
+        "description": "更改指定员工的角色。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id",
+                  "role_id"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "integer",
+                    "description": "员工ID",
+                    "example": 1
+                  },
+                  "role_id": {
+                    "type": "integer",
+                    "description": "新角色ID",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "角色修改成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "角色修改成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "员工或角色不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "员工或角色不存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/delete/employee": {
+      "post": {
+        "summary": "删除员工",
+        "deprecated": false,
+        "description": "删除指定员工账号。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "employee_id"
+                ],
+                "properties": {
+                  "employee_id": {
+                    "type": "integer",
+                    "description": "员工ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "服务器错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "内部错误"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/delete/role": {
+      "post": {
+        "summary": "删除角色",
+        "deprecated": false,
+        "description": "删除指定的系统角色。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role_id"
+                ],
+                "properties": {
+                  "role_id": {
+                    "type": "integer",
+                    "description": "角色ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "角色不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "角色不存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/delete/permission": {
+      "post": {
+        "summary": "删除权限",
+        "deprecated": false,
+        "description": "删除指定的系统权限。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "permission_id"
+                ],
+                "properties": {
+                  "permission_id": {
+                    "type": "integer",
+                    "description": "权限ID",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "删除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "删除成功"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "权限不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "权限不存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/add/hotel": {
+      "post": {
+        "summary": "添加酒店",
+        "deprecated": false,
+        "description": "添加新的酒店。需要'管理员'权限。",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "place"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "酒店名称",
+                    "example": "希尔顿酒店"
+                  },
+                  "place": {
+                    "type": "string",
+                    "description": "酒店位置",
+                    "example": "北京市朝阳区"
+                  },
+                  "remark": {
+                    "type": "string",
+                    "description": "备注，可选",
+                    "example": "五星级酒店"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Hotel"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "message": "添加成功",
+                  "data": {
+                    "name": "希尔顿酒店",
+                    "place": "北京市朝阳区",
+                    "remark": "五星级酒店"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "请求参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "请求数据格式错误"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "409": {
+            "description": "酒店已存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "酒店已存在"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "操作成功"
+          }
+        }
+      },
+      "通用内部错误": {
+        "$ref": "#/components/schemas/ErrorResponse"
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "操作失败"
+          }
+        }
+      },
+      "通用令牌无效": {
+        "$ref": "#/components/schemas/ErrorResponse"
+      },
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "员工ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "员工姓名",
+            "example": "张三"
+          },
+          "user": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码（加密后）"
+          },
+          "phone": {
+            "type": "string",
+            "description": "电话号码",
+            "example": "13800138000"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态",
+            "example": "有效"
+          },
+          "last_active_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "最后活跃时间"
+          },
+          "hotel_id": {
+            "type": "integer",
+            "description": "酒店ID",
+            "example": 1
+          },
+          "role_id": {
+            "type": "integer",
+            "description": "角色ID",
+            "example": 1
+          },
+          "hotel": {
+            "$ref": "#/components/schemas/Hotel"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "expires_in": {
+            "type": "integer",
+            "example": 900
+          },
+          "token_type": {
+            "type": "string",
+            "example": "Bearer"
+          }
+        }
+      },
+      "Luggage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "tag_id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "example": "寄存中"
+          },
+          "location_id": {
+            "type": "integer"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          }
+        },
+        "required": [
+          "location_id",
+          "location"
+        ]
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "权限ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "权限名称",
+            "example": "创建行李"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态",
+            "example": "有效"
+          }
+        }
+      },
+      "EmployeeWithRole": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Employee"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "访问令牌（15分钟有效）",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "刷新令牌（7天有效）",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "Access Token 过期时间（秒）",
+            "example": 900
+          },
+          "token_type": {
+            "type": "string",
+            "description": "令牌类型",
+            "example": "Bearer"
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "角色ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "员工"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态",
+            "example": "有效"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "权限列表"
+          }
+        }
+      },
+      "RoleWithPermissions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Role"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Permission"
+                },
+                "description": "角色对应的权限列表"
+              }
+            }
+          }
+        ]
+      },
+      "LuggageStorage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "bag_count": {
+            "type": "integer",
+            "example": 2
+          },
+          "backpack_count": {
+            "type": "integer",
+            "example": 1
+          },
+          "box_count": {
+            "type": "integer",
+            "example": 3
+          },
+          "other_count": {
+            "type": "integer",
+            "example": 1
+          },
+          "guest_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "operator_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "operator_name": {
+            "type": "string",
+            "example": "张三"
+          },
+          "pick_up_code": {
+            "type": "string",
+            "example": "ABC123"
+          },
+          "status": {
+            "type": "string",
+            "example": "寄存中"
+          },
+          "remark": {
+            "type": "string",
+            "example": "易碎品"
+          },
+          "guest": {
+            "$ref": "#/components/schemas/Guest"
+          },
+          "luggage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Luggage"
+            }
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "红色行李箱"
+          },
+          "mac": {
+            "type": "string",
+            "example": "AA:BB:CC:DD:EE:FF"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "前台"
+          }
+        }
+      },
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "张三"
+          },
+          "gender": {
+            "type": "string",
+            "example": "男"
+          },
+          "phone": {
+            "type": "string",
+            "example": "13800138000"
+          },
+          "room": {
+            "type": "string",
+            "example": "808"
+          }
+        }
+      },
+      "Hotel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "酒店ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "酒店名称",
+            "example": "希尔顿酒店"
+          },
+          "status": {
+            "type": "string",
+            "description": "状态",
+            "example": "有效"
+          },
+          "place": {
+            "type": "string",
+            "description": "酒店位置",
+            "example": "北京市朝阳区"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注",
+            "example": "五星级酒店"
+          }
+        }
+      },
+      "通用内部错误1": {
+        "title": "",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "错误消息"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "通用令牌无效2": {
+        "title": "",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "操作是否成功",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "错误消息"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      }
+    },
+    "responses": {
+      "通用内部错误": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "title": "",
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "操作是否成功",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "description": "错误消息"
+                }
+              },
+              "required": [
+                "success",
+                "message"
+              ]
+            },
+            "examples": {
+              "示例 1": {
+                "summary": "示例 1",
+                "value": "{\r\n    \"success\": false,\r\n    \"message\": \"登录失败\",\r\n)"
+              }
+            }
+          }
+        }
+      },
+      "通用令牌无效": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "title": "",
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "操作是否成功",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "description": "错误消息"
+                }
+              },
+              "required": [
+                "success",
+                "message"
+              ]
+            },
+            "examples": {
+              "示例 1": {
+                "summary": "示例 1",
+                "value": {
+                  "success": false,
+                  "message": "token无效"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}

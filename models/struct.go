@@ -62,16 +62,13 @@ type LuggageStorage struct {
 	OperatorID   uint   `json:"operator_id" gorm:"index"`
 	OperatorName string `json:"operator_name"`
 
-	LocationID uint      `json:"location_id" gorm:"index"`
-	Location   *Location `json:"location,omitempty" gorm:"foreignKey:LocationID"`
-
 	HotelID uint   `json:"hotel_id" gorm:"index"`
 	Hotel   *Hotel `json:"hotel,omitempty" gorm:"foreignKey:HotelID"`
 
 	GuestID uint   `json:"guest_id" gorm:"index"`
-	Guest   *Guest `json:"guest,omitempty" gorm:"foreignKey:GuestID"`
+	Guest   *Guest `json:"guest,omitempty" gorm:"foreignKey:GuestID;constraint:OnDelete:CASCADE"`
 
-	Luggage []Luggage `json:"luggage,omitempty" gorm:"foreignKey:LuggageStorageID"`
+	Luggage []Luggage `json:"luggage,omitempty" gorm:"foreignKey:LuggageStorageID;constraint:OnDelete:CASCADE"`
 
 	//Photos []Photo `json:"photos,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
@@ -91,7 +88,10 @@ type Luggage struct {
 	LuggageStorageID uint            `json:"luggage_storage_id"`
 	LuggageStorage   *LuggageStorage `json:"luggage_storage,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
-	TagID uint `json:"tag_id"`
+	LocationID uint      `json:"location_id" gorm:"index"`
+	Location   *Location `json:"location,omitempty" gorm:"foreignKey:LocationID"`
+
+	TagID uint `json:"tag_id" gorm:"index"`
 	Tag   *Tag `json:"tag,omitempty" gorm:"foreignKey:TagID"`
 
 	CreatedAt time.Time
@@ -122,14 +122,13 @@ type Tag struct {
 }*/
 
 type Location struct {
-	ID     uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name string `json:"name"`
 
 	HotelID uint   `json:"hotel_id" gorm:"index"`
 	Hotel   *Hotel `json:"hotel,omitempty" gorm:"foreignKey:HotelID"`
 
-	Luggage []LuggageStorage `json:"luggage,omitempty" gorm:"foreignKey:LocationID"`
+	Luggage []Luggage `json:"luggage,omitempty" gorm:"foreignKey:LocationID"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -142,7 +141,7 @@ type Guest struct {
 	Phone string `json:"phone"`
 	Room  string `json:"room"`
 
-	Luggage []LuggageStorage `json:"luggage,omitempty" gorm:"foreignKey:GuestID"`
+	LuggageStorage []LuggageStorage `json:"luggage,omitempty" gorm:"foreignKey:GuestID"`
 
 	CreatedAt time.Time      ``
 	UpdatedAt time.Time      ``

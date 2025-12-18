@@ -1,13 +1,12 @@
 package admin
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
+	"net/http"
 )
 
 func GetAllRole(s *services.Services, c *gin.Context) {
@@ -74,6 +73,28 @@ func GetAllEmployee(s *services.Services, c *gin.Context) {
 
 }
 
-func GetEmployee() {
+func GetAllLocation(s *services.Services, c *gin.Context) {
+	v, _ := c.Get("hotel_id")
+	id := v.(uint)
+	HotelID := id
+
+	var locations []models.Location
+	result := s.DB.Model(models.Location{}).Where("hotel_id = ?", HotelID).Find(&locations)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		logger.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("位置数据库查询错误")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "获取成功",
+		"data":    locations,
+	})
 
 }

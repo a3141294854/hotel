@@ -186,6 +186,11 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 		}).Error("角色权限数据库插入错误")
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "添加成功",
+	})
 }
 
 func AddHotel(s *services.Services, c *gin.Context) {
@@ -248,6 +253,6 @@ func AddHotel(s *services.Services, c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "添加成功",
-		"data":    req,
+		"data":    insert,
 	})
 }

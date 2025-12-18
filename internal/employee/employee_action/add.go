@@ -26,9 +26,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 		GuestPhone string `json:"guest_phone"`
 		GuestRoom  string `json:"guest_room"`
 
-		LocationID int `json:"location_id"`
-
-		Macs []string `json:"macs"`
+		Luggage []models.Luggage `json:"luggage"`
 
 		Status string `json:"status"`
 		Remark string `json:"remark"`
@@ -116,12 +114,6 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 	insert.OperatorName = d.(string)
 
 	insert.Status = "寄存中"
-	//默认设置为前台
-	if req.LocationID == 0 {
-		insert.LocationID = 1
-	} else {
-		insert.LocationID = uint(req.LocationID)
-	}
 
 	code, err := util.GeneratePickUpCode(s, a.(uint))
 	insert.PickUpCode = code
@@ -148,44 +140,18 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	//创建行李mac表记录
-	for _, mac := range req.Macs {
-		var tag models.Tag
-		result = s.DB.Model(&models.Tag{}).Where("mac = ?", mac).First(&tag)
-		if result.Error != nil {
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				c.JSON(http.StatusNotFound, gin.H{
-					"success": false,
-					"message": "行李mac不存在",
-				})
-				return
-			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"success": false,
-					"message": "查询行李mac失败",
-				})
-				logger.Logger.WithFields(logrus.Fields{
-					"error": result.Error,
-				}).Error("查询行李mac失败")
-				return
-			}
-		}
-
-		luggage := models.Luggage{
-			LuggageStorageID: insert.ID,
-			TagID:            tag.ID,
-			Status:           "寄存中",
-		}
-
-		result = s.DB.Model(&models.Luggage{}).Create(&luggage)
+	//创建行李表
+	for _, v := range req.Luggage {
+		v.LuggageStorageID = insert.ID
+		result = s.DB.Model(&models.Luggage{}).Create(&v)
 		if result.Error != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
-				"message": "创建行李mac记录失败",
+				"message": "创建行李记录失败",
 			})
 			logger.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
-			}).Error("创建行李mac记录失败")
+			}).Error("创建行李记录失败")
 			return
 		}
 	}

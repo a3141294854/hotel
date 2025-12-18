@@ -51,6 +51,9 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			d.POST("/luggageStorage", func(c *gin.Context) {
 				employee_action.DeleteStorage(c, service)
 			})
+			d.POST("/luggage", func(c *gin.Context) {
+				employee_action.DeleteLuggage(c, service)
+			})
 		}
 
 		u := e.Group("/update")
@@ -133,6 +136,9 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 			g.GET("/role", func(c *gin.Context) {
 				admin.GetAllRole(service, c)
+			})
+			g.GET("/location", func(c *gin.Context) {
+				admin.GetAllLocation(service, c)
 			})
 		}
 

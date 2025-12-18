@@ -137,6 +137,7 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 		var role models.Role
 		s.DB.Model(&models.Role{}).Preload("Permissions").Where("id = ?", employee.RoleID).First(&role)
 		for _, v := range role.Permissions {
+			//fmt.Println(v.Name)
 			c.Set(v.Name, 1)
 		}
 		c.Next()

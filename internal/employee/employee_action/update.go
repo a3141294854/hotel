@@ -2,7 +2,6 @@ package employee_action
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -74,8 +73,7 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 		}).Error("更新行李失败")
 		return
 	}
-	s.RdbCac.Del(c, existingLuggage.Guest.Name)
-	s.RdbCac.Del(c, fmt.Sprintf("%d", luggage.GuestID))
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李更新成功",
