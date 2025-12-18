@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Hotel 行李管理系统 API",
-    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流和分布式锁机制。",
+    "description": "酒店行李管理系统，提供JWT双令牌认证、RBAC权限管理、Redis缓存、行李管理和统计功能。支持员工注册、登录、基于角色的权限控制、行李增删改查和统计功能。系统使用Redis多层缓存架构提升性能，包含令牌桶限流。",
     "version": "2.5.1",
     "contact": {
       "name": "Hotel Management System",
@@ -17,13 +17,16 @@
       "name": "行李管理"
     },
     {
-      "name": "行李查询"
+      "name": "行李寄存表查询"
     },
     {
       "name": "统计功能"
     },
     {
       "name": "管理员工具"
+    },
+    {
+      "name": "行李查询"
     }
   ],
   "paths": {
@@ -260,7 +263,7 @@
       "post": {
         "summary": "更新行李消息",
         "deprecated": false,
-        "description": "更新行李的信息，行李寄存表下的行李信息,主要是取出和迁移",
+        "description": "更新行李的信息，行李寄存表下的行李信息,主要是取出.",
         "tags": [
           "行李管理"
         ],
@@ -276,18 +279,28 @@
                     "example": 1
                   },
                   "tag_id": {
-                    "type": "string",
-                    "example": "红色行李箱"
+                    "type": "integer"
                   },
-                  "status": {
-                    "type": "string",
-                    "example": "寄存中"
+                  "tag": {
+                    "$ref": "#/components/schemas/Tag"
+                  },
+                  "location_id": {
+                    "type": "integer"
+                  },
+                  "location": {
+                    "$ref": "#/components/schemas/Location"
+                  },
+                  "luggage_storage_id": {
+                    "type": "integer"
+                  },
+                  "luggage_storage": {
+                    "$ref": "#/components/schemas/LuggageStorage"
                   }
                 }
               },
               "example": {
-                "id": 1,
-                "status": "寄存中"
+                "id": 2,
+                "location_id": 1
               }
             }
           },
@@ -321,13 +334,77 @@
           },
           "401": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           },
           "500": {
             "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employee/delete/luggage": {
+      "post": {
+        "summary": "删除行李信息",
+        "deprecated": false,
+        "description": "删除行李消息，发个id",
+        "tags": [
+          "行李管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              },
+              "example": {
+                "id": 4
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
             "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "操作成功"
+                    }
+                  }
+                }
+              }
+            },
             "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": ""
           }
         },
         "security": [
@@ -641,6 +718,23 @@
                     }
                   }
                 }
+              },
+              "example": {
+                "id": 2,
+                "status": "已取出",
+                "location_id": 1,
+                "remark": "客户已取走",
+                "bag_count": 2,
+                "backpack_count": 1,
+                "box_count": 3,
+                "other_count": 1,
+                "guest": {
+                  "id": 1,
+                  "name": "张三",
+                  "gender": "男",
+                  "phone": "13800138000",
+                  "id_card": "110101199001011234"
+                }
               }
             }
           },
@@ -747,6 +841,9 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "id": 1
               }
             }
           },
@@ -933,6 +1030,7 @@
         "deprecated": false,
         "description": "根据客户姓名查询行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [
@@ -974,32 +1072,56 @@
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "行李获取成功",
+                  "count": 1,
                   "data": [
                     {
-                      "id": 1,
+                      "id": 5,
                       "bag_count": 2,
                       "backpack_count": 1,
                       "box_count": 3,
-                      "other_count": 1,
-                      "guest": {
-                        "id": 1,
-                        "name": "张三",
-                        "phone": "13800138000",
-                        "room": "808"
-                      },
-                      "location": {
-                        "id": 1,
-                        "name": "前台"
-                      },
-                      "operator_name": "张三",
-                      "pick_up_code": "ABC123",
+                      "other_count": 0,
+                      "operator_id": 1,
+                      "operator_name": "管理员",
+                      "hotel_id": 1,
+                      "guest_id": 3,
+                      "luggage": [
+                        {
+                          "id": 5,
+                          "status": "寄存中",
+                          "luggage_storage_id": 5,
+                          "location_id": 1,
+                          "location": {
+                            "id": 1,
+                            "name": "前台",
+                            "hotel_id": 1,
+                            "CreatedAt": "2025-12-15T16:56:36+08:00",
+                            "UpdatedAt": "2025-12-15T16:56:36+08:00",
+                            "DeletedAt": null
+                          },
+                          "tag_id": 1,
+                          "tag": {
+                            "id": 1,
+                            "name": "红色行李箱",
+                            "mac": "AA:BB:CC:DD:EE:FF",
+                            "CreatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "UpdatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "DeletedAt": null
+                          },
+                          "CreatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "UpdatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "DeletedAt": null
+                        }
+                      ],
+                      "pick_up_code": "731282",
                       "status": "寄存中",
-                      "remark": "易碎品"
+                      "remark": "易碎品",
+                      "CreatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "UpdatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "DeletedAt": null
                     }
                   ],
-                  "count": 1
+                  "message": "行李获取成功",
+                  "success": true
                 }
               }
             },
@@ -1022,8 +1144,7 @@
           },
           "404": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -1035,10 +1156,11 @@
     },
     "/employee/get/all": {
       "get": {
-        "summary": "查询所有行李",
+        "summary": "查询所有行李寄存表",
         "deprecated": false,
         "description": "查询所有行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [],
@@ -1053,63 +1175,78 @@
                       "$ref": "#/components/schemas/SuccessResponse"
                     },
                     {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/LuggageStorage"
-                          }
-                        },
-                        "count": {
-                          "type": "integer"
-                        }
-                      }
+                      "$ref": "#/components/schemas/LuggageStorage"
                     }
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "行李获取成功",
+                  "count": 1,
                   "data": [
                     {
-                      "id": 1,
+                      "id": 5,
                       "bag_count": 2,
                       "backpack_count": 1,
                       "box_count": 3,
-                      "other_count": 1,
+                      "other_count": 0,
+                      "operator_id": 1,
+                      "operator_name": "管理员",
+                      "hotel_id": 1,
+                      "guest_id": 3,
                       "guest": {
-                        "id": 1,
+                        "id": 3,
                         "name": "张三",
                         "phone": "13800138000",
-                        "room": "808"
-                      },
-                      "location": {
-                        "id": 1,
-                        "name": "前台"
+                        "room": "808",
+                        "CreatedAt": "2025-12-18T15:38:30.323+08:00",
+                        "UpdatedAt": "2025-12-18T15:38:30.323+08:00",
+                        "DeletedAt": null
                       },
                       "luggage": [
                         {
-                          "id": 1,
+                          "id": 5,
+                          "status": "寄存中",
+                          "luggage_storage_id": 5,
+                          "location_id": 1,
+                          "location": {
+                            "id": 1,
+                            "name": "前台",
+                            "hotel_id": 1,
+                            "CreatedAt": "2025-12-15T16:56:36+08:00",
+                            "UpdatedAt": "2025-12-15T16:56:36+08:00",
+                            "DeletedAt": null
+                          },
+                          "tag_id": 1,
                           "tag": {
                             "id": 1,
                             "name": "红色行李箱",
-                            "mac": "AA:BB:CC:DD:EE:FF"
+                            "mac": "AA:BB:CC:DD:EE:FF",
+                            "CreatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "UpdatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "DeletedAt": null
                           },
-                          "status": "寄存中"
+                          "CreatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "UpdatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "DeletedAt": null
                         }
                       ],
-                      "operator_name": "张三",
-                      "pick_up_code": "ABC123",
+                      "pick_up_code": "731282",
                       "status": "寄存中",
-                      "remark": "易碎品"
+                      "remark": "易碎品",
+                      "CreatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "UpdatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "DeletedAt": null
                     }
                   ],
-                  "count": 1
+                  "message": "行李获取成功",
+                  "success": true
                 }
               }
             },
             "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
           },
           "500": {
             "description": "服务器错误",
@@ -1140,6 +1277,7 @@
         "deprecated": false,
         "description": "根据客户ID查询行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [
@@ -1148,7 +1286,7 @@
             "in": "query",
             "description": "客户ID",
             "required": true,
-            "example": 1,
+            "example": 3,
             "schema": {
               "type": "integer"
             }
@@ -1179,6 +1317,67 @@
                       }
                     }
                   ]
+                },
+                "example": {
+                  "count": 1,
+                  "data": [
+                    {
+                      "id": 5,
+                      "bag_count": 2,
+                      "backpack_count": 1,
+                      "box_count": 3,
+                      "other_count": 0,
+                      "operator_id": 1,
+                      "operator_name": "管理员",
+                      "hotel_id": 1,
+                      "guest_id": 3,
+                      "guest": {
+                        "id": 3,
+                        "name": "张三",
+                        "phone": "13800138000",
+                        "room": "808",
+                        "CreatedAt": "2025-12-18T15:38:30.323+08:00",
+                        "UpdatedAt": "2025-12-18T15:38:30.323+08:00",
+                        "DeletedAt": null
+                      },
+                      "luggage": [
+                        {
+                          "id": 5,
+                          "status": "寄存中",
+                          "luggage_storage_id": 5,
+                          "location_id": 1,
+                          "location": {
+                            "id": 1,
+                            "name": "前台",
+                            "hotel_id": 1,
+                            "CreatedAt": "2025-12-15T16:56:36+08:00",
+                            "UpdatedAt": "2025-12-15T16:56:36+08:00",
+                            "DeletedAt": null
+                          },
+                          "tag_id": 1,
+                          "tag": {
+                            "id": 1,
+                            "name": "红色行李箱",
+                            "mac": "AA:BB:CC:DD:EE:FF",
+                            "CreatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "UpdatedAt": "2025-12-16T22:15:30.068+08:00",
+                            "DeletedAt": null
+                          },
+                          "CreatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "UpdatedAt": "2025-12-18T15:38:30.369+08:00",
+                          "DeletedAt": null
+                        }
+                      ],
+                      "pick_up_code": "731282",
+                      "status": "寄存中",
+                      "remark": "易碎品",
+                      "CreatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "UpdatedAt": "2025-12-18T15:38:30.365+08:00",
+                      "DeletedAt": null
+                    }
+                  ],
+                  "message": "行李获取成功",
+                  "success": true
                 }
               }
             },
@@ -1201,8 +1400,7 @@
           },
           "404": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -1218,6 +1416,7 @@
         "deprecated": false,
         "description": "根据存放位置名称查询行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [
@@ -1257,6 +1456,23 @@
                       }
                     }
                   ]
+                },
+                "example": {
+                  "count": 1,
+                  "data": [
+                    {
+                      "id": 5,
+                      "status": "寄存中",
+                      "luggage_storage_id": 5,
+                      "location_id": 1,
+                      "tag_id": 1,
+                      "CreatedAt": "2025-12-18T15:38:30.369+08:00",
+                      "UpdatedAt": "2025-12-18T15:38:30.369+08:00",
+                      "DeletedAt": null
+                    }
+                  ],
+                  "message": "获取行李成功",
+                  "success": true
                 }
               }
             },
@@ -1277,122 +1493,13 @@
             },
             "headers": {}
           },
+          "401": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
+          },
           "404": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/employee/get/status": {
-      "get": {
-        "summary": "按状态查询行李",
-        "deprecated": false,
-        "description": "根据状态查询行李记录。需要'查看行李'权限。",
-        "tags": [
-          "行李查询"
-        ],
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "description": "行李状态",
-            "required": true,
-            "example": "寄存中",
-            "schema": {
-              "type": "string",
-              "example": "寄存中"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "查询成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/SuccessResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Luggage"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "example": {
-                  "count": 5,
-                  "data": [
-                    {
-                      "id": 3,
-                      "guest_id": 2,
-                      "tag": "红色行李箱",
-                      "weight": 15.5,
-                      "status": "寄存中",
-                      "location": "前台",
-                      "guest": {
-                        "id": 2,
-                        "name": "李四"
-                      }
-                    },
-                    {
-                      "id": 4,
-                      "guest_id": 1,
-                      "tag": "红色行李箱",
-                      "weight": 0,
-                      "status": "寄存中",
-                      "location": "前台",
-                      "guest": {
-                        "id": 1,
-                        "name": "张三"
-                      }
-                    }
-                  ],
-                  "message": "行李获取成功",
-                  "success": true
-                }
-              }
-            },
-            "headers": {}
-          },
-          "401": {
-            "description": "令牌无效或已过期",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "success": false,
-                  "message": "令牌无效或已过期"
-                }
-              }
-            },
-            "headers": {}
-          },
-          "403": {
-            "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
-          },
-          "500": {
-            "$ref": "#/components/responses/通用令牌无效",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -1408,6 +1515,7 @@
         "deprecated": false,
         "description": "多条件组合查询行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [],
@@ -1438,6 +1546,9 @@
                     "example": "寄存中"
                   }
                 }
+              },
+              "example": {
+                "status": "寄存中"
               }
             }
           },
@@ -1490,8 +1601,7 @@
           },
           "404": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -1507,6 +1617,7 @@
         "deprecated": false,
         "description": "根据取件码查询行李寄存记录。需要'查看行李'权限。",
         "tags": [
+          "行李寄存表查询",
           "行李查询"
         ],
         "parameters": [],
@@ -1525,6 +1636,9 @@
                     "example": "ABC123"
                   }
                 }
+              },
+              "example": {
+                "pick_up_code": "731282"
               }
             }
           },
@@ -1551,40 +1665,63 @@
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "行李获取成功",
                   "data": {
-                    "id": 1,
+                    "id": 2,
                     "bag_count": 2,
                     "backpack_count": 1,
                     "box_count": 3,
-                    "other_count": 1,
+                    "other_count": 0,
+                    "operator_id": 1,
+                    "operator_name": "管理员",
+                    "hotel_id": 1,
+                    "guest_id": 2,
                     "guest": {
-                      "id": 1,
+                      "id": 2,
                       "name": "张三",
                       "phone": "13800138000",
-                      "room": "808"
-                    },
-                    "location": {
-                      "id": 1,
-                      "name": "前台"
+                      "room": "801",
+                      "CreatedAt": "2025-12-15T16:49:24.45+08:00",
+                      "UpdatedAt": "2025-12-15T16:49:24.45+08:00",
+                      "DeletedAt": null
                     },
                     "luggage": [
                       {
-                        "id": 1,
+                        "id": 2,
+                        "status": "寄存中",
+                        "luggage_storage_id": 2,
+                        "location_id": 1,
+                        "location": {
+                          "id": 1,
+                          "name": "前台",
+                          "status": "激活",
+                          "hotel_id": 1,
+                          "CreatedAt": "2025-12-15T16:56:36+08:00",
+                          "UpdatedAt": "2025-12-15T16:56:36+08:00",
+                          "DeletedAt": null
+                        },
+                        "tag_id": 1,
                         "tag": {
                           "id": 1,
                           "name": "红色行李箱",
-                          "mac": "AA:BB:CC:DD:EE:FF"
+                          "mac": "AA:BB:CC:DD:EE:FF",
+                          "CreatedAt": "2025-12-16T22:15:30.068+08:00",
+                          "UpdatedAt": "2025-12-16T22:15:30.068+08:00",
+                          "DeletedAt": null
                         },
-                        "status": "寄存中"
+                        "CreatedAt": "2025-12-16T23:26:46.515+08:00",
+                        "UpdatedAt": "2025-12-16T23:26:46.515+08:00",
+                        "DeletedAt": null
                       }
                     ],
-                    "operator_name": "张三",
-                    "pick_up_code": "ABC123",
+                    "pick_up_code": "882234",
                     "status": "寄存中",
-                    "remark": "易碎品"
-                  }
+                    "remark": "易碎品",
+                    "CreatedAt": "2025-12-16T23:26:46.511+08:00",
+                    "UpdatedAt": "2025-12-16T23:26:46.511+08:00",
+                    "DeletedAt": null
+                  },
+                  "message": "行李获取成功",
+                  "success": true
                 }
               }
             },
@@ -1796,6 +1933,13 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "name": "张三",
+                "user": "zhangsan",
+                "password": "123456",
+                "phone": "13800138000",
+                "hotel_id": 1
               }
             }
           },
@@ -1897,6 +2041,9 @@
                     "example": "查看行李"
                   }
                 }
+              },
+              "example": {
+                "name": "测试"
               }
             }
           },
@@ -1923,13 +2070,16 @@
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "添加成功",
                   "data": {
-                    "id": 1,
-                    "name": "查看行李",
-                    "status": "有效"
-                  }
+                    "id": 6,
+                    "name": "测试",
+                    "status": "有效",
+                    "CreatedAt": "2025-12-18T16:55:52.673+08:00",
+                    "UpdatedAt": "2025-12-18T16:55:52.673+08:00",
+                    "DeletedAt": null
+                  },
+                  "message": "添加成功",
+                  "success": true
                 }
               }
             },
@@ -1952,8 +2102,7 @@
           },
           "409": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -1987,6 +2136,9 @@
                     "example": "行李管理员"
                   }
                 }
+              },
+              "example": {
+                "name": "测试"
               }
             }
           },
@@ -2042,8 +2194,7 @@
           },
           "409": {
             "$ref": "#/components/responses/通用内部错误",
-            "description": "",
-            "headers": {}
+            "description": ""
           }
         },
         "security": [
@@ -2073,36 +2224,79 @@
                       "$ref": "#/components/schemas/SuccessResponse"
                     },
                     {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Employee"
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/Employee"
                     }
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "获取成功",
                   "data": [
                     {
                       "id": 1,
-                      "name": "张三",
-                      "user": "zhangsan",
+                      "name": "管理员",
+                      "user": "admin",
+                      "password": "admin123",
                       "phone": "13800138000",
+                      "status": "正常",
+                      "last_active_time": "2025-12-18T16:22:43.872+08:00",
                       "hotel_id": 1,
-                      "role_id": 1,
+                      "role_id": 2,
                       "role": {
-                        "id": 1,
-                        "name": "员工",
-                        "status": "有效"
-                      }
+                        "id": 2,
+                        "name": "管理员",
+                        "status": "",
+                        "permissions": [
+                          {
+                            "id": 1,
+                            "name": "查看行李",
+                            "status": "有效",
+                            "CreatedAt": "2025-12-14T17:59:25.835+08:00",
+                            "UpdatedAt": "2025-12-14T17:59:25.835+08:00",
+                            "DeletedAt": null
+                          },
+                          {
+                            "id": 2,
+                            "name": "创建行李",
+                            "status": "有效",
+                            "CreatedAt": "2025-12-14T17:59:25.838+08:00",
+                            "UpdatedAt": "2025-12-14T17:59:25.838+08:00",
+                            "DeletedAt": null
+                          },
+                          {
+                            "id": 3,
+                            "name": "更新行李",
+                            "status": "有效",
+                            "CreatedAt": "2025-12-14T17:59:25.841+08:00",
+                            "UpdatedAt": "2025-12-14T17:59:25.841+08:00",
+                            "DeletedAt": null
+                          },
+                          {
+                            "id": 4,
+                            "name": "删除行李",
+                            "status": "有效",
+                            "CreatedAt": "2025-12-14T17:59:25.843+08:00",
+                            "UpdatedAt": "2025-12-14T17:59:25.843+08:00",
+                            "DeletedAt": null
+                          },
+                          {
+                            "id": 5,
+                            "name": "管理员",
+                            "status": "有效",
+                            "CreatedAt": "2025-12-14T17:59:25.845+08:00",
+                            "UpdatedAt": "2025-12-14T17:59:25.845+08:00",
+                            "DeletedAt": null
+                          }
+                        ],
+                        "CreatedAt": "2025-12-14T17:59:25.85+08:00",
+                        "UpdatedAt": "2025-12-14T17:59:25.85+08:00",
+                        "DeletedAt": null
+                      },
+                      "CreatedAt": "2025-12-16T23:24:22+08:00",
+                      "UpdatedAt": "2025-12-18T16:22:43.872+08:00",
+                      "DeletedAt": null
                     }
-                  ]
+                  ],
+                  "message": "获取成功",
+                  "success": true
                 }
               }
             },
@@ -2164,20 +2358,50 @@
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "获取成功",
                   "data": [
                     {
                       "id": 1,
-                      "name": "创建行李",
-                      "status": "有效"
+                      "name": "查看行李",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-14T17:59:25.835+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.835+08:00",
+                      "DeletedAt": null
                     },
                     {
                       "id": 2,
-                      "name": "查看行李",
-                      "status": "有效"
+                      "name": "创建行李",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-14T17:59:25.838+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.838+08:00",
+                      "DeletedAt": null
+                    },
+                    {
+                      "id": 3,
+                      "name": "更新行李",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-14T17:59:25.841+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.841+08:00",
+                      "DeletedAt": null
+                    },
+                    {
+                      "id": 4,
+                      "name": "删除行李",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-14T17:59:25.843+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.843+08:00",
+                      "DeletedAt": null
+                    },
+                    {
+                      "id": 5,
+                      "name": "管理员",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-14T17:59:25.845+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.845+08:00",
+                      "DeletedAt": null
                     }
-                  ]
+                  ],
+                  "message": "获取成功",
+                  "success": true
                 }
               }
             },
@@ -2226,39 +2450,123 @@
                       "$ref": "#/components/schemas/SuccessResponse"
                     },
                     {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Role"
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/Role"
                     }
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "获取成功",
                   "data": [
                     {
                       "id": 1,
                       "name": "员工",
-                      "status": "有效",
+                      "status": "",
                       "permissions": [
                         {
                           "id": 1,
+                          "name": "查看行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.835+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.835+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 2,
                           "name": "创建行李",
-                          "status": "有效"
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.838+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.838+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 3,
+                          "name": "更新行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.841+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.841+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 4,
+                          "name": "删除行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.843+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.843+08:00",
+                          "DeletedAt": null
                         }
-                      ]
+                      ],
+                      "CreatedAt": "2025-12-14T17:59:25.847+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.847+08:00",
+                      "DeletedAt": null
+                    },
+                    {
+                      "id": 2,
+                      "name": "管理员",
+                      "status": "",
+                      "permissions": [
+                        {
+                          "id": 1,
+                          "name": "查看行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.835+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.835+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 2,
+                          "name": "创建行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.838+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.838+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 3,
+                          "name": "更新行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.841+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.841+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 4,
+                          "name": "删除行李",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.843+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.843+08:00",
+                          "DeletedAt": null
+                        },
+                        {
+                          "id": 5,
+                          "name": "管理员",
+                          "status": "",
+                          "CreatedAt": "2025-12-14T17:59:25.845+08:00",
+                          "UpdatedAt": "2025-12-14T17:59:25.845+08:00",
+                          "DeletedAt": null
+                        }
+                      ],
+                      "CreatedAt": "2025-12-14T17:59:25.85+08:00",
+                      "UpdatedAt": "2025-12-14T17:59:25.85+08:00",
+                      "DeletedAt": null
+                    },
+                    {
+                      "id": 3,
+                      "name": "测试",
+                      "status": "有效",
+                      "CreatedAt": "2025-12-15T21:49:16.812+08:00",
+                      "UpdatedAt": "2025-12-15T21:49:16.812+08:00",
+                      "DeletedAt": null
                     }
-                  ]
+                  ],
+                  "message": "获取成功",
+                  "success": true
                 }
               }
             },
             "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
           },
           "500": {
             "description": "服务器错误",
@@ -2274,6 +2582,76 @@
               }
             },
             "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tool/get/location": {
+      "get": {
+        "summary": "查询所有寄存位置",
+        "deprecated": false,
+        "description": "查询查询者所处的酒店的寄存位置",
+        "tags": [
+          "管理员工具"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "前台"
+                    },
+                    "hotel_id": {
+                      "type": "integer"
+                    },
+                    "hotel": {
+                      "$ref": "#/components/schemas/Hotel"
+                    },
+                    "luggage": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "前台",
+                      "hotel_id": 1,
+                      "CreatedAt": "2025-12-15T16:56:36+08:00",
+                      "UpdatedAt": "2025-12-15T16:56:36+08:00",
+                      "DeletedAt": null
+                    }
+                  ],
+                  "message": "获取成功",
+                  "success": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/通用令牌无效",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/通用内部错误",
+            "description": ""
           }
         },
         "security": [
@@ -2313,6 +2691,10 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "role_id": 4,
+                "permission_id": 1
               }
             }
           },
@@ -2414,6 +2796,10 @@
                     "example": 2
                   }
                 }
+              },
+              "example": {
+                "employee_id": 3,
+                "role_id": 4
               }
             }
           },
@@ -2497,6 +2883,9 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "employee_id": 2
               }
             }
           },
@@ -2580,6 +2969,9 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "role_id": 3
               }
             }
           },
@@ -2663,6 +3055,9 @@
                     "example": 1
                   }
                 }
+              },
+              "example": {
+                "permission_id": 6
               }
             }
           },
@@ -2757,6 +3152,11 @@
                     "example": "五星级酒店"
                   }
                 }
+              },
+              "example": {
+                "name": "希尔顿酒店1",
+                "place": "北京市朝阳区",
+                "remark": "五星级酒店"
               }
             }
           },
@@ -2783,13 +3183,18 @@
                   ]
                 },
                 "example": {
-                  "success": true,
-                  "message": "添加成功",
                   "data": {
-                    "name": "希尔顿酒店",
+                    "id": 3,
+                    "name": "希尔顿酒店1",
+                    "status": "",
                     "place": "北京市朝阳区",
-                    "remark": "五星级酒店"
-                  }
+                    "remark": "五星级酒店",
+                    "CreatedAt": "2025-12-18T16:54:57.268+08:00",
+                    "UpdatedAt": "2025-12-18T16:54:57.268+08:00",
+                    "DeletedAt": null
+                  },
+                  "message": "添加成功",
+                  "success": true
                 }
               }
             },
@@ -2849,9 +3254,6 @@
           }
         }
       },
-      "通用内部错误": {
-        "$ref": "#/components/schemas/ErrorResponse"
-      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -2864,6 +3266,64 @@
             "example": "操作失败"
           }
         }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "expires_in": {
+            "type": "integer",
+            "example": 900
+          },
+          "token_type": {
+            "type": "string",
+            "example": "Bearer"
+          }
+        }
+      },
+      "RoleWithPermissions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Role"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "permissions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Permission"
+                },
+                "description": "角色对应的权限列表"
+              }
+            }
+          }
+        ]
+      },
+      "EmployeeWithRole": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Employee"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        ]
+      },
+      "通用内部错误": {
+        "$ref": "#/components/schemas/ErrorResponse"
       },
       "通用令牌无效": {
         "$ref": "#/components/schemas/ErrorResponse"
@@ -2910,37 +3370,16 @@
             "description": "酒店ID",
             "example": 1
           },
+          "hotel": {
+            "$ref": "#/components/schemas/Hotel"
+          },
           "role_id": {
             "type": "integer",
             "description": "角色ID",
             "example": 1
           },
-          "hotel": {
-            "$ref": "#/components/schemas/Hotel"
-          },
           "role": {
             "$ref": "#/components/schemas/Role"
-          }
-        }
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          },
-          "refresh_token": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          },
-          "expires_in": {
-            "type": "integer",
-            "example": 900
-          },
-          "token_type": {
-            "type": "string",
-            "example": "Bearer"
           }
         }
       },
@@ -2954,21 +3393,22 @@
           "tag_id": {
             "type": "integer"
           },
-          "status": {
-            "type": "string",
-            "example": "寄存中"
+          "tag": {
+            "$ref": "#/components/schemas/Tag"
           },
           "location_id": {
             "type": "integer"
           },
           "location": {
             "$ref": "#/components/schemas/Location"
+          },
+          "luggage_storage_id": {
+            "type": "integer"
+          },
+          "luggage_storage": {
+            "$ref": "#/components/schemas/LuggageStorage"
           }
-        },
-        "required": [
-          "location_id",
-          "location"
-        ]
+        }
       },
       "Permission": {
         "type": "object",
@@ -2987,23 +3427,11 @@
             "type": "string",
             "description": "状态",
             "example": "有效"
+          },
+          "roles": {
+            "$ref": "#/components/schemas/Role"
           }
         }
-      },
-      "EmployeeWithRole": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Employee"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "role": {
-                "$ref": "#/components/schemas/Role"
-              }
-            }
-          }
-        ]
       },
       "TokenResponse": {
         "type": "object",
@@ -3049,32 +3477,10 @@
             "example": "有效"
           },
           "permissions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            },
-            "description": "权限列表"
+            "description": "权限列表",
+            "$ref": "#/components/schemas/Permission"
           }
         }
-      },
-      "RoleWithPermissions": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Role"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "permissions": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Permission"
-                },
-                "description": "角色对应的权限列表"
-              }
-            }
-          }
-        ]
       },
       "LuggageStorage": {
         "type": "object",
@@ -3103,6 +3509,9 @@
             "type": "integer",
             "example": 1
           },
+          "guest": {
+            "$ref": "#/components/schemas/Guest"
+          },
           "operator_id": {
             "type": "integer",
             "example": 1
@@ -3110,10 +3519,6 @@
           "operator_name": {
             "type": "string",
             "example": "张三"
-          },
-          "pick_up_code": {
-            "type": "string",
-            "example": "ABC123"
           },
           "status": {
             "type": "string",
@@ -3123,14 +3528,18 @@
             "type": "string",
             "example": "易碎品"
           },
-          "guest": {
-            "$ref": "#/components/schemas/Guest"
-          },
           "luggage": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Luggage"
-            }
+            "$ref": "#/components/schemas/Luggage"
+          },
+          "pick_up_code": {
+            "type": "string",
+            "example": "ABC123"
+          },
+          "hotel_id": {
+            "type": "integer"
+          },
+          "hotel": {
+            "$ref": "#/components/schemas/Hotel"
           }
         }
       },
@@ -3161,6 +3570,15 @@
           "name": {
             "type": "string",
             "example": "前台"
+          },
+          "hotel_id": {
+            "type": "integer"
+          },
+          "hotel": {
+            "$ref": "#/components/schemas/Hotel"
+          },
+          "luggage": {
+            "type": "string"
           }
         }
       },
@@ -3175,10 +3593,6 @@
             "type": "string",
             "example": "张三"
           },
-          "gender": {
-            "type": "string",
-            "example": "男"
-          },
           "phone": {
             "type": "string",
             "example": "13800138000"
@@ -3186,6 +3600,9 @@
           "room": {
             "type": "string",
             "example": "808"
+          },
+          "luggageStorage": {
+            "$ref": "#/components/schemas/LuggageStorage"
           }
         }
       },
