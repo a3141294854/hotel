@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"hotel/internal/util/logger"
 	"net"
 	"net/http"
 	"strings"
@@ -35,12 +34,12 @@ func CheckAction(name string) gin.HandlerFunc {
 // RateLimit 限流中间件
 func RateLimit(name string, s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !util.LimiterAllow(name, s, c) {
+		if !util.LimiterAllow(name, s.RdbLim, c) {
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"success": false,
 				"message": "请求过于频繁，请稍后再试",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"client_ip": c.ClientIP(),
 			}).Warn("请求过于频繁")
 			c.Abort()
@@ -118,7 +117,7 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 				"success": false,
 				"message": "请先登录",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"client_ip": c.ClientIP(),
 			}).Warn("JWT令牌中未找到声明")
 			c.Abort()
@@ -181,7 +180,7 @@ func LogRequest() gin.HandlerFunc {
 		//记录请求信息
 		requestID, _ := c.Get("request_id")
 		duration := time.Since(start)
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"request_id": requestID,
 			"method":     c.Request.Method,
 			"path":       c.Request.URL.Path,

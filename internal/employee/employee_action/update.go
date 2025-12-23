@@ -2,12 +2,12 @@ package employee_action
 
 import (
 	"errors"
+	"hotel/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -22,7 +22,7 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 			"message": "请求数据格式错误",
 		})
 
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("行李数据绑定错误")
 		return
@@ -53,7 +53,7 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 				"message": "查询行李失败",
 			})
 
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
 				"luggage_id": luggage.ID,
 			}).Error("查询行李失败")
@@ -68,7 +68,7 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "更新行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("更新行李失败")
@@ -104,7 +104,7 @@ func UpdateLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询行李失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
 				"luggage_id": luggage.ID,
 			}).Error("查询行李失败")
@@ -118,7 +118,7 @@ func UpdateLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "更新行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("更新行李失败")

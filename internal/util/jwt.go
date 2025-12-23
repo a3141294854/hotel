@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"hotel/internal/config"
 )
 
 var Secret []byte
@@ -29,10 +28,10 @@ type RefreshClaims struct {
 }
 
 // ConfigJwt 配置JWT
-func ConfigJwt(cfg *config.Config) {
-	Secret = []byte(cfg.JWT.SecretKey)
-	AccessExpireTime = cfg.JWT.AccessTokenDuration
-	RefreshExpireTime = cfg.JWT.RefreshTokenDuration
+func ConfigJwt(AccessTokenDuration time.Duration, RefreshTokenDuration time.Duration, SecretKey string) {
+	Secret = []byte(SecretKey)
+	AccessExpireTime = AccessTokenDuration
+	RefreshExpireTime = RefreshTokenDuration
 }
 
 // GenerateAccessToken 生成访问令牌

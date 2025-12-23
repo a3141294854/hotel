@@ -2,12 +2,12 @@ package admin
 
 import (
 	"errors"
+	"hotel/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -21,7 +21,7 @@ func AddPermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("权限数据绑定错误")
 		return
@@ -43,7 +43,7 @@ func AddPermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("权限数据库插入错误")
 		return
@@ -65,7 +65,7 @@ func AddRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("角色数据绑定错误")
 		return
@@ -84,7 +84,7 @@ func AddRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("角色数据库查询错误")
 	}
@@ -95,7 +95,7 @@ func AddRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("角色数据库插入错误")
 		return
@@ -122,7 +122,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("请求数据格式错误")
 		return
@@ -142,7 +142,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":   result.Error,
 			"role_id": req.RoleID,
 		}).Error("角色数据库查询错误")
@@ -163,7 +163,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":         result.Error,
 			"permission_id": req.PermissionID,
 		}).Error("权限数据库查询错误")
@@ -178,7 +178,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":         result1,
 			"role_id":       req.RoleID,
 			"permission_id": req.PermissionID,
@@ -207,7 +207,7 @@ func AddHotel(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("请求数据格式错误")
 		return
@@ -227,7 +227,7 @@ func AddHotel(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("酒店数据库查询错误")
 	}
@@ -244,7 +244,7 @@ func AddHotel(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("酒店数据库插入错误")
 		return

@@ -4,7 +4,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"hotel/internal/util"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"time"
 )
@@ -13,68 +12,68 @@ import (
 func Table(db *gorm.DB) {
 	err := db.AutoMigrate(&models.Employee{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建员工表失败")
 	}
 
 	err = db.AutoMigrate(&models.Guest{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建客户表失败")
 	}
 
 	err = db.AutoMigrate(&models.LuggageStorage{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建行李存储表失败")
 	}
 
 	err = db.AutoMigrate(&models.Role{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建角色表失败")
 	}
 
 	err = db.AutoMigrate(&models.Permission{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建权限表失败")
 	}
 
 	err = db.AutoMigrate(&models.Location{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建位置表失败")
 	}
 
 	err = db.AutoMigrate(&models.Hotel{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建酒店表失败")
 	}
 
 	err = db.AutoMigrate(&models.Luggage{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建行李表失败")
 	}
 
 	err = db.AutoMigrate(&models.Tag{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("创建标签表失败")
 	}
 
-	logger.Logger.Info("数据库表创建成功")
+	util.Logger.Info("数据库表创建成功")
 
 	p1 := models.Permission{
 		Name: "查看行李",
@@ -83,13 +82,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&p1)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
@@ -102,13 +101,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&p2)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
@@ -121,13 +120,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&p3)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
@@ -140,13 +139,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&p4)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
@@ -159,13 +158,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&p5)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询权限表失败")
 		}
@@ -179,13 +178,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&insert)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询角色表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询角色表失败")
 		}
@@ -199,13 +198,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&insert5)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询角色表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询角色表失败")
 		}
@@ -218,13 +217,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&insert2)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询酒店表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询酒店表失败")
 		}
@@ -241,13 +240,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&insert3)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询员工表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询员工表失败")
 		}
@@ -261,13 +260,13 @@ func Table(db *gorm.DB) {
 	if !ok {
 		db.Create(&insert4)
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询位置表失败")
 		}
 	} else {
 		if err != nil {
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": err,
 			}).Error("查询位置表失败")
 		}

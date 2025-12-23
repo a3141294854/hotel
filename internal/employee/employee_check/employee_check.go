@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"hotel/internal/util"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 	"net/http"
@@ -23,7 +22,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("员工注册失败")
 		return
@@ -61,7 +60,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "注册失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"username": e.User,
 			"error":    result.Error,
 		}).Error("插入员工记录失败")
@@ -87,7 +86,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("员工登录信息绑定错误")
 		return
@@ -124,7 +123,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "登录失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
 			}).Error("员工信息搜索错误")
 			return
@@ -138,7 +137,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "登录失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("JWT token生成错误")
 		return
@@ -192,7 +191,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("员工刷新token信息绑定错误")
 		return
@@ -205,7 +204,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "token无效",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("JWT token解析错误")
 		return
@@ -235,7 +234,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("JWT token生成错误")
 		return

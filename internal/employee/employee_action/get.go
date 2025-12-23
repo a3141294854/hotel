@@ -3,13 +3,13 @@ package employee_action
 import (
 	"encoding/json"
 	"errors"
+	"hotel/internal/util"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -45,7 +45,7 @@ func GetPickUpCode(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询行李失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
 				"luggage_id": luggageStorage.ID,
 			}).Error("查询行李失败")
@@ -93,7 +93,7 @@ func GetName(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询客户失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
 			}).Error("查询客户失败")
 		}
@@ -122,7 +122,7 @@ func GetAll(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("获取行李失败")
 		return
@@ -175,7 +175,7 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("获取行李失败")
 		return
@@ -191,7 +191,7 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 
 	val, err := json.Marshal(luggage)
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":    err,
 			"guest_id": guestID,
 		}).Error("JSON序列化失败")
@@ -234,7 +234,7 @@ func GetLocation(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取存放地点失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("获取存放地点失败")
 		return
@@ -264,7 +264,7 @@ func GetAdvance(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("获取行李信息绑定错误")
 		return
@@ -294,7 +294,7 @@ func GetAdvance(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "获取行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("获取行李失败")
 		return

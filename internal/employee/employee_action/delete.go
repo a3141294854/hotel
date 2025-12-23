@@ -3,12 +3,12 @@ package employee_action
 import (
 	"errors"
 	"fmt"
+	"hotel/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -41,7 +41,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询行李失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
 				"luggage_id": luggage.ID,
 			}).Error("查询行李失败")
@@ -59,7 +59,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("删除行李失败")
@@ -73,7 +73,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result2.Error,
 			"luggage_id": luggage.ID,
 		}).Error("删除行李失败")
@@ -87,7 +87,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("删除行李失败")
@@ -100,7 +100,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "删除行李失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
 			"luggage_id": luggage.ID,
 		}).Error("事务提交失败")
@@ -123,7 +123,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("请求数据格式错误")
 		return
@@ -139,7 +139,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "行李不存在",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
 				"luggage_id": luggage.ID,
 			}).Error("行李不存在")
@@ -149,7 +149,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("行李数据库查询错误")
@@ -165,7 +165,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("行李数据库删除错误")
@@ -182,7 +182,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": luggage.ID,
 		}).Error("行李数据库删除错误")
@@ -198,7 +198,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "内部错误",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
 				"luggage_id": luggage.ID,
 			}).Error("行李数据库删除错误")
@@ -212,7 +212,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
 			"luggage_id": luggage.ID,
 		}).Error("事务提交失败")

@@ -6,7 +6,6 @@ import (
 	"hotel/internal/config"
 	"hotel/internal/table"
 	"hotel/internal/util"
-	"hotel/internal/util/logger"
 	"hotel/services"
 )
 
@@ -18,16 +17,16 @@ func main() {
 		return
 	}
 	//启动日志
-	logger.InitLogger(cfg.Log.Level, cfg.Log.Output, cfg.Log.FilePath, cfg.Log.MaxSize, cfg.Log.MaxBackups, cfg.Log.MaxAge)
+	util.InitLogger(cfg.Log.Level, cfg.Log.Output, cfg.Log.FilePath, cfg.Log.MaxSize, cfg.Log.MaxBackups, cfg.Log.MaxAge)
 
 	//建立数据库连接和表
 	service := services.NewDatabase(cfg)
 	table.Table(service.DB)
 
 	//创建全局限流
-	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service)
+	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service.RdbLim)
 	//启动jwt
-	util.ConfigJwt(cfg)
+	util.ConfigJwt(cfg.JWT.AccessTokenDuration, cfg.JWT.RefreshTokenDuration, cfg.JWT.SecretKey)
 
 	//启动路由
 	r := gin.Default()

@@ -155,9 +155,3 @@ type Hotel struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
-type TokenBucketLimiter struct {
-	Capacity     int           // 桶容量
-	FillRate     time.Duration // 添加令牌速率，如每10ms加1个令牌
-	Tokens       int           // 当前令牌数
-	LastFillTime int64         // 上次添加令牌时间
-}

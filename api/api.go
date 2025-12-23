@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"hotel/internal/employee/employee_action"
 	"hotel/internal/employee/employee_check"
+	"hotel/internal/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"hotel/internal/admin"
 	"hotel/internal/config"
 	"hotel/internal/middleware"
-	"hotel/internal/util/logger"
 	"hotel/services"
 )
 
@@ -181,13 +181,13 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 
 	//显示IP地址
 	middleware.FindIp()
-	logger.Logger.WithFields(logrus.Fields{
+	util.Logger.WithFields(logrus.Fields{
 		"mode": cfg.Server.Mode,
 	}).Info("服务器启动")
 	err := r.Run(cfg.Server.Host + fmt.Sprintf(":%d", cfg.Server.Port))
 
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err,
 			"mode":  cfg.Server.Mode,
 		}).Error("服务器启动失败")

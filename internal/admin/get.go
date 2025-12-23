@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"hotel/internal/util/logger"
+	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
 	"net/http"
@@ -18,7 +18,7 @@ func GetAllRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("角色数据库查询错误")
 		return
@@ -41,7 +41,7 @@ func GetAllPermission(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("权限数据库查询错误")
 		return
@@ -62,7 +62,7 @@ func GetAllEmployee(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("员工数据库查询错误")
 		return
@@ -89,7 +89,7 @@ func GetAllLocation(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("位置数据库查询错误")
 		return

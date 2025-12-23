@@ -2036,3 +2036,5 @@
 {"duration":"6.3537ms","level":"info","method":"POST","msg":"请求处理完成","path":"/employee/login","request_id":"3686edf9-4fca-49a8-9b94-0e4e143da8d5","status":200,"time":"2025-12-23 16:40:57"}
 {"level":"info","msg":"数据库表创建成功","time":"2025-12-23 16:42:33"}
 {"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-23 16:42:33"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-23 21:28:02"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-23 21:28:04"}

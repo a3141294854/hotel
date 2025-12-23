@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -37,7 +36,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("行李数据绑定错误")
 		return
@@ -74,7 +73,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 					"success": false,
 					"message": "创建客户记录失败",
 				})
-				logger.Logger.WithFields(logrus.Fields{
+				util.Logger.WithFields(logrus.Fields{
 					"error":      err,
 					"guest_name": req.GuestName,
 				}).Error("创建客户记录失败")
@@ -86,7 +85,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "查询客户失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
 				"guest_name": req.GuestName,
 			}).Error("查询客户失败")
@@ -116,14 +115,14 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 	insert.Status = "寄存中"
 
 	//生成取件码
-	code, err := util.GeneratePickUpCode(s, a.(uint))
+	code, err := util.GeneratePickUpCode(s.RdbRand, a.(uint))
 	insert.PickUpCode = code
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "生成取件码失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("生成取件码失败")
 		return
@@ -136,7 +135,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "创建行李记录失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("创建行李记录失败")
 		return
@@ -151,7 +150,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 				"success": false,
 				"message": "创建行李记录失败",
 			})
-			logger.Logger.WithFields(logrus.Fields{
+			util.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
 			}).Error("创建行李记录失败")
 			return
@@ -204,7 +203,7 @@ func AddMac(c *gin.Context, s *services.Services) {
 			"success": false,
 			"message": "创建行李mac记录失败",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
 		}).Error("创建行李mac记录失败")
 		return

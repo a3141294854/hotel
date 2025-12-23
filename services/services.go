@@ -2,13 +2,12 @@ package services
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"hotel/internal/config"
-	"hotel/internal/util/logger"
-
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"hotel/internal/config"
+	"hotel/internal/util"
 )
 
 // Services 服务结构体
@@ -27,7 +26,7 @@ func NewDatabase(cfg *config.Config) *Services {
 	dsn := cfg.Database.GetDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Fatal("数据库连接失败")
 	}

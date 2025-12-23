@@ -2,12 +2,12 @@ package admin
 
 import (
 	"errors"
+	"hotel/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"hotel/internal/util/logger"
 	"hotel/models"
 	"hotel/services"
 )
@@ -24,7 +24,7 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "请求数据格式错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
 		}).Error("请求数据格式错误")
 		return
@@ -44,7 +44,7 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":       result.Error,
 			"employee_id": req.EmployeeID,
 		}).Error("员工数据库查询错误")
@@ -65,7 +65,7 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":   result.Error,
 			"role_id": req.RoleID,
 		}).Error("角色数据库查询错误")
@@ -78,7 +78,7 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 			"success": false,
 			"message": "内部错误",
 		})
-		logger.Logger.WithFields(logrus.Fields{
+		util.Logger.WithFields(logrus.Fields{
 			"error":       result.Error,
 			"employee_id": req.EmployeeID,
 			"role_id":     req.RoleID,
