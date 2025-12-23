@@ -3355,11 +3355,6 @@
             "description": "电话号码",
             "example": "13800138000"
           },
-          "status": {
-            "type": "string",
-            "description": "状态",
-            "example": "有效"
-          },
           "last_active_time": {
             "type": "string",
             "format": "date-time",
@@ -3423,11 +3418,6 @@
             "description": "权限名称",
             "example": "创建行李"
           },
-          "status": {
-            "type": "string",
-            "description": "状态",
-            "example": "有效"
-          },
           "roles": {
             "$ref": "#/components/schemas/Role"
           }
@@ -3470,11 +3460,6 @@
             "type": "string",
             "description": "角色名称",
             "example": "员工"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态",
-            "example": "有效"
           },
           "permissions": {
             "description": "权限列表",
@@ -3618,11 +3603,6 @@
             "type": "string",
             "description": "酒店名称",
             "example": "希尔顿酒店"
-          },
-          "status": {
-            "type": "string",
-            "description": "状态",
-            "example": "有效"
           },
           "place": {
             "type": "string",
