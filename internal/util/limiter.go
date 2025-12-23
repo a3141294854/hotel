@@ -14,6 +14,7 @@ import (
 	"hotel/services"
 )
 
+// NewTokenBucketLimiter 创建令牌桶限流器
 func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, s *services.Services) {
 	limiter := models.TokenBucketLimiter{
 		Capacity:     capacity,
@@ -32,6 +33,7 @@ func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, s 
 	s.RdbLim.Set(context.Background(), name, string(insert), 0)
 }
 
+// LimiterAllow 限流检查
 func LimiterAllow(Name string, s *services.Services, c *gin.Context) bool {
 	luaScipt := `
 --获取数据
@@ -61,6 +63,7 @@ local insert = cjson.encode(limiter)
 redis.call('SET', KEYS[1], insert)
 return {flag, limiter.Tokens}
  `
+	//运行限流脚本
 	result, err := s.RdbLim.Eval(c, luaScipt, []string{Name}, time.Now().UnixNano()).Result()
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{
@@ -69,6 +72,7 @@ return {flag, limiter.Tokens}
 		}).Error("限流器执行脚本失败")
 		return false
 	}
+	//获取数据
 	results := result.([]interface{})
 	flag := results[0].(int64)
 	tokens := results[1].(int64)

@@ -12,6 +12,7 @@ import (
 	"hotel/services"
 )
 
+// DeleteEmployee 删除员工
 func DeleteEmployee(s *services.Services, c *gin.Context) {
 
 	var req struct {
@@ -68,6 +69,7 @@ func DeleteEmployee(s *services.Services, c *gin.Context) {
 	})
 }
 
+// DeleteRole 删除角色
 func DeleteRole(s *services.Services, c *gin.Context) {
 	var req struct {
 		RoleID uint `json:"role_id" binding:"required"`
@@ -165,6 +167,7 @@ func DeleteRole(s *services.Services, c *gin.Context) {
 	})
 }
 
+// DeletePermission 删除权限
 func DeletePermission(s *services.Services, c *gin.Context) {
 	var req struct {
 		PermissionID uint `json:"permission_id" binding:"required"`

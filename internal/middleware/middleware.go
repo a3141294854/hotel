@@ -53,6 +53,7 @@ func RateLimit(name string, s *services.Services) gin.HandlerFunc {
 // JwtCheck jwt检查中间件
 func JwtCheck(s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//检查请求头
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -62,7 +63,7 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		//提取令牌
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -72,7 +73,7 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		//解析令牌
 		claims, err := util.ParseAccessToken(tokenString)
 		if err != nil {
 
@@ -90,7 +91,7 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		//验证令牌有效性
 		a := tokenString
 		b := s.RdbAcc.Get(c, fmt.Sprintf("%d", claims.UserId)).Val()
 		if a != b {
@@ -107,9 +108,10 @@ func JwtCheck(s *services.Services) gin.HandlerFunc {
 	}
 }
 
-// AuthCheck 解析的
+// AuthCheck 解析JWT并设置权限
 func AuthCheck(s *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//获取JWT声明
 		claims, ok := c.Get("claims")
 		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{
@@ -124,20 +126,22 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 		}
 		e := claims.(*util.AccessClaims)
 
+		//设置上下文
 		c.Set("employee_id", e.UserId)
 		c.Set("employee_name", e.UserName)
 		c.Set("hotel_id", e.HotelId)
+		//更新最后活动时间
 		insert := models.Employee{
 			LastActiveTime: time.Now(),
 		}
 		s.DB.Model(&models.Employee{}).Where("id = ?", e.UserId).Updates(insert)
-
+		//查询角色权限
 		var employee models.Employee
 		s.DB.Model(&models.Employee{}).Preload("Role").Where("id = ?", e.UserId).First(&employee)
 		var role models.Role
 		s.DB.Model(&models.Role{}).Preload("Permissions").Where("id = ?", employee.RoleID).First(&role)
 		for _, v := range role.Permissions {
-			//fmt.Println(v.Name)
+			//设置权限
 			c.Set(v.Name, 1)
 		}
 		c.Next()
@@ -147,7 +151,7 @@ func AuthCheck(s *services.Services) gin.HandlerFunc {
 // RequestIDMiddleware 请求ID中间件
 func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		//检查请求ID
 		requestID := c.GetHeader("X-Request-ID")
 		if requestID == "" {
 			requestID = generateRequestID()
@@ -161,19 +165,20 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
-// generateRequestID() 上面的id
+// generateRequestID 生成请求ID
 func generateRequestID() string {
 	// 生成UUID v4
 	return uuid.New().String()
 }
 
-// LogRequest 在日志中使用请求ID
+// LogRequest 记录请求日志
 func LogRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
 		c.Next()
 
+		//记录请求信息
 		requestID, _ := c.Get("request_id")
 		duration := time.Since(start)
 		logger.Logger.WithFields(logrus.Fields{
@@ -187,6 +192,7 @@ func LogRequest() gin.HandlerFunc {
 	}
 }
 
+// FindIp 查找并显示IP地址
 func FindIp() {
 	_, err := net.InterfaceAddrs()
 	if err != nil {
@@ -243,7 +249,7 @@ func FindIp() {
 	fmt.Println("4. 确保设备在同一局域网内")
 }
 
-// 判断是否为私有IP地址
+// isPrivateIP 判断是否为私有IP地址
 func isPrivateIP(ip net.IP) bool {
 	// 10.0.0.0/8
 	if ip4 := ip.To4(); ip4 != nil {

@@ -15,7 +15,9 @@ import (
 
 // DeleteStorage 删除行李寄存表
 func DeleteStorage(c *gin.Context, s *services.Services) {
+
 	var luggage models.LuggageStorage
+	//绑定
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -23,6 +25,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+	//检查是否存在
 	var existingLuggage models.LuggageStorage
 	if err := s.DB.
 		Preload("Guest").
@@ -45,9 +48,10 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}
 		return
 	}
+	//开启事务
 	tx := s.DB.Begin()
-
 	luggage.Status = "已取出"
+	//更新行李寄存表
 	result := tx.Model(&models.LuggageStorage{}).Where("id = ?", luggage.ID).Updates(luggage)
 	if result.Error != nil {
 		tx.Rollback()
@@ -61,7 +65,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}).Error("删除行李失败")
 		return
 	}
-
+	//删除行李
 	result2 := tx.Where("id = ?", luggage.ID).Delete(&models.LuggageStorage{})
 	if result2.Error != nil {
 		tx.Rollback()
@@ -75,7 +79,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}).Error("删除行李失败")
 		return
 	}
-
+	//删除客户
 	result = tx.Model(&models.Guest{}).Where("id = ?", existingLuggage.GuestID).Delete(&models.Guest{})
 	if result.Error != nil {
 		tx.Rollback()
@@ -89,7 +93,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}).Error("删除行李失败")
 		return
 	}
-
+	//提交事务
 	err := tx.Commit().Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -113,6 +117,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 // DeleteLuggage 删除行李
 func DeleteLuggage(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
+	//绑定
 	if err := c.ShouldBind(&luggage); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -123,7 +128,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		}).Error("请求数据格式错误")
 		return
 	}
-
+	//检查是否存在
 	var ex models.Luggage
 	result := s.DB.Model(&models.Luggage{}).
 		Preload("LuggageStorage").
@@ -150,8 +155,9 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		}).Error("行李数据库查询错误")
 		return
 	}
+	//开启事务
 	tx := s.DB.Begin()
-
+	//删除行李
 	result = tx.Model(&models.Luggage{}).Where("id = ?", luggage.ID).Delete(&models.Luggage{})
 	if result.Error != nil {
 		tx.Rollback()
@@ -165,7 +171,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		}).Error("行李数据库删除错误")
 		return
 	}
-
+	//检查行李寄存表是否还有行李
 	var luggageStorage models.LuggageStorage
 	result = tx.Model(&models.LuggageStorage{}).
 		Preload("Luggage").
@@ -199,7 +205,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			return
 		}
 	}
-
+	//提交事务
 	err := tx.Commit().Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

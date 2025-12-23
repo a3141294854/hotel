@@ -17,6 +17,7 @@ import (
 // EmployeeRegister 员工注册
 func EmployeeRegister(c *gin.Context, s *services.Services) {
 	var e models.Employee
+	//绑定
 	if err := c.ShouldBind(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -27,7 +28,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		}).Error("员工注册失败")
 		return
 	}
-
+	//检查必要字段
 	if e.User == "" || e.Password == "" || e.Name == "" || e.HotelID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -35,7 +36,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	//检查用户名是否存在
 	var existingEmployee models.Employee
 	result2 := s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&existingEmployee)
 	if result2.Error == nil {
@@ -45,14 +46,14 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	//设置默认值
 	if e.RoleID == 0 {
 		e.RoleID = 1
 	}
-	e.Status = "有效"
 	e.LastActiveTime = time.Now()
 	result := s.DB.Create(&e)
 
+	//插入
 	employee := models.Employee{}
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
@@ -80,6 +81,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		User     string `json:"user"`
 		Password string `json:"password"`
 	}
+	//绑定
 	if err := c.ShouldBindJSON(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -90,6 +92,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		}).Error("员工登录信息绑定错误")
 		return
 	}
+	//检查必要字段
 	if e.User == "" || e.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -97,10 +100,12 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+	//设置默认值
 	if e.HotelID == 0 {
 		e.HotelID = 1
 	}
 
+	//检查用户名是否存在
 	var user models.Employee
 	result := s.DB.Model(models.Employee{}).
 		Where("user=?", e.User).
@@ -126,6 +131,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		}
 	}
 
+	//生成令牌
 	accessToken, refreshToken, err := util.GenerateTokenPair(user.ID, user.Name, user.HotelID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -155,6 +161,7 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 
 // EmployeeLogout 员工退出
 func EmployeeLogout(c *gin.Context, s *services.Services) {
+
 	claims, ok := c.Get("claims")
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -179,6 +186,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 	var e struct {
 		RefreshTokens string `json:"refresh_token"`
 	}
+	//绑定
 	if err := c.ShouldBindJSON(&e); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -190,6 +198,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//解析令牌
 	claims, err := util.ParseRefreshToken(e.RefreshTokens)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -202,6 +211,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//验证令牌
 	refreshToken, err := s.RdbRef.Get(c, fmt.Sprintf("%d", claims.UserId)).Result()
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -210,7 +220,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	//验证令牌是否一致
 	if refreshToken != e.RefreshTokens {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
@@ -218,7 +228,7 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	//生成新令牌
 	accessToken, refreshToken, err := util.GenerateTokenPair(claims.UserId, claims.UserName, claims.HotelID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

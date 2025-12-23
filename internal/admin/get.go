@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+// GetAllRole 获取所有角色
 func GetAllRole(s *services.Services, c *gin.Context) {
 	var roles []models.Role
 	result := s.DB.Model(models.Role{}).Preload("Permissions").Find(&roles)
@@ -31,6 +32,7 @@ func GetAllRole(s *services.Services, c *gin.Context) {
 	})
 }
 
+// GetAllPermission 获取所有权限
 func GetAllPermission(s *services.Services, c *gin.Context) {
 	var permissions []models.Permission
 	result := s.DB.Model(models.Permission{}).Find(&permissions)
@@ -51,6 +53,7 @@ func GetAllPermission(s *services.Services, c *gin.Context) {
 	})
 }
 
+// GetAllEmployee 获取所有员工
 func GetAllEmployee(s *services.Services, c *gin.Context) {
 	var employees []models.Employee
 	result := s.DB.Model(models.Employee{}).Preload("Role").Preload("Role.Permissions").Find(&employees)
@@ -73,6 +76,7 @@ func GetAllEmployee(s *services.Services, c *gin.Context) {
 
 }
 
+// GetAllLocation 获取所有位置
 func GetAllLocation(s *services.Services, c *gin.Context) {
 	v, _ := c.Get("hotel_id")
 	id := v.(uint)

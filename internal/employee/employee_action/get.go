@@ -17,6 +17,7 @@ import (
 // GetPickUpCode 获取行李寄存表
 func GetPickUpCode(c *gin.Context, s *services.Services) {
 	var luggageStorage models.LuggageStorage
+	//绑定
 	err := c.ShouldBindJSON(&luggageStorage)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -26,6 +27,7 @@ func GetPickUpCode(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//查询行李
 	result := s.DB.Model(&models.LuggageStorage{}).
 		Preload("Guest").
 		Preload("Luggage").
@@ -61,7 +63,7 @@ func GetPickUpCode(c *gin.Context, s *services.Services) {
 
 // GetName 获取行李寄存表
 func GetName(c *gin.Context, s *services.Services) {
-
+	//获取客户姓名
 	guestName := c.Query("guest_name")
 	if guestName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -72,7 +74,7 @@ func GetName(c *gin.Context, s *services.Services) {
 	}
 
 	var guest models.Guest
-
+	//查询客户
 	result := s.DB.Model(&models.Guest{}).
 		Preload("LuggageStorage").
 		Preload("LuggageStorage.Luggage").

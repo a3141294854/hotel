@@ -12,6 +12,7 @@ import (
 	"hotel/services"
 )
 
+// ChangeEmployeeRole 修改员工角色
 func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 	var req struct {
 		EmployeeID uint `json:"employee_id" binding:"required"`

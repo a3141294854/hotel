@@ -11,7 +11,6 @@ type Employee struct {
 	User           string    `json:"user"`
 	Password       string    `json:"password"`
 	Phone          string    `json:"phone"`
-	Status         string    `json:"status"`
 	LastActiveTime time.Time `json:"last_active_time"`
 
 	HotelID uint   `json:"hotel_id" gorm:"index"`
@@ -25,9 +24,8 @@ type Employee struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 type Role struct {
-	ID     uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name string `json:"name"`
 
 	Permissions []Permission `json:"permissions,omitempty" gorm:"many2many:role_permission"`
 
@@ -37,9 +35,8 @@ type Role struct {
 }
 
 type Permission struct {
-	ID     uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name string `json:"name"`
 
 	Roles []Role `json:"roles,omitempty" gorm:"many2many:role_permission"`
 
@@ -151,7 +148,6 @@ type Guest struct {
 type Hotel struct {
 	ID     uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name   string `json:"name"`
-	Status string `json:"status"`
 	Place  string `json:"place"`
 	Remark string `json:"remark"`
 

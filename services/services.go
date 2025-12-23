@@ -11,17 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// Services 服务结构体
 type Services struct {
-	DB      *gorm.DB
-	RdbAcc  *redis.Client
-	RdbRef  *redis.Client
-	RdbCac  *redis.Client
-	RdbLim  *redis.Client
-	RdbRand *redis.Client
+	DB      *gorm.DB      //数据库连接
+	RdbAcc  *redis.Client //访问令牌Redis
+	RdbRef  *redis.Client //刷新令牌Redis
+	RdbCac  *redis.Client //缓存Redis
+	RdbLim  *redis.Client //限流Redis
+	RdbRand *redis.Client //随机数Redis
 }
 
 // NewDatabase 初始化数据库连接
 func NewDatabase(cfg *config.Config) *Services {
+	//连接数据库
 	dsn := cfg.Database.GetDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -30,37 +32,38 @@ func NewDatabase(cfg *config.Config) *Services {
 		}).Fatal("数据库连接失败")
 	}
 
-	//访问令牌的
+	//访问令牌Redis
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.AccessToken,
 	})
-	//刷新令牌的
+	//刷新令牌Redis
 	rdb1 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.RefreshToken,
 	})
-	//缓存的
+	//缓存Redis
 	rdb2 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.Cache,
 	})
-	//限流的
+	//限流Redis
 	rdb3 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.RateLimit,
 	})
-	//随机取数的
+	//随机数Redis
 	rdb4 := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.Databases.Random,
 	})
 
+	//返回封装的连接
 	service := Services{
 		DB:      db,
 		RdbAcc:  rdb,

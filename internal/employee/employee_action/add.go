@@ -31,7 +31,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 		Status string `json:"status"`
 		Remark string `json:"remark"`
 	}
-
+	//绑定
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -42,7 +42,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 		}).Error("行李数据绑定错误")
 		return
 	}
-
+	//检查必要字段
 	if req.GuestName == "" || req.GuestPhone == "" || req.GuestRoom == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -115,6 +115,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 
 	insert.Status = "寄存中"
 
+	//生成取件码
 	code, err := util.GeneratePickUpCode(s, a.(uint))
 	insert.PickUpCode = code
 	if err != nil {
@@ -128,6 +129,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//创建行李表记录
 	result = s.DB.Model(&models.LuggageStorage{}).Create(&insert)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -167,6 +169,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 // AddMac 添加mac
 func AddMac(c *gin.Context, s *services.Services) {
 	var req models.Tag
+	//绑定
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -174,6 +177,7 @@ func AddMac(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+	//检查必要字段
 	if req.Mac == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -182,6 +186,7 @@ func AddMac(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//检查mac是否存在
 	var ex models.Tag
 	result := s.DB.Model(&models.Tag{}).Where("mac = ?", req.Mac).First(&ex)
 	if result.Error == nil {
@@ -192,6 +197,7 @@ func AddMac(c *gin.Context, s *services.Services) {
 		return
 	}
 
+	//插入
 	result = s.DB.Model(&models.Tag{}).Create(&req)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

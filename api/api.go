@@ -14,11 +14,14 @@ import (
 	"hotel/services"
 )
 
+// open 启动路由配置
 func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
+	//中间件配置
 	r.Use(middleware.RequestIDMiddleware())
 	r.Use(middleware.LogRequest())
 	r.Use(middleware.RateLimit("local", service))
 
+	//公共接口
 	r.POST("/employee/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
 	})
@@ -26,14 +29,17 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 		employee_check.RefreshToken(c, service)
 	})
 
+	//员工组
 	e := r.Group("/employee")
 	e.Use(middleware.JwtCheck(service))
 	e.Use(middleware.AuthCheck(service))
 	{
+		//退出登录
 		e.POST("/logout", func(c *gin.Context) {
 			employee_check.EmployeeLogout(c, service)
 		})
 
+		//添加操作
 		a := e.Group("/add")
 		a.Use(middleware.CheckAction("创建行李"))
 		{
@@ -45,6 +51,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//删除操作
 		d := e.Group("/delete")
 		d.Use(middleware.CheckAction("删除行李"))
 		{
@@ -56,6 +63,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//更新操作
 		u := e.Group("/update")
 		u.Use(middleware.CheckAction("更新行李"))
 		{
@@ -67,6 +75,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//查询操作
 		g := e.Group("/get")
 		g.Use(middleware.CheckAction("查看行李"))
 		{
@@ -90,6 +99,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//统计操作
 		c := e.Group("/count")
 		{
 			c.GET("/sum", func(c *gin.Context) {
@@ -102,11 +112,13 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 
 	}
 
+	//管理员组
 	t := r.Group("/tool")
 	t.Use(middleware.JwtCheck(service))
 	t.Use(middleware.AuthCheck(service))
 	t.Use(middleware.CheckAction("管理员"))
 	{
+		//添加操作
 		a := t.Group("/add")
 		{
 			a.POST("/permission", func(c *gin.Context) {
@@ -126,6 +138,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//查询操作
 		g := t.Group("/get")
 		{
 			g.GET("/employee", func(c *gin.Context) {
@@ -142,6 +155,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//修改操作
 		c := t.Group("/change")
 		{
 			c.POST("/employee_role", func(c *gin.Context) {
@@ -149,6 +163,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//删除操作
 		d := t.Group("/delete")
 		{
 			d.POST("/employee", func(c *gin.Context) {
@@ -164,6 +179,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 
 	}
 
+	//显示IP地址
 	middleware.FindIp()
 	logger.Logger.WithFields(logrus.Fields{
 		"mode": cfg.Server.Mode,

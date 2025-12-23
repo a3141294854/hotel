@@ -12,6 +12,7 @@ import (
 	"hotel/services"
 )
 
+// UpdateLuggageStorage 更新行李寄存表
 func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 	var luggage models.LuggageStorage
 	if err := c.ShouldBind(&luggage); err != nil {
@@ -80,6 +81,7 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 	})
 }
 
+// UpdateLuggage 更新行李
 func UpdateLuggage(c *gin.Context, s *services.Services) {
 	var luggage models.Luggage
 	if err := c.ShouldBind(&luggage); err != nil {

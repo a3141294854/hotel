@@ -12,6 +12,7 @@ import (
 	"hotel/services"
 )
 
+// AddPermission 添加权限
 func AddPermission(s *services.Services, c *gin.Context) {
 	var p models.Permission
 	err := c.ShouldBind(&p)
@@ -36,8 +37,6 @@ func AddPermission(s *services.Services, c *gin.Context) {
 		return
 	}
 
-	p.Status = "有效"
-
 	result = s.DB.Create(&p)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -57,6 +56,7 @@ func AddPermission(s *services.Services, c *gin.Context) {
 
 }
 
+// AddRole 添加角色
 func AddRole(s *services.Services, c *gin.Context) {
 	var r models.Role
 	err := c.ShouldBind(&r)
@@ -89,8 +89,6 @@ func AddRole(s *services.Services, c *gin.Context) {
 		}).Error("角色数据库查询错误")
 	}
 
-	r.Status = "有效"
-
 	result = s.DB.Create(&r)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -111,6 +109,7 @@ func AddRole(s *services.Services, c *gin.Context) {
 
 }
 
+// AddRolePermission 添加角色权限关联
 func AddRolePermission(s *services.Services, c *gin.Context) {
 
 	var req struct {
@@ -193,6 +192,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 	})
 }
 
+// AddHotel 添加酒店
 func AddHotel(s *services.Services, c *gin.Context) {
 
 	var req struct {

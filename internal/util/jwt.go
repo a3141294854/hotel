@@ -12,6 +12,7 @@ var Secret []byte
 var AccessExpireTime time.Duration
 var RefreshExpireTime time.Duration
 
+// AccessClaims 访问令牌声明
 type AccessClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
@@ -19,6 +20,7 @@ type AccessClaims struct {
 	jwt.RegisteredClaims
 }
 
+// RefreshClaims 刷新令牌声明
 type RefreshClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
@@ -26,6 +28,7 @@ type RefreshClaims struct {
 	jwt.RegisteredClaims
 }
 
+// ConfigJwt 配置JWT
 func ConfigJwt(cfg *config.Config) {
 	Secret = []byte(cfg.JWT.SecretKey)
 	AccessExpireTime = cfg.JWT.AccessTokenDuration
