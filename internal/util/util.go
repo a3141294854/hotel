@@ -5,10 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"math/big"
@@ -41,54 +39,17 @@ func GeneratePickUpCode(RdbRand *redis.Client, HotelID uint) (string, error) {
 // 传入数据库连接，查询的类型，查询的值
 func ExIf(db *gorm.DB, ty string, model interface{}, value string) (bool, error) {
 
-	if ty == "id" {
-		num, err := strconv.ParseUint(value, 10, 64)
-		if err != nil {
-			Logger.WithFields(logrus.Fields{
-				"error": err,
-			}).Error("转换id失败")
-			return false, err
-		}
-		uintnum := uint(num)
-		result := db.Model(model).Where("id = ?", uintnum).First(model)
-		if result.Error != nil {
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				return false, nil
-			} else {
-				return false, result.Error
-			}
+	result := db.Model(model).Where(fmt.Sprintf("%s = ?", ty), value).First(model)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false, nil
 		} else {
-			return true, nil
+			return false, result.Error
 		}
+	} else {
+		return true, nil
 	}
 
-	if ty == "name" {
-		result := db.Model(model).Where("name = ?", value).First(model)
-		if result.Error != nil {
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				return false, nil
-			} else {
-				return false, result.Error
-			}
-		} else {
-			return true, nil
-		}
-	}
-
-	if ty == "user" {
-		result := db.Model(model).Where("user = ?", value).First(model)
-		if result.Error != nil {
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				return false, nil
-			} else {
-				return false, result.Error
-			}
-		} else {
-			return true, nil
-		}
-	}
-
-	return false, errors.New("不支持的类型")
 }
 
 // ExIfByField 根据字段名从模型中获取值并检查是否存在
@@ -119,6 +80,7 @@ func ConvertSnakeToCamel(s string) string {
 		"id":   "ID",
 		"user": "User",
 		"name": "Name",
+		"mac":  "Mac",
 	}
 
 	FieldName, ok := mappings[s]

@@ -43,10 +43,10 @@ func Create(db *gorm.DB, c *gin.Context, list RequestList) {
 	if list.CheckExist {
 		ty := list.CheckType
 		ok, err := ExIfByField(db, ty, req)
-		if !ok && err == nil {
-			c.JSON(http.StatusNotFound, gin.H{
+		if ok && err == nil {
+			c.JSON(http.StatusConflict, gin.H{
 				"success": false,
-				"message": "数据不存在",
+				"message": "数据已存在",
 			})
 			return
 		}

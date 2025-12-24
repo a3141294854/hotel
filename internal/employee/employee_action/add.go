@@ -167,51 +167,11 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 
 // AddMac 添加mac
 func AddMac(c *gin.Context, s *services.Services) {
-	var req models.Tag
-	//绑定
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		return
-	}
-	//检查必要字段
-	if req.Mac == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "mac不能为空",
-		})
-		return
-	}
-
-	//检查mac是否存在
-	var ex models.Tag
-	result := s.DB.Model(&models.Tag{}).Where("mac = ?", req.Mac).First(&ex)
-	if result.Error == nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"success": false,
-			"message": "mac已存在",
-		})
-		return
-	}
-
-	//插入
-	result = s.DB.Model(&models.Tag{}).Create(&req)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "创建行李mac记录失败",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": result.Error,
-		}).Error("创建行李mac记录失败")
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{
-		"success": true,
-		"message": "行李mac添加成功",
-		"data":    req,
+	util.Create(s.DB, c, util.RequestList{
+		Model:      &models.Tag{},
+		CheckExist: true,
+		CheckType:  "mac",
+		CheckField: []string{"Mac"},
 	})
 
 }
