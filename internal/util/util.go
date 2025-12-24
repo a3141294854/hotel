@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"math/big"
 
@@ -92,8 +93,8 @@ func ExIf(db *gorm.DB, ty string, model interface{}, value string) (bool, error)
 
 // ExIfByField 根据字段名从模型中获取值并检查是否存在
 func ExIfByField(db *gorm.DB, ty string, model interface{}) (bool, error) {
-	reqValue := reflect.ValueOf(model).Elem() //获取指针指向的值
-	fieldValue := reqValue.FieldByName(ty)    //根据字段名获取对应的值
+	reqValue := reflect.ValueOf(model).Elem()                   //获取指针指向的值
+	fieldValue := reqValue.FieldByName(ConvertSnakeToCamel(ty)) //根据字段名获取对应的值
 
 	if !fieldValue.IsValid() {
 		return false, errors.New("字段 " + ty + " 不存在")
@@ -111,4 +112,23 @@ func ExIfByField(db *gorm.DB, ty string, model interface{}) (bool, error) {
 	}
 
 	return ExIf(db, ty, model, value)
+}
+
+func ConvertSnakeToCamel(s string) string {
+	mappings := map[string]string{
+		"id":   "ID",
+		"user": "User",
+		"name": "Name",
+	}
+
+	FieldName, ok := mappings[s]
+	if ok {
+		return FieldName
+	}
+
+	if len(s) == 0 {
+		return s
+	}
+	//如果没有记录，默认开头大写
+	return strings.ToUpper(s[:1]) + s[1:]
 }
