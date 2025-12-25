@@ -65,20 +65,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}).Error("删除行李失败")
 		return
 	}
-	//删除行李
-	result2 := tx.Where("id = ?", luggage.ID).Delete(&models.LuggageStorage{})
-	if result2.Error != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "删除行李失败",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error":      result2.Error,
-			"luggage_id": luggage.ID,
-		}).Error("删除行李失败")
-		return
-	}
+
 	//删除客户
 	result = tx.Model(&models.Guest{}).Where("id = ?", existingLuggage.GuestID).Delete(&models.Guest{})
 	if result.Error != nil {

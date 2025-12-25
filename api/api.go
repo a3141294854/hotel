@@ -67,10 +67,10 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 		u := e.Group("/update")
 		u.Use(middleware.CheckAction("更新行李"))
 		{
-			u.POST("/luggageStorage", func(c *gin.Context) {
+			u.PUT("/luggageStorage", func(c *gin.Context) {
 				employee_action.UpdateLuggageStorage(c, service)
 			})
-			u.POST("/luggage", func(c *gin.Context) {
+			u.PUT("/luggage", func(c *gin.Context) {
 				employee_action.UpdateLuggage(c, service)
 			})
 		}
@@ -94,7 +94,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			g.POST("/guest_advance", func(c *gin.Context) {
 				employee_action.GetAdvance(c, service)
 			})
-			g.POST("/pick_up_code", func(c *gin.Context) {
+			g.GET("/pick_up_code", func(c *gin.Context) {
 				employee_action.GetPickUpCode(c, service)
 			})
 		}

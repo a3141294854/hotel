@@ -75,6 +75,11 @@ func Table(db *gorm.DB) {
 
 	util.Logger.Info("数据库表创建成功")
 
+	open(db)
+
+}
+
+func open(db *gorm.DB) {
 	p1 := models.Permission{
 		Name: "查看行李",
 	}

@@ -167,7 +167,7 @@ func AddLuggage(c *gin.Context, s *services.Services) {
 
 // AddMac 添加mac
 func AddMac(c *gin.Context, s *services.Services) {
-	util.Create(s.DB, c, util.RequestList{
+	util.Create(c, s.DB, util.RequestList{
 		Model:      &models.Tag{},
 		CheckExist: true,
 		CheckType:  "mac",

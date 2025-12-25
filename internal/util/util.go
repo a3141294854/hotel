@@ -77,10 +77,11 @@ func ExIfByField(db *gorm.DB, ty string, model interface{}) (bool, error) {
 
 func ConvertSnakeToCamel(s string) string {
 	mappings := map[string]string{
-		"id":   "ID",
-		"user": "User",
-		"name": "Name",
-		"mac":  "Mac",
+		"id":           "ID",
+		"user":         "User",
+		"name":         "Name",
+		"mac":          "Mac",
+		"pick_up_code": "PickUpCode",
 	}
 
 	FieldName, ok := mappings[s]

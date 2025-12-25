@@ -1,110 +1,32 @@
 package employee_action
 
 import (
-	"encoding/json"
 	"errors"
-	"hotel/internal/util"
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
+	"net/http"
 )
 
-// GetPickUpCode 获取行李寄存表
+// GetPickUpCode 通过取件码，获取行李寄存表
 func GetPickUpCode(c *gin.Context, s *services.Services) {
-	var luggageStorage models.LuggageStorage
-	//绑定
-	err := c.ShouldBindJSON(&luggageStorage)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "行李数据绑定错误",
-		})
-		return
-	}
-
-	//查询行李
-	result := s.DB.Model(&models.LuggageStorage{}).
-		Preload("Guest").
-		Preload("Luggage").
-		Preload("Luggage.Tag").
-		Preload("Luggage.Location").
-		Where("pick_up_code = ?", luggageStorage.PickUpCode).First(&luggageStorage)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "行李记录不存在",
-			})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"message": "查询行李失败",
-			})
-			util.Logger.WithFields(logrus.Fields{
-				"error":      result.Error,
-				"luggage_id": luggageStorage.ID,
-			}).Error("查询行李失败")
-		}
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "行李获取成功",
-		"data":    luggageStorage,
+	util.Get(c, s.DB, util.RequestList{
+		Model:     &models.LuggageStorage{},
+		CheckType: "pick_up_code",
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
 	})
-
 }
 
-// GetName 获取行李寄存表
+// GetName 通过用户姓名，获取行李寄存表
 func GetName(c *gin.Context, s *services.Services) {
-	//获取客户姓名
-	guestName := c.Query("guest_name")
-	if guestName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请输入客户姓名",
-		})
-		return
-	}
-
-	var guest models.Guest
-	//查询客户
-	result := s.DB.Model(&models.Guest{}).
-		Preload("LuggageStorage").
-		Preload("LuggageStorage.Luggage").
-		Preload("LuggageStorage.Luggage.Tag").
-		Preload("LuggageStorage.Luggage.Location").
-		Where("name = ?", guestName).
-		First(&guest)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "客户不存在",
-			})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"message": "查询客户失败",
-			})
-			util.Logger.WithFields(logrus.Fields{
-				"error": result.Error,
-			}).Error("查询客户失败")
-		}
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "行李获取成功",
-		"data":    guest.LuggageStorage,
-		"count":   len(guest.LuggageStorage),
+	util.Get(c, s.DB, util.RequestList{
+		Model:     &models.LuggageStorage{},
+		CheckType: "guest_name",
+		GetType:   "Guest.Name",
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
 	})
 }
 
@@ -137,73 +59,12 @@ func GetAll(c *gin.Context, s *services.Services) {
 
 }
 
-// GetGuestID 获取行李寄存表
+// GetGuestID 通过用户id,获取行李寄存表
 func GetGuestID(c *gin.Context, s *services.Services) {
-	guestID := c.Query("guest_id")
-	if guestID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请输入客户ID",
-		})
-		return
-	}
-
-	if val, err := s.RdbCac.Get(c, guestID).Result(); err == nil {
-		var luggage []models.LuggageStorage
-		val := json.Unmarshal([]byte(val), &luggage)
-		if val == nil {
-			c.JSON(http.StatusOK, gin.H{
-				"success": true,
-				"message": "获取行李成功",
-				"data":    luggage,
-				"count":   len(luggage),
-			})
-			return
-		}
-	}
-
-	var luggage []models.LuggageStorage
-	result := s.DB.
-		Preload("Guest").
-		Preload("Luggage").
-		Preload("Luggage.Tag").
-		Preload("Luggage.Location").
-		Where("guest_id = ? AND status = ?", guestID, "寄存中").
-		Find(&luggage)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "获取行李失败",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": result.Error,
-		}).Error("获取行李失败")
-		return
-	}
-
-	if len(luggage) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "未找到该客户的行李",
-		})
-		return
-	}
-
-	val, err := json.Marshal(luggage)
-	if err != nil {
-		util.Logger.WithFields(logrus.Fields{
-			"error":    err,
-			"guest_id": guestID,
-		}).Error("JSON序列化失败")
-	} else {
-		s.RdbCac.Set(c, guestID, val, time.Minute*15)
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "行李获取成功",
-		"data":    luggage,
-		"count":   len(luggage),
+	util.Get(c, s.DB, util.RequestList{
+		Model:     &models.LuggageStorage{},
+		CheckType: "guest_id",
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
 	})
 }
 
