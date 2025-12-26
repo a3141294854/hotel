@@ -72,9 +72,11 @@ func ExIfByField(db *gorm.DB, ty string, model interface{}) (bool, error) {
 		value = fmt.Sprintf("%v", fieldValue.Interface())
 	}
 
-	return ExIf(db, ty, model, value)
+	TempModel := reflect.New(reflect.TypeOf(model).Elem()).Interface()
+	return ExIf(db, ty, TempModel, value)
 }
 
+// ConvertSnakeToCamel 讲蛇形转换为驼峰
 func ConvertSnakeToCamel(s string) string {
 	mappings := map[string]string{
 		"id":           "ID",

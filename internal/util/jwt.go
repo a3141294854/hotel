@@ -15,7 +15,7 @@ var RefreshExpireTime time.Duration
 type AccessClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
-	HotelId  uint   `json:"hotel_id"`
+	HotelId  uint   `json:"hotel_id"` //额外绑定消息
 	jwt.RegisteredClaims
 }
 
@@ -23,15 +23,15 @@ type AccessClaims struct {
 type RefreshClaims struct {
 	UserId   uint   `json:"user_id"`
 	UserName string `json:"user_name"`
-	HotelID  uint   `json:"hotel_id"`
+	HotelID  uint   `json:"hotel_id"` //额外绑定消息
 	jwt.RegisteredClaims
 }
 
 // ConfigJwt 配置JWT
 func ConfigJwt(AccessTokenDuration time.Duration, RefreshTokenDuration time.Duration, SecretKey string) {
-	Secret = []byte(SecretKey)
-	AccessExpireTime = AccessTokenDuration
-	RefreshExpireTime = RefreshTokenDuration
+	Secret = []byte(SecretKey)               //转换密钥
+	AccessExpireTime = AccessTokenDuration   //设置过期时间
+	RefreshExpireTime = RefreshTokenDuration //设置过期时间
 }
 
 // GenerateAccessToken 生成访问令牌
@@ -50,7 +50,6 @@ func GenerateAccessToken(userId uint, userName string, HotelID uint) (string, er
 		return "", err
 	}
 	return tokenString, nil
-
 }
 
 // GenerateRefreshToken 生成刷新令牌

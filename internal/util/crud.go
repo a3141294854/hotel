@@ -21,7 +21,9 @@ type RequestList struct {
 
 // Create 通用创建数据
 func Create(c *gin.Context, db *gorm.DB, list RequestList) {
+	//确定模型
 	req := list.Model
+	//绑定数据
 	err := c.ShouldBind(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +32,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		return
 	}
-
+	//需要检查的字段
 	if len(list.CheckField) > 0 {
 		for _, v := range list.CheckField {
 			if reflect.ValueOf(req).Elem().FieldByName(v).IsZero() {
@@ -42,7 +44,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 			}
 		}
 	}
-
+	//检查是否存在数据
 	if list.CheckExist {
 		ty := list.CheckType
 		ok, err := ExIfByField(db, ty, req)
@@ -66,6 +68,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 		}
 	}
 	query := db.Model(req)
+	//检查有无要预加载的表
 	if len(list.Preloads) > 0 {
 		for _, v := range list.Preloads {
 			query = query.Preload(v)
@@ -95,7 +98,9 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 
 // Delete 通用删除数据
 func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
+	//确定模型
 	req := list.Model
+	//绑定数据
 	err := c.ShouldBind(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -104,7 +109,7 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		return
 	}
-
+	//需要检查的字段
 	if len(list.CheckField) > 0 {
 		for _, v := range list.CheckField {
 			if reflect.ValueOf(req).Elem().FieldByName(v).IsZero() {
@@ -116,14 +121,14 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 			}
 		}
 	}
-
+	//检查是否存在数据
 	if list.CheckExist {
 		ty := list.CheckType
 		ok, err := ExIfByField(db, ty, req)
-		if !ok && err == nil {
-			c.JSON(http.StatusNotFound, gin.H{
+		if ok && err == nil {
+			c.JSON(http.StatusConflict, gin.H{
 				"success": false,
-				"message": "数据不存在",
+				"message": "数据已存在",
 			})
 			return
 		}
@@ -140,6 +145,7 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 		}
 	}
 	query := db.Model(req)
+	//检查有无要预加载的表
 	if len(list.Preloads) > 0 {
 		for _, v := range list.Preloads {
 			query = query.Preload(v)
@@ -167,7 +173,9 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 
 // Update 通用更新数据
 func Update(c *gin.Context, db *gorm.DB, list RequestList) {
+	//确定模型
 	req := list.Model
+	//绑定数据
 	err := c.ShouldBind(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -176,7 +184,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		return
 	}
-
+	//需要检查的字段
 	if len(list.CheckField) > 0 {
 		for _, v := range list.CheckField {
 			if reflect.ValueOf(req).Elem().FieldByName(v).IsZero() {
@@ -189,6 +197,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		}
 	}
 
+	//检查是否存在数据
 	if list.CheckExist {
 		ty := list.CheckType
 		ok, err := ExIfByField(db, ty, req)
@@ -212,11 +221,11 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		}
 	}
 	query := db.Model(req)
+	//检查有无要预加载的表
 	if len(list.Preloads) > 0 {
 		for _, v := range list.Preloads {
 			query = query.Preload(v)
 		}
-
 	}
 
 	va := reflect.ValueOf(req).Elem().FieldByName(ConvertSnakeToCamel(list.CheckType)).Interface()
@@ -235,7 +244,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "更新成功",
-		"data":    req,
+		//"data":    req,
 	})
 }
 

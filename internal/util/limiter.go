@@ -13,11 +13,12 @@ import (
 // NewTokenBucketLimiter 创建令牌桶限流器
 func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, RdbLim *redis.Client) {
 	limiter := TokenBucketLimiter{
-		Capacity:     capacity,
-		FillRate:     fillRate,
-		Tokens:       capacity,
+		Capacity:     capacity, //容量
+		FillRate:     fillRate, //填充速率
+		Tokens:       capacity, //令牌数
 		LastFillTime: time.Now().UnixNano(),
 	}
+	//序列化
 	insert, err := json.Marshal(limiter)
 	if err != nil {
 		Logger.WithFields(logrus.Fields{
@@ -26,6 +27,7 @@ func NewTokenBucketLimiter(name string, capacity int, fillRate time.Duration, Rd
 		}).Error("限流器序列化失败")
 		return
 	}
+	//设置
 	RdbLim.Set(context.Background(), name, string(insert), 0)
 }
 

@@ -1,10 +1,8 @@
 package employee_action
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
@@ -68,44 +66,13 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 	})
 }
 
-// GetLocation 获取一个地方的行李
+// GetLocation 根据名字,获取一个地方的行李
 func GetLocation(c *gin.Context, s *services.Services) {
-	location := c.Query("location")
-	if location == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请输入存放地点",
-		})
-		return
-	}
-
-	var loc models.Location
-	result := s.DB.Model(models.Location{}).
-		Preload("Luggage").
-		Where("name = ?", location).First(&loc)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "存放地点不存在",
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "获取存放地点失败",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": result.Error,
-		}).Error("获取存放地点失败")
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "获取行李成功",
-		"data":    loc.Luggage,
-		"count":   len(loc.Luggage),
+	util.Get(c, s.DB, util.RequestList{
+		Model:      &models.Location{},
+		CheckExist: true,
+		CheckType:  "name",
+		Preloads:   []string{"Luggage"},
 	})
 }
 
