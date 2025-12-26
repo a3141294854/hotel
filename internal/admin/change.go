@@ -1,13 +1,12 @@
 package admin
 
 import (
-	"errors"
+	"fmt"
 	"hotel/internal/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"hotel/models"
 	"hotel/services"
 )
@@ -18,6 +17,7 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 		EmployeeID uint `json:"employee_id" binding:"required"`
 		RoleID     uint `json:"role_id" binding:"required"`
 	}
+	//绑定
 	err := c.ShouldBind(&req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -29,50 +29,46 @@ func ChangeEmployeeRole(s *services.Services, c *gin.Context) {
 		}).Error("请求数据格式错误")
 		return
 	}
-
-	var ex1 models.Employee
-	result := s.DB.Model(models.Employee{}).Where("id = ?", req.EmployeeID).First(&ex1)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "员工不存在",
-			})
-			return
-		}
+	//检查员工是否存在
+	ok, err := util.ExIf(s.DB, "id", &models.Employee{}, fmt.Sprintf("%d", req.EmployeeID))
+	if !ok && err == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "员工不存在",
+		})
+		return
+	}
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "内部错误",
 		})
 		util.Logger.WithFields(logrus.Fields{
-			"error":       result.Error,
-			"employee_id": req.EmployeeID,
+			"error": err,
 		}).Error("员工数据库查询错误")
 		return
 	}
-
-	var ex2 models.Role
-	result = s.DB.Model(models.Role{}).Where("id = ?", req.RoleID).First(&ex2)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"success": false,
-				"message": "角色不存在",
-			})
-			return
-		}
+	//检查角色是否存在
+	ok, err = util.ExIf(s.DB, "id", &models.Role{}, fmt.Sprintf("%d", req.RoleID))
+	if !ok && err == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "角色不存在",
+		})
+		return
+	}
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": "内部错误",
 		})
 		util.Logger.WithFields(logrus.Fields{
-			"error":   result.Error,
-			"role_id": req.RoleID,
+			"error": err,
 		}).Error("角色数据库查询错误")
 		return
 	}
-
-	result = s.DB.Model(models.Employee{}).Where("id = ?", req.EmployeeID).Update("role_id", req.RoleID)
+	//更新
+	result := s.DB.Model(models.Employee{}).Where("id = ?", req.EmployeeID).Update("role_id", req.RoleID)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

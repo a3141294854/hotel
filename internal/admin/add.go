@@ -58,55 +58,12 @@ func AddPermission(s *services.Services, c *gin.Context) {
 
 // AddRole 添加角色
 func AddRole(s *services.Services, c *gin.Context) {
-	var r models.Role
-	err := c.ShouldBind(&r)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": err.Error(),
-		}).Error("角色数据绑定错误")
-		return
-	}
-
-	var ex models.Role
-	result := s.DB.Model(models.Role{}).Where("name = ?", r.Name).First(&ex)
-	if result.Error == nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"success": false,
-			"message": "角色已存在",
-		})
-		return
-	} else if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "内部错误",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": result.Error,
-		}).Error("角色数据库查询错误")
-	}
-
-	result = s.DB.Create(&r)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "内部错误",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": result.Error,
-		}).Error("角色数据库插入错误")
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "添加成功",
-		"data":    r,
+	util.Create(c, s.DB, util.RequestList{
+		Model:      &models.Role{},
+		CheckExist: true,
+		CheckType:  "name",
+		CheckField: []string{"Name"},
 	})
-
 }
 
 // AddRolePermission 添加角色权限关联

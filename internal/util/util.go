@@ -36,7 +36,7 @@ func GeneratePickUpCode(RdbRand *redis.Client, HotelID uint) (string, error) {
 }
 
 // ExIf 判断是否存在这个数据 true 存在 false 不存在
-// 传入数据库连接，查询的类型，查询的值
+// 传入数据库连接，查询的类型，查询的模型,查询的值
 func ExIf(db *gorm.DB, ty string, model interface{}, value string) (bool, error) {
 
 	result := db.Model(model).Where(fmt.Sprintf("%s = ?", ty), value).First(model)
