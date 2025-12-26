@@ -50,7 +50,6 @@ type LuggageStorage struct {
 
 	/*TagID uint `json:"tag_id"`
 	Tag   *Tag `json:"tag,omitempty" gorm:"foreignKey:TagID"`*/
-
 	BagCount      int `json:"bag_count"`
 	BackpackCount int `json:"backpack_count"`
 	BoxCount      int `json:"box_count"`
@@ -67,7 +66,7 @@ type LuggageStorage struct {
 
 	Luggage []Luggage `json:"luggage,omitempty" gorm:"foreignKey:LuggageStorageID;constraint:OnDelete:CASCADE"`
 
-	//Photos []Photo `json:"photos,omitempty" gorm:"foreignKey:LuggageStorageID"`
+	Photos []Photo `json:"photos,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
 	PickUpCode string `json:"pick_up_code"`
 	Status     string `json:"status" gorm:"index"`
@@ -106,17 +105,18 @@ type Tag struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-/*type Photo struct {
-	ID  uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	Url string `json:"url"`
-
-	LuggageID uint     `json:"luggage_id"`
-	LuggageStorage   *LuggageStorage `json:"luggage,omitempty" gorm:"foreignKey:LuggageID"`
+type Photo struct {
+	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	FileName string `json:"file_name"`
+	Url      string `json:"url"`
+	//因为是指针在sql中会自动转换为null，不一定需要，所以可以暂时不写
+	LuggageStorageID *uint           `json:"luggage_storage_id"`
+	LuggageStorage   *LuggageStorage `json:"luggage_storage,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-}*/
+}
 
 type Location struct {
 	ID   uint   `json:"id" gorm:"primaryKey;autoIncrement"`

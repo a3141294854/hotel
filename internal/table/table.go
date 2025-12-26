@@ -77,6 +77,13 @@ func Table(db *gorm.DB) {
 		}).Error("创建标签表失败")
 	}
 
+	err = db.AutoMigrate(&models.Photo{})
+	if err != nil {
+		util.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建照片表失败")
+	}
+
 	util.Logger.Info("数据库表创建成功")
 
 	open(db)

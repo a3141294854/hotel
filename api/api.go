@@ -110,6 +110,24 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 			})
 		}
 
+		//图片的操作
+		p := e.Group("/photo")
+		{
+			p.POST("/upload", func(c *gin.Context) {
+				employee_action.UploadPhoto(c, service)
+			})
+
+			p.GET("/download/:filename", func(c *gin.Context) {
+				employee_action.DownloadPhoto(c)
+			})
+			p.POST("/touch", func(c *gin.Context) {
+				employee_action.PhotoTouchLuggageStorage(c, service)
+			})
+			p.GET("/get_all", func(c *gin.Context) {
+				employee_action.GetAllPhoto(c, service)
+			})
+		}
+
 	}
 
 	//管理员组
