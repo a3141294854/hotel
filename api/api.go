@@ -198,7 +198,7 @@ func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 	}
 
 	//显示IP地址
-	middleware.FindIp()
+	//middleware.FindIp()
 	util.Logger.WithFields(logrus.Fields{
 		"mode": cfg.Server.Mode,
 	}).Info("服务器启动")

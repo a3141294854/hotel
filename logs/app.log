@@ -2361,3 +2361,13 @@
 {"duration":"4.9368ms","level":"info","method":"GET","msg":"请求处理完成","path":"/employee/photo/get_all","request_id":"fa2f9399-8936-4d11-83cf-1fca968ee747","status":200,"time":"2025-12-27 13:41:57"}
 {"level":"debug","msg":"限流器状态","name":"local","time":"2025-12-27 13:42:00","tokens":99}
 {"duration":"14.4408ms","level":"info","method":"GET","msg":"请求处理完成","path":"/employee/get/all","request_id":"fbda9e84-b005-4f07-bd30-58bfb8454d1a","status":200,"time":"2025-12-27 13:42:00"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 13:58:12"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-27 13:58:14"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:07:14"}
+{"level":"info","mode":"debug","msg":"服务器启动","time":"2025-12-27 14:07:16"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:11:42"}
+{"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:11:44"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:13:16"}
+{"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:13:18"}
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:18:19"}
+{"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:18:21"}
