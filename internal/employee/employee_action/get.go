@@ -14,7 +14,7 @@ func GetPickUpCode(c *gin.Context, s *services.Services) {
 	util.Get(c, s.DB, util.RequestList{
 		Model:     &models.LuggageStorage{},
 		CheckType: "pick_up_code",
-		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location", "Photos"},
 	})
 }
 
@@ -24,7 +24,7 @@ func GetName(c *gin.Context, s *services.Services) {
 		Model:     &models.LuggageStorage{},
 		CheckType: "guest_name",
 		GetType:   "Guest.Name",
-		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location", "Photos"},
 	})
 }
 
@@ -36,6 +36,7 @@ func GetAll(c *gin.Context, s *services.Services) {
 		Preload("Luggage").
 		Preload("Luggage.Tag").
 		Preload("Luggage.Location").
+		Preload("Photos").
 		Find(&luggage)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -62,7 +63,7 @@ func GetGuestID(c *gin.Context, s *services.Services) {
 	util.Get(c, s.DB, util.RequestList{
 		Model:     &models.LuggageStorage{},
 		CheckType: "guest_id",
-		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location"},
+		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location", "Photos"},
 	})
 }
 

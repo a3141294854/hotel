@@ -46,7 +46,7 @@ rate_limiting:
 
   # 不同位置的限流配置
   locations:
-    - name: "local"           # 本地API限流
+    - name: "local"           # 全局限流
       capacity: 100
       fill_rate: 10ms
 
