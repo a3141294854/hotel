@@ -17,6 +17,7 @@ import (
 // open 启动路由配置
 func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
 	//中间件配置
+	r.Use(middleware.Recovery())
 	r.Use(middleware.RequestIDMiddleware())
 	r.Use(middleware.LogRequest())
 	r.Use(middleware.RateLimit("local", service))

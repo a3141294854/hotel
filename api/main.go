@@ -30,7 +30,7 @@ func main() {
 	util.ConfigJwt(cfg.JWT.AccessTokenDuration, cfg.JWT.RefreshTokenDuration, cfg.JWT.SecretKey)
 
 	//启动路由
-	r := gin.Default()
+	r := gin.New()
 	open(r, service, cfg)
 
 }

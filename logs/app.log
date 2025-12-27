@@ -2371,3 +2371,133 @@
 {"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:13:18"}
 {"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:18:19"}
 {"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:18:21"}
+time="2025-12-27 14:23:45" level=info msg="数据库表创建成功"
+time="2025-12-27 14:23:47" level=info msg="服务器启动" mode=release
+time="2025-12-27 14:24:40" level=info msg="数据库表创建成功"
+time="2025-12-27 14:24:42" level=info msg="服务器启动" mode=release
+time="2025-12-27 14:24:58" level=info msg="数据库表创建成功"
+time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
+[2025-12-27 14:26:10] [INFO] 数据库表创建成功
+[2025-12-27 14:26:12] [INFO] 服务器启动
+[2025-12-27 14:31:07] [INFO] 数据库表创建成功
+[2025-12-27 14:31:09] [INFO] 服务器启动
+[2025-12-27 14:31:22] [INFO] 数据库表创建成功
+[2025-12-27 14:31:24] [INFO] 服务器启动
+[2025-12-27 14:31:34] [ERROR] 限流器执行脚本失败
+[2025-12-27 14:31:34] [WARNING] 请求过于频繁
+[2025-12-27 14:31:34] [INFO] 请求处理完成
+[2025-12-27 14:31:52] [INFO] 员工登录成功
+[2025-12-27 14:31:52] [INFO] 请求处理完成
+[2025-12-27 14:32:15] [INFO] 数据库表创建成功
+[2025-12-27 14:32:15] [INFO] 服务器启动
+[2025-12-27 14:32:19] [INFO] 员工登录成功
+[2025-12-27 14:32:19] [INFO] 请求处理完成
+{"level":"info","msg":"数据库表创建成功","time":"2025-12-27 14:33:21"}
+{"level":"info","mode":"release","msg":"服务器启动","time":"2025-12-27 14:33:21"}
+[2025-12-27 14:34:08] [INFO] 数据库表创建成功
+[2025-12-27 14:34:08] [INFO] 服务器启动
+[2025-12-27 14:34:15] [INFO] 员工登录成功
+[2025-12-27 14:34:15] [INFO] 请求处理完成
+[2025-12-27 14:34:33] [INFO] 员工登录成功
+[2025-12-27 14:34:33] [INFO] 请求处理完成
+[2025-12-27 14:34:49] [INFO] 请求处理完成
+[2025-12-27 14:34:51] [INFO] 请求处理完成
+[2025-12-27 14:35:13] [INFO] 行李寄存成功
+[2025-12-27 14:35:13] [INFO] 请求处理完成
+[2025-12-27 14:35:53] [INFO] 数据库表创建成功
+[2025-12-27 14:35:53] [INFO] 服务器启动
+[2025-12-27 14:35:56] [INFO] 行李寄存成功
+[2025-12-27 14:35:56] [INFO] 请求处理完成
+[2025-12-27 14:37:39] [INFO] 数据库表创建成功
+[2025-12-27 14:37:39] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:37:39] [ERROR] 服务器启动失败 - mode=release, error=listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+[2025-12-27 14:37:42] [INFO] 行李寄存成功
+[2025-12-27 14:37:42] [INFO] 请求处理完成
+[2025-12-27 14:37:53] [INFO] 数据库表创建成功
+[2025-12-27 14:37:53] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:37:53] [ERROR] 服务器启动失败 - error=listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted., mode=release
+[2025-12-27 14:38:25] [INFO] 数据库表创建成功
+[2025-12-27 14:38:25] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:38:31] [INFO] 行李寄存成功 - guest_room=808, bag_count=2, operator_id=1, operator_name=, pick_up_code=796739, luggage_id=6, guest_name=张三, guest_phone=13800138000
+[2025-12-27 14:38:31] [INFO] 请求处理完成 - path=/employee/add/luggageStorage, status=201, duration=19.8991ms, request_id=f748c464-46b9-4ce1-a63e-822331bfcd84, method=POST
+[2025-12-27 14:39:37] [INFO] 请求处理完成 - duration=9.3581ms, request_id=a9d114c3-1a7b-4567-8315-6082fb75a134, method=GET, path=/employee/count/sum, status=200
+[2025-12-27 14:40:21] [INFO] 查询所有行李成功 - result_count=6, ip_address=::1
+[2025-12-27 14:40:21] [INFO] 请求处理完成 - request_id=f08d9986-4732-482c-95e9-b5a9d79898d6, method=GET, path=/employee/get/all, status=200, duration=18.2103ms
+[2025-12-27 14:42:31] [INFO] 数据库表创建成功
+[2025-12-27 14:42:31] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:42:35] [INFO] 请求处理完成 - request_id=806ab2d6-9870-4afe-99d6-dda270a514ac, method=GET, path=/employee/get/all, status=200, duration=11.391ms
+[2025-12-27 14:42:52] [INFO] 数据库表创建成功
+[2025-12-27 14:42:52] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:42:56] [INFO] 请求处理完成 - status=200, duration=56.2219ms, request_id=a380c0b5-6ff8-4c10-a3ab-7fc96583d03d, method=GET, path=/employee/get/all
+[2025-12-27 14:48:40] [INFO] 数据库表创建成功
+[2025-12-27 14:48:40] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:48:42] [INFO] 请求处理完成 - status=200, duration=11.1276ms, name=, request_id=aa518589-93f3-430c-98e2-1d7fbbc88b0a, method=GET, path=/employee/get/all
+[2025-12-27 14:48:57] [INFO] 请求处理完成 - request_id=cab14667-cc9f-4472-ad57-2b4f6035be7f, method=GET, path=/employee/get/all, status=200, duration=105.0582ms, name=
+[2025-12-27 14:49:46] [INFO] 数据库表创建成功
+[2025-12-27 14:49:46] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:49:48] [INFO] 请求处理完成 - method=GET, path=/employee/get/all, status=200, duration=26.9596ms, name=, request_id=730e6f79-ebd4-41da-99f2-36d8e18ae7fc
+[2025-12-27 14:50:50] [INFO] 数据库表创建成功
+[2025-12-27 14:50:50] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:50:52] [INFO] 请求处理完成 - method=GET, 路径=/employee/get/all, 状态码=200, 使用时间=15.762ms, 操作员=, 请求id=d8aa1807-7253-4a30-a88d-4cbd41a1daf0
+[2025-12-27 14:53:49] [INFO] 数据库表创建成功
+[2025-12-27 14:53:49] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:53:54] [INFO] 请求处理完成 - 路径=/employee/get/all, 状态码=200, 使用时间=19.5531ms, 操作员=, 请求id=a82f4a5e-7447-44fb-8f8b-bbf632305199, method=GET
+[2025-12-27 14:58:41] [INFO] 数据库表创建成功
+[2025-12-27 14:58:41] [INFO] 服务器启动 - mode=release
+[2025-12-27 14:58:45] [INFO] 请求处理完成 - 路径=/employee/get/all, 状态码=200, 使用时间=18.497ms, 操作员=, 请求id=5a001623-6792-4f37-b2d5-044cac5d21b5, 请求方法=GET
+[2025-12-27 14:59:02] [INFO] 请求处理完成 - 请求id=a7cc954d-fb94-49ee-b093-802a8762cf97, 请求方法=GET, 路径=/employee/get/name, 状态码=200, 使用时间=18.3773ms, 操作员=
+[2025-12-27 14:59:59] [INFO] 请求处理完成 - 请求方法=POST, 路径=/employee/add/luggageStorage, 状态码=201, 使用时间=21.8447ms, 操作员=, 请求id=b2d06d4d-aa7e-45e7-912f-8d12bf80ed47
+[2025-12-27 15:03:30] [INFO] 数据库表创建成功
+[2025-12-27 15:03:30] [INFO] 服务器启动 - 
+[2025-12-27 15:03:32] [INFO] 请求处理完成 - 请求id=f9b84d36-022f-4469-be7c-6a56800de0d5, 请求方法=POST, 路径=/employee/add/luggageStorage, 状态码=201, 使用时间=18.4421ms, 操作员=
+[2025-12-27 15:03:44] [INFO] 请求处理完成 - 请求id=ff831102-fe8e-468d-9988-ebf589443df2, 请求方法=GET, 路径=/employee/get/all, 状态码=200, 使用时间=7.057ms, 操作员=
+[2025-12-27 15:03:48] [INFO] 请求处理完成 - 请求id=96fcc132-35a5-457d-8e97-1ef9422b00ee, 请求方法=GET, 路径=/employee/get/all, 状态码=200, 使用时间=11.2735ms, 操作员=
+[2025-12-27 15:03:49] [INFO] 请求处理完成 - 请求id=71388ce4-931b-42cd-8b01-654baea8f810, 请求方法=GET, 路径=/employee/get/all, 状态码=200, 使用时间=13.5894ms, 操作员=
+[2025-12-27 15:04:35] [INFO] 数据库表创建成功
+[2025-12-27 15:04:35] [INFO] 服务器启动 - 
+[2025-12-27 15:04:37] [INFO] 请求处理完成 - 请求id=54c90ca1-0756-4cc9-ae36-fd7aebab8751, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=2.3424ms, 操作员=未知
+[2025-12-27 15:04:42] [INFO] 请求处理完成 - 请求id=9418ec1a-0245-474c-a225-10335cca4b42, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=1.0065ms, 操作员=未知
+[2025-12-27 15:04:43] [INFO] 请求处理完成 - 请求id=097c4d00-ba64-4cee-83f1-fbf8eccdc371, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=1.8969ms, 操作员=未知
+[2025-12-27 15:05:53] [INFO] 数据库表创建成功
+[2025-12-27 15:05:53] [INFO] 服务器启动 - 
+[2025-12-27 15:05:55] [INFO] 请求处理完成 - 请求id=1e2fc860-dbf5-4622-b54e-0b84b7ff96d0, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=4.7526ms, 操作员=未知
+[2025-12-27 15:05:56] [INFO] 请求处理完成 - 请求id=24b51c0b-29ab-472b-8903-cd11aad4cc9c, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=1.4749ms, 操作员=未知
+[2025-12-27 15:06:02] [INFO] 请求处理完成 - 请求id=28064a87-bd56-4722-b095-965bb7b05eb5, 请求方法=GET, 路径=/employee/get/all, 状态码=200, 使用时间=12.9111ms, 操作员=
+[2025-12-27 15:06:27] [INFO] 请求处理完成 - 请求id=d6b9e313-f288-4f2f-aeb3-d90cac65e442, 请求方法=PUT, 路径=/employee/update/luggageStorage, 状态码=200, 使用时间=16.2275ms, 操作员=
+[2025-12-27 15:06:36] [INFO] 请求处理完成 - 请求id=c182edd7-cad3-480e-9030-c669c4e80623, 请求方法=PUT, 路径=/employee/update/luggageStorage, 状态码=404, 使用时间=13.6931ms, 操作员=
+[2025-12-27 15:08:26] [INFO] 数据库表创建成功
+[2025-12-27 15:08:26] [INFO] 服务器启动 - 
+[2025-12-27 15:08:30] [INFO] 请求处理完成 - 请求id=6f5d145d-16c1-44c3-8d27-37956651ee1a, 请求方法=PUT, 路径=/employee/update/luggageStorage, 状态码=404, 使用时间=6.6103ms, 操作员=
+[2025-12-27 15:09:15] [INFO] 数据库表创建成功
+[2025-12-27 15:09:15] [INFO] 服务器启动 - 
+[2025-12-27 15:09:19] [INFO] 请求处理完成 - 请求id=54986fe6-78d4-409d-8344-d9bb1346c323, 请求方法=PUT, 路径=/employee/update/luggageStorage, 状态码=404, 使用时间=12.6981ms, 操作员=
+[2025-12-27 15:10:19] [INFO] 数据库表创建成功
+[2025-12-27 15:10:19] [INFO] 服务器启动 - 
+[2025-12-27 15:10:25] [INFO] 请求处理完成 - 请求id=6df83c0c-78af-4408-91ad-df3dd952e9ab, 请求方法=PUT, 路径=/employee/update/luggageStorage, 状态码=404, 使用时间=12.5531ms, 操作员=
+[2025-12-27 15:10:29] [INFO] 请求处理完成 - 请求id=cb78df12-12c8-40e9-a854-76e9bb0c3278, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=3.8846ms, 操作员=未知
+[2025-12-27 15:11:55] [INFO] 数据库表创建成功
+[2025-12-27 15:11:56] [INFO] 服务器启动 - 
+[2025-12-27 15:11:58] [INFO] 请求处理完成 - 请求id=9178dcc1-198b-4740-8fc1-df7d30092482, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=6.2835ms, 操作员=未知
+[2025-12-27 15:13:37] [INFO] 数据库表创建成功
+[2025-12-27 15:13:37] [INFO] 服务器启动 - mode=release
+[2025-12-27 15:13:40] [INFO] 请求处理完成 - 请求id=5b8370ce-cfa3-48cd-b5db-82904facc529, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=5.0803ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:17:35] [INFO] 数据库表创建成功
+[2025-12-27 15:17:35] [INFO] 服务器启动 - mode=release
+[2025-12-27 15:17:39] [INFO] 请求处理完成 - 请求id=1f5feee0-5b73-4215-8435-ac1c9fb271f3, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=6.5065ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:17:49] [ERROR] 限流器执行脚本失败 - name=local, error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.
+[2025-12-27 15:17:49] [WARNING] 请求过于频繁 - client_ip=::1
+[2025-12-27 15:17:49] [INFO] 请求处理完成 - 请求id=becd9b5f-41f4-4bf8-ae5c-2ea6ded2668f, 请求方法=POST, 路径=/employee/login, 状态码=429, 使用时间=1.0001ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:17:51] [ERROR] 限流器执行脚本失败 - name=local, error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.
+[2025-12-27 15:17:51] [WARNING] 请求过于频繁 - client_ip=::1
+[2025-12-27 15:17:51] [INFO] 请求处理完成 - 请求id=a3a7c556-7d82-4611-ac87-0e05c3aaf6d0, 请求方法=GET, 路径=/employee/get/all, 状态码=429, 使用时间=1.3933ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:18:45] [INFO] 数据库表创建成功
+[2025-12-27 15:18:45] [INFO] 服务器启动 - mode=release
+[2025-12-27 15:18:45] [ERROR] 服务器启动失败 - error=listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted., mode=release
+[2025-12-27 15:18:49] [ERROR] 限流器执行脚本失败 - name=local, error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.
+[2025-12-27 15:18:49] [WARNING] 请求过于频繁 - client_ip=::1
+[2025-12-27 15:18:49] [INFO] 请求处理完成 - 请求id=e44b7206-3a94-443e-8e68-acda4b06b205, 请求方法=GET, 路径=/employee/get/all, 状态码=429, 使用时间=1.7826ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:19:02] [INFO] 请求处理完成 - 请求id=e91a1821-8627-4005-bc7d-cc206512fa5f, 请求方法=GET, 路径=/employee/get/all, 状态码=401, 使用时间=23.814ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:19:05] [INFO] 请求处理完成 - 请求id=455abf48-6589-45ce-988b-7b9562e9f0c0, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=37.6278ms, 操作员=未知, 客户端IP=::1
+[2025-12-27 15:19:08] [INFO] 请求处理完成 - 请求id=1adde113-4340-4094-8d90-771c026c87a3, 请求方法=GET, 路径=/employee/get/all, 状态码=200, 使用时间=19.9955ms, 操作员=, 客户端IP=::1
+[2025-12-27 15:20:46] [INFO] 数据库表创建成功
+[2025-12-27 15:20:46] [INFO] 服务器启动 - mode=release

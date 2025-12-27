@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -40,7 +41,7 @@ func RateLimit(name string, s *services.Services) gin.HandlerFunc {
 				"message": "请求过于频繁，请稍后再试",
 			})
 			util.Logger.WithFields(logrus.Fields{
-				"client_ip": c.ClientIP(),
+				"客户端IP": c.ClientIP(),
 			}).Warn("请求过于频繁")
 			c.Abort()
 			return
@@ -180,14 +181,37 @@ func LogRequest() gin.HandlerFunc {
 		//记录请求信息
 		requestID, _ := c.Get("request_id")
 		duration := time.Since(start)
+		va, ok := c.Get("employee_name")
+		if !ok {
+			va = "未知"
+		}
+		name := va.(string)
+
 		util.Logger.WithFields(logrus.Fields{
-			"request_id": requestID,
-			"method":     c.Request.Method,
-			"path":       c.Request.URL.Path,
-			"status":     c.Writer.Status(),
-			"duration":   duration.String(),
+			"请求id":  requestID,
+			"请求方法":  c.Request.Method,
+			"路径":    c.Request.URL.Path,
+			"状态码":   c.Writer.Status(),
+			"使用时间":  duration.String(),
+			"操作员":   name,
+			"客户端IP": c.ClientIP(),
 		}).Info("请求处理完成")
 
+	}
+}
+func Recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				// 记录 panic 错误
+				debug.PrintStack()
+				// 返回 500 错误
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"message": "Internal Server Error",
+				})
+			}
+		}()
+		c.Next()
 	}
 }
 

@@ -25,9 +25,7 @@ func InitLogger(logLevel, output, filePath string, maxSize, maxBackups, maxAge i
 	Logger.SetLevel(level)
 
 	// 设置日志格式
-	Logger.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
+	Logger.SetFormatter(&CustomFormatter{})
 
 	// 设置输出，全部转换成小写
 	switch strings.ToLower(output) {
@@ -85,4 +83,49 @@ func InitLogger(logLevel, output, filePath string, maxSize, maxBackups, maxAge i
 	default: // console
 		Logger.SetOutput(os.Stdout)
 	}
+}
+
+// CustomFormatter 自定义日志格式
+type CustomFormatter struct{}
+
+func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := entry.Time.Format("2006-01-02 15:04:05")
+	level := strings.ToUpper(entry.Level.String())
+	msg := entry.Message
+
+	// 如果有字段信息，按固定顺序输出
+	var fieldsStr string
+	if len(entry.Data) > 0 {
+		// 定义字段输出顺序（添加 "客户端IP"）
+		fieldOrder := []string{"请求id", "请求方法", "路径", "状态码", "使用时间", "操作员", "客户端IP"}
+
+		fields := make([]string, 0, len(entry.Data))
+
+		// 按固定顺序添加字段
+		for _, key := range fieldOrder {
+			if value, exists := entry.Data[key]; exists {
+				fields = append(fields, fmt.Sprintf("%s=%v", key, value))
+			}
+		}
+
+		// 添加其他未在 fieldOrder 中的字段
+		for k, v := range entry.Data {
+			found := false
+			for _, key := range fieldOrder {
+				if k == key {
+					found = true
+					break
+				}
+			}
+			if !found {
+				fields = append(fields, fmt.Sprintf("%s=%v", k, v))
+			}
+		}
+
+		fieldsStr = fmt.Sprintf(" - %s", strings.Join(fields, ", "))
+	}
+
+	// 格式: [时间] [级别] 消息 - 字段1=值1, 字段2=值2
+	output := fmt.Sprintf("[%s] [%s] %s%s\n", timestamp, level, msg, fieldsStr)
+	return []byte(output), nil
 }
