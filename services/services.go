@@ -6,7 +6,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"hotel/internal/config"
 	"hotel/internal/util"
 )
 
@@ -21,7 +20,7 @@ type Services struct {
 }
 
 // NewDatabase 初始化数据库连接
-func NewDatabase(cfg *config.Config) *Services {
+func NewDatabase(cfg *util.Config) *Services {
 	//连接数据库
 	dsn := cfg.Database.GetDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

@@ -125,10 +125,17 @@ func open(db *gorm.DB) {
 	hotel := models.Hotel{Name: "酒店1"}
 	createIfNotExists(db, "name", &hotel, "酒店表")
 
+	password, err := util.HashPassword("admin123")
+	if err != nil {
+		util.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("创建管理员员工失败")
+	}
+
 	// 创建管理员员工
 	admin := models.Employee{
 		User:           "admin",
-		Password:       "admin123",
+		Password:       password,
 		LastActiveTime: time.Now(),
 		RoleID:         2,
 		HotelID:        1,

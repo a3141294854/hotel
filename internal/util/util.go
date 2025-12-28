@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"reflect"
 	"strings"
@@ -96,4 +97,22 @@ func ConvertSnakeToCamel(s string) string {
 	}
 	//如果没有记录，默认开头大写
 	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+// HashPassword 对密码进行哈希处理
+// 使用 bcrypt 算法,成本因子(cost)默认为 10
+func HashPassword(password string) (string, error) {
+	// 使用默认成本因子 10 生成哈希
+	// 成本因子决定了计算所需的迭代次数,值越大越安全但计算越慢
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+// CheckPassword 验证密码是否匹配哈希值
+// password: 用户输入的明文密码
+// hash: 数据库中存储的哈希密码
+// 返回: 密码是否匹配
+func CheckPassword(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

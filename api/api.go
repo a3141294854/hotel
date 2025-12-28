@@ -9,13 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"hotel/internal/admin"
-	"hotel/internal/config"
 	"hotel/internal/middleware"
 	"hotel/services"
 )
 
 // open 启动路由配置
-func open(r *gin.Engine, service *services.Services, cfg *config.Config) {
+func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	//中间件配置
 	r.Use(middleware.Recovery())
 	r.Use(middleware.RequestIDMiddleware())

@@ -17,7 +17,8 @@ import (
 func EmployeeRegister(c *gin.Context, s *services.Services) {
 	var e models.Employee
 	//绑定
-	if err := c.ShouldBind(&e); err != nil {
+	err := c.ShouldBind(&e)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
@@ -49,11 +50,26 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 	if e.RoleID == 0 {
 		e.RoleID = 1
 	}
+
+	e.Password, err = util.HashPassword(e.Password)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "注册失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"username": e.User,
+			"error":    err,
+		}).Error("员工密码加密错误")
+		return
+	}
 	e.LastActiveTime = time.Now()
 	result := s.DB.Create(&e)
 
 	//插入
 	employee := models.Employee{}
+	employee.Password = ""
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -108,7 +124,6 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 	var user models.Employee
 	result := s.DB.Model(models.Employee{}).
 		Where("user=?", e.User).
-		Where("password=?", e.Password).
 		Where("hotel_id=?", e.HotelID).
 		First(&user)
 	if result.Error != nil {
@@ -128,6 +143,14 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 			}).Error("员工信息搜索错误")
 			return
 		}
+	}
+
+	if !util.CheckPassword(e.Password, user.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "密码错误",
+		})
+		return
 	}
 
 	//生成令牌
