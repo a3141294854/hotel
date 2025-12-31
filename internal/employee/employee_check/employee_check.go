@@ -9,6 +9,7 @@ import (
 	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -170,8 +171,8 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		return
 	}
 
-	s.RdbAcc.Set(c, fmt.Sprintf("%d", user.ID), accessToken, util.AccessExpireTime)
-	s.RdbRef.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, util.RefreshExpireTime)
+	s.RdbAcc.Set(c, fmt.Sprintf("%d", user.ID), accessToken, util.AccessExpireTime+time.Duration(rand.Intn(100))*time.Second)
+	s.RdbRef.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, util.RefreshExpireTime+time.Duration(rand.Intn(100))*time.Second)
 
 	util.Logger.WithFields(logrus.Fields{
 		"username": user.User,
@@ -270,8 +271,8 @@ func RefreshToken(c *gin.Context, s *services.Services) {
 		}).Error("JWT token生成错误")
 		return
 	}
-	s.RdbAcc.Set(c, fmt.Sprintf("%d", claims.UserId), accessToken, util.AccessExpireTime)
-	s.RdbRef.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, util.RefreshExpireTime)
+	s.RdbAcc.Set(c, fmt.Sprintf("%d", claims.UserId), accessToken, util.AccessExpireTime+time.Duration(rand.Intn(100))*time.Second)
+	s.RdbRef.Set(c, fmt.Sprintf("%d", claims.UserId), refreshToken, util.RefreshExpireTime+time.Duration(rand.Intn(100))*time.Second)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
