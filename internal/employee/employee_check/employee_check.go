@@ -71,6 +71,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 	employee := models.Employee{}
 	employee.Password = ""
 	s.DB.Model(models.Employee{}).Where("user=?", e.User).First(&employee)
+
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -81,6 +82,9 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 			"error":    result.Error,
 		}).Error("插入员工记录失败")
 	} else {
+		util.Logger.WithFields(logrus.Fields{
+			"username": e.User,
+		}).Info("员工注册成功")
 		c.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "注册成功",
@@ -168,6 +172,10 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 
 	s.RdbAcc.Set(c, fmt.Sprintf("%d", user.ID), accessToken, util.AccessExpireTime)
 	s.RdbRef.Set(c, fmt.Sprintf("%d", user.ID), refreshToken, util.RefreshExpireTime)
+
+	util.Logger.WithFields(logrus.Fields{
+		"username": user.User,
+	}).Info("员工登录成功")
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

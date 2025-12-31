@@ -2507,3 +2507,41 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2025-12-28 23:06:30] [INFO] 服务器启动 - mode=release
 [2025-12-28 23:54:19] [INFO] 数据库表创建成功
 [2025-12-28 23:54:21] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:09:22] [INFO] 数据库表创建成功
+[2025-12-29 19:09:24] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:09:24] [ERROR] 服务器启动失败 - error=listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted., mode=release
+[2025-12-29 19:11:07] [INFO] 数据库表创建成功
+[2025-12-29 19:11:09] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:23:28] [INFO] 数据库表创建成功
+[2025-12-29 19:23:28] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:23:34] [INFO] 请求处理完成 - 请求id=a8024637-82ce-4fa3-954d-c94fe7413c9c, 请求方法=POST, 路径=/employee/login, 状态码=401, 使用时间=2.1089ms, 操作员=未知, 客户端IP=::1
+[2025-12-29 19:25:18] [INFO] 数据库表创建成功
+[2025-12-29 19:25:18] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:25:30] [INFO] 请求处理完成 - 请求id=2fb030eb-f902-4752-8a76-e63992ca4c85, 请求方法=POST, 路径=/employee/login, 状态码=401, 使用时间=1.503ms, 操作员=未知, 客户端IP=::1
+[2025-12-29 19:25:54] [INFO] 数据库表创建成功
+[2025-12-29 19:25:54] [INFO] 服务器启动 - mode=release
+[2025-12-29 19:26:08] [INFO] 员工登录成功 - username=admin
+[2025-12-29 19:26:08] [INFO] 请求处理完成 - 请求id=e95c41fe-0fcf-4f7b-8000-5155f5b2c57d, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=47.2479ms, 操作员=未知, 客户端IP=::1
+[2025-12-30 13:02:16] [INFO] 数据库表创建成功
+[2025-12-30 13:02:16] [INFO] 服务器启动 - mode=release
+[2025-12-30 13:02:29] [INFO] 员工登录成功 - username=admin
+[2025-12-30 13:02:29] [INFO] 请求处理完成 - 请求id=9e11185d-2b57-4fd5-9ea5-03bac9effe0c, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=42.451228ms, 操作员=未知, 客户端IP=172.18.0.1
+[2025-12-30 13:02:34] [INFO] 员工登录成功 - username=admin
+[2025-12-30 13:02:34] [INFO] 请求处理完成 - 请求id=f0046e8f-7ec4-48cd-8026-13211970aa6d, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=45.785378ms, 操作员=未知, 客户端IP=172.18.0.1
+[2025-12-30 13:05:12] [INFO] 数据库表创建成功
+[2025-12-30 13:05:12] [INFO] 服务器启动 - mode=release
+[2025-12-30 13:05:18] [INFO] 员工登录成功 - username=admin
+[2025-12-30 13:05:18] [INFO] 请求处理完成 - 请求id=27557a80-4334-4ea8-918d-8780b97028a9, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=43.059569ms, 操作员=未知, 客户端IP=172.18.0.1
+[2025-12-30 21:14:13] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host
+[2025-12-30 21:14:51] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host
+[2025-12-30 21:22:15] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host
+[2025-12-30 21:23:49] [INFO] 数据库表创建成功
+[2025-12-30 21:23:51] [INFO] 服务器启动 - mode=debug
+[2025-12-30 21:24:06] [INFO] 数据库表创建成功
+[2025-12-30 21:24:06] [INFO] 服务器启动 - mode=debug
+[2025-12-30 21:24:09] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-30 21:24:09] [INFO] 员工登录成功 - username=admin
+[2025-12-30 21:24:09] [INFO] 请求处理完成 - 请求id=460b262e-808b-4f97-b5db-e2a813a7ef3b, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=47.0151ms, 操作员=未知, 客户端IP=::1
+[2025-12-30 21:25:00] [INFO] 数据库表创建成功
+[2025-12-30 21:25:02] [INFO] 服务器启动 - mode=debug
+[2025-12-30 21:25:20] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host

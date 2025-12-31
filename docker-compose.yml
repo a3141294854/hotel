@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hotel-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "@furenjie321"
+      MYSQL_DATABASE: study
+      MYSQL_USER: hotel_user
+      MYSQL_PASSWORD: hotel_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p@furenjie321"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: hotel-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hotel-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: "@furenjie321"
+      DB_NAME: study
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    volumes:
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+
+networks:
+  hotel-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
