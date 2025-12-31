@@ -28,6 +28,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	r.POST("/employee/refresh", func(c *gin.Context) {
 		employee_check.RefreshToken(c, service)
 	})
+	r.GET("/photos/:filename", middleware.JwtCheck(service), func(c *gin.Context) {
+		employee_action.StaticDownloadPhoto(c)
+	})
 
 	//员工组
 	e := r.Group("/employee")
@@ -112,6 +115,7 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 
 		//图片的操作
 		p := e.Group("/photo")
+
 		{
 			p.POST("/upload", func(c *gin.Context) {
 				employee_action.UploadPhoto(c, service)

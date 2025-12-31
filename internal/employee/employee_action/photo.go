@@ -5,9 +5,11 @@ import (
 	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
+	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -129,6 +131,39 @@ func DownloadPhoto(c *gin.Context) {
 	c.File(path)
 }
 
+func StaticDownloadPhoto(c *gin.Context) {
+	filename := c.Param("filename")
+	if filename == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请提供文件地址",
+		})
+		return
+	}
+	//规范化路径，防止.和/
+	cleanPath := filepath.Clean(filename)
+
+	if strings.Contains(cleanPath, "..") {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	localPath := fmt.Sprintf("./uploads/photos/%s", filename)
+
+	// 检查文件是否存在
+	if _, err := os.Stat(localPath); os.IsNotExist(err) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "照片不存在",
+		})
+		return
+	}
+
+	// 返回文件
+	c.File(localPath)
+
+}
+
 func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 	var req struct {
 		LuggageStorageID uint     `json:"luggage_storage_id"`
@@ -212,7 +247,7 @@ func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[i%len(charset)]
+		b[i] = charset[rand.Intn(len(charset))] // ✅ 随机选择
 	}
 	return string(b)
 }

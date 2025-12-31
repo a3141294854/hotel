@@ -12,7 +12,7 @@ import (
 
 func main() {
 	//加载配置
-	cfg, err := util.LoadConfig("configs/prod.yaml")
+	cfg, err := util.LoadConfig("")
 	if err != nil {
 		fmt.Println("配置文件加载失败:", err.Error())
 		return

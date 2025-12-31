@@ -2545,3 +2545,82 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2025-12-30 21:25:00] [INFO] 数据库表创建成功
 [2025-12-30 21:25:02] [INFO] 服务器启动 - mode=debug
 [2025-12-30 21:25:20] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host
+[2025-12-31 16:08:48] [FATAL] 数据库连接失败 - error=dial tcp: lookup mysql: no such host
+[2025-12-31 16:09:05] [INFO] 数据库表创建成功
+[2025-12-31 16:09:05] [INFO] 服务器启动 - mode=debug
+[2025-12-31 16:09:12] [ERROR] 限流器执行脚本失败 - name=local, error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.
+[2025-12-31 16:09:12] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2025-12-31 16:09:12] [INFO] 请求处理完成 - 请求id=25f5f6f7-3bf5-4ebc-b842-7d3f7b8a4986, 请求方法=POST, 路径=/user/login, 状态码=429, 使用时间=746.6µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:09:22] [ERROR] 限流器执行脚本失败 - name=local, error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26.
+[2025-12-31 16:09:22] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2025-12-31 16:09:22] [INFO] 请求处理完成 - 请求id=07130ce8-7ebc-4f6b-a010-55cd48cde4e2, 请求方法=POST, 路径=/user/login, 状态码=429, 使用时间=505µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:10:45] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 16:10:45] [INFO] 请求处理完成 - 请求id=c5761a6d-760f-43d1-a115-069bccbd4da4, 请求方法=POST, 路径=/user/login, 状态码=404, 使用时间=21.7574ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:10:51] [INFO] 数据库表创建成功
+[2025-12-31 16:10:51] [INFO] 服务器启动 - mode=debug
+[2025-12-31 16:11:01] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 16:11:01] [INFO] 请求处理完成 - 请求id=19ebe474-e8c9-4331-9a1f-cb9495b813f5, 请求方法=POST, 路径=/user/login, 状态码=404, 使用时间=1.0052ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:11:02] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 16:11:02] [INFO] 请求处理完成 - 请求id=d8037d3f-a278-4add-91d0-340e97b12a73, 请求方法=POST, 路径=/user/login, 状态码=404, 使用时间=462.6µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:12:10] [ERROR] 限流器执行脚本失败 - name=local, error=dial tcp 127.0.0.1:6379: connectex: No connection could be made because the target machine actively refused it.
+[2025-12-31 16:12:10] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2025-12-31 16:12:10] [INFO] 请求处理完成 - 请求id=6c076b13-6c10-40d7-a260-11296736ba09, 请求方法=POST, 路径=/user/login, 状态码=429, 使用时间=1.576942s, 操作员=未知, 客户端IP=::1
+[2025-12-31 16:12:24] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 16:12:24] [INFO] 请求处理完成 - 请求id=acc4245a-40ef-40df-83e9-eceeb31aac58, 请求方法=POST, 路径=/user/login, 状态码=404, 使用时间=2.5062ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:17:35] [INFO] 数据库表创建成功
+[2025-12-31 20:17:37] [INFO] 服务器启动 - mode=debug
+[2025-12-31 20:17:53] [DEBUG] 限流器状态 - tokens=99, name=local
+[2025-12-31 20:17:53] [INFO] 员工登录成功 - username=admin
+[2025-12-31 20:17:53] [INFO] 请求处理完成 - 请求id=fd5775b1-797c-412c-a2f1-9779e4a18e65, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=64.6106ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:19:05] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:19:05] [INFO] 请求处理完成 - 请求id=c0bfac66-56f4-4371-99c8-49bb372da80e, 请求方法=POST, 路径=/employee/photo/touch, 状态码=200, 使用时间=25.871ms, 操作员=, 客户端IP=::1
+[2025-12-31 20:19:12] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:19:12] [INFO] 请求处理完成 - 请求id=72866891-e4ab-4fa2-8fa1-4934c61e0bb2, 请求方法=POST, 路径=/employee/photo/upload, 状态码=200, 使用时间=20.5159ms, 操作员=, 客户端IP=::1
+[2025-12-31 20:19:58] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:19:58] [INFO] 请求处理完成 - 请求id=125a88c9-aeb3-4072-86bc-004e3c061d43, 请求方法=POST, 路径=/employee/photo/upload, 状态码=200, 使用时间=90.198ms, 操作员=, 客户端IP=::1
+[2025-12-31 20:20:17] [DEBUG] 限流器状态 - tokens=99, name=local
+[2025-12-31 20:20:18] [INFO] 请求处理完成 - 请求id=754c632a-4d29-4502-b8c8-a0a66185a930, 请求方法=POST, 路径=/employee/photo/upload, 状态码=200, 使用时间=14.689ms, 操作员=, 客户端IP=::1
+[2025-12-31 20:20:34] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:20:34] [INFO] 请求处理完成 - 请求id=c80dd452-5574-4436-9fdf-29187e4179bc, 请求方法=GET, 路径=//photos/20251231202017_abcdef.png, 状态码=404, 使用时间=1.0435ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:21:08] [DEBUG] 限流器状态 - tokens=99, name=local
+[2025-12-31 20:21:08] [INFO] 请求处理完成 - 请求id=43301ce3-7bf0-4b16-aeac-22bc4b2a1005, 请求方法=GET, 路径=/employee/photo/download/20251226191757_abcdef.png, 状态码=200, 使用时间=53.4091ms, 操作员=, 客户端IP=::1
+[2025-12-31 20:21:16] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:21:16] [INFO] 请求处理完成 - 请求id=dcf24201-626f-4a5b-a4a0-ecb6834dcf16, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=404, 使用时间=1.0003ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:44:18] [INFO] 数据库表创建成功
+[2025-12-31 20:44:20] [INFO] 服务器启动 - mode=debug
+[2025-12-31 20:44:27] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:44:27] [INFO] 员工登录成功 - username=admin
+[2025-12-31 20:44:27] [INFO] 请求处理完成 - 请求id=37df7522-6a8b-4b0f-b53f-b5be1c23e403, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=57.1789ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:44:29] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:44:29] [INFO] 请求处理完成 - 请求id=d31b82a4-5631-427e-a7fd-94389bab6186, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=404, 使用时间=0s, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:45:23] [INFO] 数据库表创建成功
+[2025-12-31 20:45:23] [INFO] 服务器启动 - mode=debug
+[2025-12-31 20:45:26] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:45:26] [INFO] 请求处理完成 - 请求id=f1aa17e2-1cde-4541-9cc4-5d1ef5299c62, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=404, 使用时间=1.3377ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 20:45:35] [INFO] 数据库表创建成功
+[2025-12-31 20:45:35] [INFO] 服务器启动 - mode=debug
+[2025-12-31 20:46:12] [INFO] 数据库表创建成功
+[2025-12-31 20:46:12] [INFO] 服务器启动 - mode=debug
+[2025-12-31 20:46:15] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 20:46:15] [INFO] 请求处理完成 - 请求id=3f9e3ada-1736-42d7-9605-33ca10cb9319, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=41.8078ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:06:50] [INFO] 数据库表创建成功
+[2025-12-31 21:06:50] [INFO] 服务器启动 - mode=debug
+[2025-12-31 21:07:02] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:07:02] [INFO] 请求处理完成 - 请求id=72db6cf6-6406-484d-9f46-a2c7d149633a, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=45.7842ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:17:50] [INFO] 数据库表创建成功
+[2025-12-31 21:17:50] [INFO] 服务器启动 - mode=debug
+[2025-12-31 21:17:57] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:17:57] [INFO] 请求处理完成 - 请求id=2fae24a5-bd08-4e93-8081-b8a2e8b1b36a, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=401, 使用时间=795.8µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:00] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:18:00] [INFO] 员工登录成功 - username=admin
+[2025-12-31 21:18:00] [INFO] 请求处理完成 - 请求id=02b53ba7-df66-4d3c-872f-83c5eb2e65ff, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=49.736ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:02] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:18:02] [INFO] 请求处理完成 - 请求id=e53b17ee-7522-4675-8bd0-483497c066db, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=401, 使用时间=515µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:10] [DEBUG] 限流器状态 - tokens=99, name=local
+[2025-12-31 21:18:10] [INFO] 请求处理完成 - 请求id=14cd6667-7ad0-465a-bdb5-94b627a60f9f, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=401, 使用时间=503.5µs, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:16] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:18:16] [INFO] 请求处理完成 - 请求id=60a0c78a-e38d-4355-b21e-86da3dcd3264, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=34.4653ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:17] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:18:17] [INFO] 请求处理完成 - 请求id=87e7a872-8f06-4472-9544-5924ad080a62, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=2.1223ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 21:18:17] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 21:18:17] [INFO] 请求处理完成 - 请求id=b62f2d54-b9c2-4675-a45d-51b4104283a9, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=1.2992ms, 操作员=未知, 客户端IP=::1
