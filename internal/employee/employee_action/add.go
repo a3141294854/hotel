@@ -177,11 +177,43 @@ func AddMac(c *gin.Context, s *services.Services) {
 }
 
 func AddLocation(c *gin.Context, s *services.Services) {
-	util.Create(c, s.DB, util.RequestList{
-		Model:      &models.Location{},
-		CheckExist: true,
-		CheckType:  "name",
-		CheckField: []string{"Name,HotelID"},
-	})
+	var req models.Location
+	//绑定
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("位置数据绑定错误")
+		return
+	}
+	//检查必要字段
+	if req.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "位置名称不能为空",
+		})
+		return
+	}
+	//确认酒店id
+	req.HotelID = c.GetUint("hotel_id")
 
+	result := s.DB.Model(&models.Location{}).Create(&req)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "创建位置记录失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("创建位置记录失败")
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "位置添加成功",
+		"data":    req,
+	})
 }

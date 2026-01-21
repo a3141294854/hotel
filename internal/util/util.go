@@ -85,6 +85,7 @@ func ConvertSnakeToCamel(s string) string {
 		"name":         "Name",
 		"mac":          "Mac",
 		"pick_up_code": "PickUpCode",
+		"hotel_id":     "HotelID",
 	}
 
 	FieldName, ok := mappings[s]

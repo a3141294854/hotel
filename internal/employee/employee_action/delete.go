@@ -215,6 +215,7 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 	//检查是否存在
 	var ex models.Location
 	result := s.DB.Model(&models.Location{}).
+		Preload("Luggage").
 		Where("id = ?", location.ID).First(&ex)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -228,6 +229,31 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 			}).Error("位置不存在")
 			return
 		}
+	}
+	//检查是否同一个酒店
+	UserHotelId := c.GetUint("hotel_id")
+	if UserHotelId != ex.HotelID {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "位置不属于该酒店",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"user_hotel_id":     UserHotelId,
+			"location_hotel_id": ex.HotelID,
+		}).Error("位置不属于该酒店")
+		return
+	}
+	//检查位置下是否还有行李
+	if len(location.Luggage) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "位置下还有行李，无法删除",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":       result.Error,
+			"location_id": location.ID,
+		}).Error("位置下还有行李，无法删除")
+		return
 	}
 	//删除位置
 	result = s.DB.Model(&models.Location{}).Where("id = ?", location.ID).Delete(&models.Location{})

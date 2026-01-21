@@ -67,6 +67,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 			d.POST("/luggage", func(c *gin.Context) {
 				employee_action.DeleteLuggage(c, service)
 			})
+			d.POST("/location", func(c *gin.Context) {
+				employee_action.DeleteLocation(c, service)
+			})
 		}
 
 		//更新操作

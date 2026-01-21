@@ -2649,3 +2649,66 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2026-01-21 13:08:16] [DEBUG] 限流器状态 - name=local, tokens=99
 [2026-01-21 13:08:16] [INFO] 员工登录成功 - username=admin
 [2026-01-21 13:08:16] [INFO] 请求处理完成 - 请求id=99eb694e-52f0-498b-a509-56be48c70dab, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=52.1925ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:17:58] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:17:58] [INFO] 数据库表创建成功
+[2026-01-21 13:17:58] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:18:01] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:18:01] [INFO] 员工登录成功 - username=admin
+[2026-01-21 13:18:01] [INFO] 请求处理完成 - 请求id=2b3ab807-230c-49af-846e-e7afaa0dd73d, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=49.9641ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:18:18] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:19:32] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:19:32] [INFO] 员工登录成功 - username=admin
+[2026-01-21 13:19:32] [INFO] 请求处理完成 - 请求id=a2feaa73-0c0f-4ee8-9863-c5030c8d42be, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=46.8668ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:20:29] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:20:29] [INFO] 数据库表创建成功
+[2026-01-21 13:20:29] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:20:32] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:21:25] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:21:25] [INFO] 数据库表创建成功
+[2026-01-21 13:21:25] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:21:27] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:21:27] [INFO] 请求处理完成 - 请求id=7fccbb30-0cfb-4e5d-ad2a-008b4f6859e8, 请求方法=POST, 路径=/employee/add/location, 状态码=200, 使用时间=59.8477ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:31:14] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:31:14] [INFO] 数据库表创建成功
+[2026-01-21 13:31:14] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:31:25] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:31:25] [INFO] 请求处理完成 - 请求id=c7b690dc-2bff-4f95-918b-72470379bf60, 请求方法=POST, 路径=/employee/add/location, 状态码=201, 使用时间=20.1826ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:32:16] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:32:16] [INFO] 请求处理完成 - 请求id=f872dc9d-e610-498f-a88c-98037a928b1b, 请求方法=POST, 路径=/employee/add/location, 状态码=201, 使用时间=7.4374ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:32:26] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:32:26] [INFO] 请求处理完成 - 请求id=49d1858d-ac23-4d41-8a93-d75043ed37c6, 请求方法=POST, 路径=/employee/delete/location, 状态码=404, 使用时间=1.3355ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:32:32] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:32:32] [INFO] 请求处理完成 - 请求id=52d3ef9f-4ffe-4dfb-a750-77890cc1d894, 请求方法=POST, 路径=/employee/delete/location, 状态码=404, 使用时间=542.4µs, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:34:24] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:34:24] [INFO] 数据库表创建成功
+[2026-01-21 13:34:24] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:34:42] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:34:42] [INFO] 数据库表创建成功
+[2026-01-21 13:34:42] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:34:45] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:34:45] [INFO] 请求处理完成 - 请求id=94ffdc87-4807-4026-b0c7-bcf6319adc4f, 请求方法=POST, 路径=/employee/delete/location, 状态码=401, 使用时间=595.8µs, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:34:58] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:34:58] [INFO] 请求处理完成 - 请求id=9d959433-5ecf-44fb-b439-ccb58ea01872, 请求方法=POST, 路径=/employee/delete/location, 状态码=401, 使用时间=503.2µs, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:35:02] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:35:02] [INFO] 员工登录成功 - username=admin
+[2026-01-21 13:35:02] [INFO] 请求处理完成 - 请求id=3f429913-8388-402a-80a7-6c4abd666cba, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=47.6532ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:35:04] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:35:04] [ERROR] 位置不属于该酒店 - error=<nil>, location_id=3
+[2026-01-21 13:35:04] [INFO] 请求处理完成 - 请求id=9fce46e4-db0c-467a-8b88-76336c5594c7, 请求方法=POST, 路径=/employee/delete/location, 状态码=400, 使用时间=77.2346ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:35:48] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:35:48] [INFO] 数据库表创建成功
+[2026-01-21 13:35:48] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:35:51] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:35:51] [ERROR] 位置不属于该酒店 - location_id=3, user_hotel_id=1
+[2026-01-21 13:35:51] [INFO] 请求处理完成 - 请求id=7fbd324f-9322-4ece-a6b2-b86d76c48f72, 请求方法=POST, 路径=/employee/delete/location, 状态码=400, 使用时间=10.6284ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:36:28] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:36:28] [INFO] 数据库表创建成功
+[2026-01-21 13:36:29] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:36:31] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:36:31] [ERROR] 位置不属于该酒店 - user_hotel_id=1, location_hotel_id=0
+[2026-01-21 13:36:31] [INFO] 请求处理完成 - 请求id=f440b7ae-c98c-4cb7-8ecf-3c5a0d974c29, 请求方法=POST, 路径=/employee/delete/location, 状态码=400, 使用时间=20.5152ms, 操作员=, 客户端IP=::1
+[2026-01-21 13:37:40] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:37:40] [INFO] 数据库表创建成功
+[2026-01-21 13:37:40] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:37:48] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:37:48] [INFO] 请求处理完成 - 请求id=38b56839-5d5d-40bf-9c23-27879d99656a, 请求方法=POST, 路径=/employee/delete/location, 状态码=200, 使用时间=13.3583ms, 操作员=, 客户端IP=::1
