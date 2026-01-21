@@ -12,7 +12,7 @@ import (
 	"hotel/services"
 )
 
-// AddLuggage 添加行李
+// AddLuggage 添加行李寄存表
 func AddLuggage(c *gin.Context, s *services.Services) {
 
 	var req struct {
@@ -172,6 +172,16 @@ func AddMac(c *gin.Context, s *services.Services) {
 		CheckExist: true,
 		CheckType:  "mac",
 		CheckField: []string{"Mac"},
+	})
+
+}
+
+func AddLocation(c *gin.Context, s *services.Services) {
+	util.Create(c, s.DB, util.RequestList{
+		Model:      &models.Location{},
+		CheckExist: true,
+		CheckType:  "name",
+		CheckField: []string{"Name,HotelID"},
 	})
 
 }

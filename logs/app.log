@@ -2624,3 +2624,28 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2025-12-31 21:18:17] [INFO] 请求处理完成 - 请求id=87e7a872-8f06-4472-9544-5924ad080a62, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=2.1223ms, 操作员=未知, 客户端IP=::1
 [2025-12-31 21:18:17] [DEBUG] 限流器状态 - name=local, tokens=99
 [2025-12-31 21:18:17] [INFO] 请求处理完成 - 请求id=b62f2d54-b9c2-4675-a45d-51b4104283a9, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=1.2992ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 22:35:54] [INFO] 数据库表创建成功
+[2025-12-31 22:35:55] [INFO] 服务器启动 - mode=debug
+[2025-12-31 22:36:00] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 22:36:00] [INFO] 员工登录成功 - username=admin
+[2025-12-31 22:36:00] [INFO] 请求处理完成 - 请求id=1c1438e2-43fb-42a4-ba47-d53a722d3d6b, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=55.8478ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 22:36:11] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 22:36:11] [INFO] 请求处理完成 - 请求id=7b98b5f2-f007-4515-b3f3-8dc29ea31e94, 请求方法=GET, 路径=/photos/20251231202017_abcdef.png, 状态码=200, 使用时间=47.1869ms, 操作员=未知, 客户端IP=::1
+[2025-12-31 22:36:14] [DEBUG] 限流器状态 - tokens=99, name=local
+[2025-12-31 22:36:14] [INFO] 请求处理完成 - 请求id=528580e0-64b6-4224-a1fc-077e1decbfee, 请求方法=GET, 路径=/employee/photo/download/20251226191757_abcdef.png, 状态码=200, 使用时间=14.4771ms, 操作员=, 客户端IP=::1
+[2025-12-31 22:36:18] [DEBUG] 限流器状态 - name=local, tokens=99
+[2025-12-31 22:36:18] [INFO] 请求处理完成 - 请求id=d7a11787-578c-43d5-9409-4e0ab227f573, 请求方法=POST, 路径=/employee/photo/upload, 状态码=200, 使用时间=18.3996ms, 操作员=, 客户端IP=::1
+[2026-01-12 19:24:32] [INFO] 数据库表创建成功
+[2026-01-12 19:24:34] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:07:49] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-21 13:07:49] [INFO] 数据库表创建成功
+[2026-01-21 13:07:51] [INFO] 服务器启动 - mode=debug
+[2026-01-21 13:07:58] [ERROR] 限流器执行脚本失败 - name=local, error=dial tcp 127.0.0.1:6379: connectex: No connection could be made because the target machine actively refused it.
+[2026-01-21 13:07:58] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2026-01-21 13:07:58] [INFO] 请求处理完成 - 请求id=0e317528-5ae4-42c3-9b3e-13f17c878e7b, 请求方法=POST, 路径=/employee/login, 状态码=429, 使用时间=2.0882854s, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:08:07] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-21 13:08:07] [INFO] 员工登录成功 - username=admin
+[2026-01-21 13:08:07] [INFO] 请求处理完成 - 请求id=55e98b83-5903-4e14-b21a-21e7b97c28bd, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=57.1618ms, 操作员=未知, 客户端IP=::1
+[2026-01-21 13:08:16] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-21 13:08:16] [INFO] 员工登录成功 - username=admin
+[2026-01-21 13:08:16] [INFO] 请求处理完成 - 请求id=99eb694e-52f0-498b-a509-56be48c70dab, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=52.1925ms, 操作员=未知, 客户端IP=::1

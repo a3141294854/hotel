@@ -107,7 +107,7 @@ type Tag struct {
 
 type Photo struct {
 	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	FileName string `json:"file_name"`
+	FileName string `json:"file_name" gorm:"index`
 	Url      string `json:"url"`
 	//因为是指针在sql中会自动转换为null，不一定需要，所以可以暂时不写
 	LuggageStorageID *uint           `json:"luggage_storage_id"`

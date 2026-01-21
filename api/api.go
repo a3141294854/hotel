@@ -52,6 +52,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 			a.POST("/mac", func(c *gin.Context) {
 				employee_action.AddMac(c, service)
 			})
+			a.POST("/location", func(c *gin.Context) {
+				employee_action.AddLocation(c, service)
+			})
 		}
 
 		//删除操作

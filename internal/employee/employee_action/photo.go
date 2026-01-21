@@ -169,6 +169,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		LuggageStorageID uint     `json:"luggage_storage_id"`
 		FileName         []string `json:"file_name"`
 	}
+	// 绑定请求数据
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -177,7 +178,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	// 检查参数
 	if len(req.FileName) == 0 || req.LuggageStorageID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -185,6 +186,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
+	// 检查行李寄存是否存在
 	ok, err := util.ExIf(s.DB, "id", &models.LuggageStorage{}, fmt.Sprintf("%d", req.LuggageStorageID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -200,7 +202,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-
+	// 更新照片
 	for _, fileName := range req.FileName {
 		result := s.DB.Model(&models.Photo{}).Where("file_name = ?", fileName).Update("luggage_storage_id", req.LuggageStorageID)
 		if result.Error != nil {

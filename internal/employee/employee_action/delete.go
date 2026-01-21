@@ -50,24 +50,9 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 	}
 	//开启事务
 	tx := s.DB.Begin()
-	luggage.Status = "已取出"
-	//更新行李寄存表
-	result := tx.Model(&models.LuggageStorage{}).Where("id = ?", luggage.ID).Updates(luggage)
-	if result.Error != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "删除行李失败",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error":      result.Error,
-			"luggage_id": luggage.ID,
-		}).Error("删除行李失败")
-		return
-	}
 
 	//删除客户
-	result = tx.Model(&models.Guest{}).Where("id = ?", existingLuggage.GuestID).Delete(&models.Guest{})
+	result := tx.Model(&models.Guest{}).Where("id = ?", existingLuggage.GuestID).Delete(&models.Guest{})
 	if result.Error != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -93,6 +78,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		}).Error("事务提交失败")
 		return
 	}
+	//删除redis缓存，更出新的取件码
 	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", luggage.HotelID, luggage.PickUpCode))
 
 	c.JSON(http.StatusOK, gin.H{
@@ -211,4 +197,53 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		"message": "行李删除成功",
 	})
 
+}
+
+func DeleteLocation(c *gin.Context, s *services.Services) {
+	var location models.Location
+	//绑定
+	if err := c.ShouldBind(&location); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error": err.Error(),
+		}).Error("请求数据格式错误")
+		return
+	}
+	//检查是否存在
+	var ex models.Location
+	result := s.DB.Model(&models.Location{}).
+		Where("id = ?", location.ID).First(&ex)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "位置不存在",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error":       result.Error,
+				"location_id": location.ID,
+			}).Error("位置不存在")
+			return
+		}
+	}
+	//删除位置
+	result = s.DB.Model(&models.Location{}).Where("id = ?", location.ID).Delete(&models.Location{})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "内部错误",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":       result.Error,
+			"location_id": location.ID,
+		}).Error("位置数据库删除错误")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "位置删除成功",
+	})
 }
