@@ -47,7 +47,7 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 		a.Use(middleware.CheckAction("创建行李"))
 		{
 			a.POST("/luggageStorage", func(c *gin.Context) {
-				employee_action.AddLuggage(c, service)
+				employee_action.AddLuggageStorage(c, service)
 			})
 			a.POST("/mac", func(c *gin.Context) {
 				employee_action.AddMac(c, service)
@@ -69,6 +69,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 			})
 			d.POST("/location", func(c *gin.Context) {
 				employee_action.DeleteLocation(c, service)
+			})
+			d.POST("/luggageStorage/code", func(c *gin.Context) {
+				employee_action.DeleteLuggageStorageByCode(c, service)
 			})
 		}
 

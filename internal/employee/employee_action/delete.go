@@ -16,21 +16,14 @@ import (
 // DeleteStorage 删除行李寄存表
 func DeleteStorage(c *gin.Context, s *services.Services) {
 
-	var luggage models.LuggageStorage
-	//绑定
-	if err := c.ShouldBind(&luggage); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		return
-	}
+	id := c.Param("id")
+
 	//检查是否存在
 	var existingLuggage models.LuggageStorage
 	if err := s.DB.
 		Preload("Guest").
 		Preload("Luggage").
-		Where("id = ?", luggage.ID).First(&existingLuggage).Error; err != nil {
+		Where("id = ?", id).First(&existingLuggage).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
@@ -43,7 +36,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
-				"luggage_id": luggage.ID,
+				"luggage_id": id,
 			}).Error("查询行李失败")
 		}
 		return
@@ -61,7 +54,21 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
+		}).Error("删除行李失败")
+		return
+	}
+	//删除行李寄存
+	result = tx.Model(&models.LuggageStorage{}).Where("id = ?", existingLuggage.ID).Delete(&models.LuggageStorage{})
+	if result.Error != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除行李失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":      result.Error,
+			"luggage_id": id,
 		}).Error("删除行李失败")
 		return
 	}
@@ -74,12 +81,12 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
 		}).Error("事务提交失败")
 		return
 	}
 	//删除redis缓存，更出新的取件码
-	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", luggage.HotelID, luggage.PickUpCode))
+	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", existingLuggage.HotelID, existingLuggage.PickUpCode))
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -271,5 +278,93 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "位置删除成功",
+	})
+}
+
+// DeleteLuggageStorageByCode 根据行李寄存码删除行李
+func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
+
+	var luggage models.LuggageStorage
+	//绑定
+	if err := c.ShouldBind(&luggage); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "请求数据格式错误",
+		})
+		return
+	}
+	//检查是否存在
+	var existingLuggage models.LuggageStorage
+	if err := s.DB.
+		Preload("Guest").
+		Preload("Luggage").
+		Where("pick_up_code = ?", luggage.PickUpCode).First(&existingLuggage).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "行李记录不存在",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "查询行李失败",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error":      err,
+				"luggage_id": luggage.ID,
+			}).Error("查询行李失败")
+		}
+		return
+	}
+	//开启事务
+	tx := s.DB.Begin()
+
+	//删除客户
+	result := tx.Model(&models.Guest{}).Where("id = ?", existingLuggage.GuestID).Delete(&models.Guest{})
+	if result.Error != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除行李失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":      result.Error,
+			"luggage_id": luggage.ID,
+		}).Error("删除行李失败")
+		return
+	}
+	//删除行李寄存表
+	result = tx.Model(&models.LuggageStorage{}).Where("pick_up_code = ?", existingLuggage.PickUpCode).Delete(&models.LuggageStorage{})
+	if result.Error != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除行李失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":      result.Error,
+			"luggage_id": luggage.ID,
+		}).Error("删除行李失败")
+		return
+	}
+	//提交事务
+	err := tx.Commit().Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除行李失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":      err,
+			"luggage_id": luggage.ID,
+		}).Error("事务提交失败")
+		return
+	}
+	//删除redis缓存，更出新的取件码
+	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", luggage.HotelID, luggage.PickUpCode))
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李删除成功",
 	})
 }

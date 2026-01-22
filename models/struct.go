@@ -138,7 +138,7 @@ type Guest struct {
 	Phone string `json:"phone"`
 	Room  string `json:"room"`
 
-	LuggageStorage []LuggageStorage `json:"luggage,omitempty" gorm:"foreignKey:GuestID"`
+	LuggageStorage []LuggageStorage `json:"luggageStorage,omitempty" gorm:"foreignKey:GuestID"`
 
 	CreatedAt time.Time      ``
 	UpdatedAt time.Time      ``

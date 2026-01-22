@@ -1,8 +1,10 @@
 package employee_action
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
@@ -20,12 +22,49 @@ func GetPickUpCode(c *gin.Context, s *services.Services) {
 
 // GetName 通过用户姓名，获取行李寄存表
 func GetName(c *gin.Context, s *services.Services) {
-	util.Get(c, s.DB, util.RequestList{
-		Model:     &models.LuggageStorage{},
-		CheckType: "guest_name",
-		GetType:   "Guest.Name",
-		Preloads:  []string{"Guest", "Luggage", "Luggage.Tag", "Luggage.Location", "Photos"},
+	name := c.Query("name")
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "姓名不能为空",
+		})
+		return
+	}
+
+	var luggageStorage []models.LuggageStorage
+	result := s.DB.
+		Preload("Guest").
+		Preload("Luggage").
+		Preload("Luggage.Tag").
+		Preload("Luggage.Location").
+		Preload("Photos").
+		Where("guests.name = ?", name).
+		Find(&luggageStorage)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "未找到符合条件的行李",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "获取行李失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error": result.Error,
+		}).Error("获取行李失败")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "行李获取成功",
+		"data":    luggageStorage,
 	})
+
 }
 
 // GetAll 获取所有行李寄存表

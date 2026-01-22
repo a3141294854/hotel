@@ -12,8 +12,8 @@ import (
 	"hotel/services"
 )
 
-// AddLuggage 添加行李寄存表
-func AddLuggage(c *gin.Context, s *services.Services) {
+// AddLuggageStorage 添加行李寄存表
+func AddLuggageStorage(c *gin.Context, s *services.Services) {
 
 	var req struct {
 		BagCount      int `json:"bag_count"`

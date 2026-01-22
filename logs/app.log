@@ -2712,3 +2712,42 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2026-01-21 13:37:40] [INFO] 服务器启动 - mode=debug
 [2026-01-21 13:37:48] [DEBUG] 限流器状态 - tokens=99, name=local
 [2026-01-21 13:37:48] [INFO] 请求处理完成 - 请求id=38b56839-5d5d-40bf-9c23-27879d99656a, 请求方法=POST, 路径=/employee/delete/location, 状态码=200, 使用时间=13.3583ms, 操作员=, 客户端IP=::1
+[2026-01-22 08:55:51] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-22 08:55:51] [INFO] 数据库表创建成功
+[2026-01-22 08:55:53] [INFO] 服务器启动 - mode=debug
+[2026-01-22 08:56:43] [ERROR] 限流器执行脚本失败 - name=local, error=dial tcp 127.0.0.1:6379: connectex: No connection could be made because the target machine actively refused it.
+[2026-01-22 08:56:43] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2026-01-22 08:56:43] [INFO] 请求处理完成 - 请求id=b688f7a4-976b-4049-8829-84f2a3594df1, 请求方法=POST, 路径=/employee/login, 状态码=429, 使用时间=2.0979865s, 操作员=未知, 客户端IP=::1
+[2026-01-22 08:57:00] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 08:57:00] [INFO] 员工登录成功 - username=admin
+[2026-01-22 08:57:00] [INFO] 请求处理完成 - 请求id=01def1ae-b9fb-4663-aa69-d7c936c5b114, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=116.5662ms, 操作员=未知, 客户端IP=::1
+[2026-01-22 08:57:18] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-22 08:57:18] [INFO] 员工注册成功 - username=zhangsa123n
+[2026-01-22 08:57:18] [INFO] 请求处理完成 - 请求id=36e76a9f-d4a6-4475-ae47-0e66bd23954a, 请求方法=POST, 路径=/tool/add/employee, 状态码=201, 使用时间=157.5422ms, 操作员=, 客户端IP=::1
+[2026-01-22 08:57:35] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 08:57:35] [INFO] 员工注册成功 - username=123456
+[2026-01-22 08:57:35] [INFO] 请求处理完成 - 请求id=a97c0b70-ba33-4757-a742-4e1e50ce74c0, 请求方法=POST, 路径=/tool/add/employee, 状态码=201, 使用时间=142.3429ms, 操作员=, 客户端IP=::1
+[2026-01-22 08:59:22] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-22 08:59:22] [INFO] 请求处理完成 - 请求id=dd6ce7d8-3de2-4052-927d-b25cfb7d8234, 请求方法=POST, 路径=/employee/add/luggageStorage, 状态码=201, 使用时间=31.6862ms, 操作员=, 客户端IP=::1
+[2026-01-22 09:01:45] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 09:01:45] [INFO] 请求处理完成 - 请求id=d5c057ba-1aba-401c-ae3e-52e701354537, 请求方法=POST, 路径=/employee/delete/luggageStorage, 状态码=200, 使用时间=21.7324ms, 操作员=, 客户端IP=::1
+[2026-01-22 09:19:31] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-22 09:19:31] [INFO] 数据库表创建成功
+[2026-01-22 09:19:31] [INFO] 服务器启动 - mode=debug
+[2026-01-22 09:19:46] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-22 09:19:46] [INFO] 请求处理完成 - 请求id=5ad5ffcf-fafe-4ed3-be2b-5b2c40fc767f, 请求方法=POST, 路径=/employee/delete/luggageStorage, 状态码=401, 使用时间=1.0432ms, 操作员=未知, 客户端IP=::1
+[2026-01-22 09:19:54] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 09:19:54] [INFO] 员工登录成功 - username=admin
+[2026-01-22 09:19:54] [INFO] 请求处理完成 - 请求id=5ae357e1-e35a-40ea-8971-63ab3a7215ce, 请求方法=POST, 路径=/employee/login, 状态码=200, 使用时间=121.974ms, 操作员=未知, 客户端IP=::1
+[2026-01-22 09:20:01] [DEBUG] 限流器状态 - tokens=99, name=local
+[2026-01-22 09:20:01] [INFO] 请求处理完成 - 请求id=ee610ef7-89d0-4075-984f-a7ac06331ac6, 请求方法=POST, 路径=/employee/delete/luggageStorage, 状态码=200, 使用时间=23.8694ms, 操作员=, 客户端IP=::1
+[2026-01-22 09:22:41] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-22 09:22:41] [INFO] 数据库表创建成功
+[2026-01-22 09:22:41] [INFO] 服务器启动 - mode=debug
+[2026-01-22 09:22:47] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 09:22:47] [INFO] 请求处理完成 - 请求id=25498485-7c0a-4540-80d6-aef3960ec100, 请求方法=POST, 路径=/employee/delete/luggageStorage, 状态码=200, 使用时间=28.9401ms, 操作员=, 客户端IP=::1
+[2026-01-22 09:23:15] [DEBUG] 限流器状态 - name=local, tokens=99
+[2026-01-22 09:23:15] [INFO] 请求处理完成 - 请求id=9b0b9fa3-27e3-426f-90fc-2147cc340e69, 请求方法=POST, 路径=/employee/delete/luggageStorage, 状态码=404, 使用时间=12.4684ms, 操作员=, 客户端IP=::1
+[2026-01-22 09:27:03] [ERROR] 创建照片表失败 - error=Error 1170 (42000): BLOB/TEXT column 'file_name' used in key specification without a key length
+[2026-01-22 09:27:03] [INFO] 数据库表创建成功
+[2026-01-22 09:27:04] [INFO] 服务器启动 - mode=debug
