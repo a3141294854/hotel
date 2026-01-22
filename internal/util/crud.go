@@ -63,6 +63,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 			})
 			Logger.WithFields(logrus.Fields{
 				"error": err,
+				"请求id":  c.GetUint("request_id"),
 			}).Error("检查数据失败")
 			return
 		}
@@ -84,6 +85,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		Logger.WithFields(logrus.Fields{
 			"error": result.Error,
+			"请求id":  c.GetUint("request_id"),
 		}).Error("创建数据失败")
 		return
 	}
@@ -140,6 +142,7 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 			})
 			Logger.WithFields(logrus.Fields{
 				"error": err,
+				"请求id":  c.GetUint("request_id"),
 			}).Error("检查数据失败")
 			return
 		}
@@ -161,6 +164,7 @@ func Delete(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		Logger.WithFields(logrus.Fields{
 			"error": result.Error,
+			"请求id":  c.GetUint("request_id"),
 		}).Error("删除数据失败")
 		return
 	}
@@ -216,6 +220,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 			})
 			Logger.WithFields(logrus.Fields{
 				"error": err,
+				"请求id":  c.GetUint("request_id"),
 			}).Error("检查数据失败")
 			return
 		}
@@ -228,7 +233,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		}
 	}
 
-	va := reflect.ValueOf(req).Elem().FieldByName(ConvertSnakeToCamel(list.CheckType)).Interface()
+	va := c.Param(list.CheckType)
 	result := query.Where(fmt.Sprintf("%s = ?", list.CheckType), va).Updates(req)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -237,6 +242,7 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		Logger.WithFields(logrus.Fields{
 			"error": result.Error,
+			"请求id":  c.GetUint("request_id"),
 		}).Error("更新数据失败")
 		return
 	}
@@ -303,6 +309,7 @@ func Get(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		Logger.WithFields(logrus.Fields{
 			"error": result.Error,
+			"请求id":  c.GetUint("request_id"),
 		}).Error("获取数据失败")
 		return
 	}

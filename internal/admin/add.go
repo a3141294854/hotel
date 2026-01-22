@@ -150,7 +150,7 @@ func AddRolePermission(s *services.Services, c *gin.Context) {
 }
 
 // AddHotel 添加酒店
-func AddHotel(s *services.Services, c *gin.Context) {
+func AddHotel(c *gin.Context, s *services.Services) {
 
 	var req struct {
 		Name   string `json:"name" binding:"required"`

@@ -22,125 +22,120 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	r.Use(middleware.RateLimit("local", service))
 
 	//公共接口
-	r.POST("/employee/login", func(c *gin.Context) {
+	r.POST("/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
 	})
-	r.POST("/employee/refresh", func(c *gin.Context) {
+	r.POST("/refresh", func(c *gin.Context) {
 		employee_check.RefreshToken(c, service)
 	})
 	r.GET("/photos/:filename", middleware.JwtCheck(service), func(c *gin.Context) {
 		employee_action.StaticDownloadPhoto(c)
 	})
 
-	//员工组
-	e := r.Group("/employee")
-	e.Use(middleware.JwtCheck(service))
-	e.Use(middleware.AuthCheck(service))
+	internal := r.Group("/internal")
+	internal.Use(middleware.JwtCheck(service))
+	internal.Use(middleware.AuthCheck(service))
+	internal.Use(middleware.CheckAction("内部接口"))
+
+	//行李寄存表
+	luggageStorage := internal.Group("/luggageStorage")
 	{
-		//退出登录
-		e.POST("/logout", func(c *gin.Context) {
-			employee_check.EmployeeLogout(c, service)
+		luggageStorage.POST("", func(c *gin.Context) {
+			employee_action.AddLuggageStorage(c, service)
 		})
-
-		//添加操作
-		a := e.Group("/add")
-		a.Use(middleware.CheckAction("创建行李"))
-		{
-			a.POST("/luggageStorage", func(c *gin.Context) {
-				employee_action.AddLuggageStorage(c, service)
-			})
-			a.POST("/mac", func(c *gin.Context) {
-				employee_action.AddMac(c, service)
-			})
-			a.POST("/location", func(c *gin.Context) {
-				employee_action.AddLocation(c, service)
-			})
-		}
-
-		//删除操作
-		d := e.Group("/delete")
-		d.Use(middleware.CheckAction("删除行李"))
-		{
-			d.POST("/luggageStorage", func(c *gin.Context) {
-				employee_action.DeleteStorage(c, service)
-			})
-			d.POST("/luggage", func(c *gin.Context) {
-				employee_action.DeleteLuggage(c, service)
-			})
-			d.POST("/location", func(c *gin.Context) {
-				employee_action.DeleteLocation(c, service)
-			})
-			d.POST("/luggageStorage/code", func(c *gin.Context) {
-				employee_action.DeleteLuggageStorageByCode(c, service)
-			})
-		}
-
-		//更新操作
-		u := e.Group("/update")
-		u.Use(middleware.CheckAction("更新行李"))
-		{
-			u.PUT("/luggageStorage", func(c *gin.Context) {
-				employee_action.UpdateLuggageStorage(c, service)
-			})
-			u.PUT("/luggage", func(c *gin.Context) {
-				employee_action.UpdateLuggage(c, service)
-			})
-		}
-
-		//查询操作
-		g := e.Group("/get")
-		g.Use(middleware.CheckAction("查看行李"))
-		{
-			g.GET("/name", func(c *gin.Context) {
-				employee_action.GetName(c, service)
-			})
-			g.GET("/all", func(c *gin.Context) {
-				employee_action.GetAll(c, service)
-			})
-			g.GET("/guest_id", func(c *gin.Context) {
-				employee_action.GetGuestID(c, service)
-			})
-			g.GET("/location", func(c *gin.Context) {
-				employee_action.GetLocation(c, service)
-			})
-			g.POST("/guest_advance", func(c *gin.Context) {
-				employee_action.GetAdvance(c, service)
-			})
-			g.GET("/pick_up_code", func(c *gin.Context) {
-				employee_action.GetPickUpCode(c, service)
-			})
-		}
-
-		//统计操作
-		c := e.Group("/count")
-		{
-			c.GET("/sum", func(c *gin.Context) {
-				employee_action.CountSum(c, service)
-			})
-			c.GET("/today", func(c *gin.Context) {
-				employee_action.CountToday(c, service)
-			})
-		}
-
-		//图片的操作
-		p := e.Group("/photo")
-
-		{
-			p.POST("/upload", func(c *gin.Context) {
-				employee_action.UploadPhoto(c, service)
-			})
-
-			p.GET("/download/:filename", func(c *gin.Context) {
-				employee_action.DownloadPhoto(c)
-			})
-			p.POST("/touch", func(c *gin.Context) {
-				employee_action.PhotoTouchLuggageStorage(c, service)
-			})
-			p.GET("/get_all", func(c *gin.Context) {
-				employee_action.GetAllPhoto(c, service)
-			})
-		}
-
+		luggageStorage.GET("", func(c *gin.Context) {
+			employee_action.GetLuggageStorage(c, service)
+		})
+		luggageStorage.PUT("/:id", func(c *gin.Context) {
+			employee_action.UpdateLuggageStorage(c, service)
+		})
+		luggageStorage.DELETE("/:id", func(c *gin.Context) {
+			employee_action.DeleteLuggageStorage(c, service)
+		})
+		luggageStorage.DELETE("/code/:pick_up_code", func(c *gin.Context) {
+			employee_action.DeleteLuggageStorageByCode(c, service)
+		})
+	}
+	//行李表
+	luggage := internal.Group("/luggage")
+	{
+		luggage.DELETE("/:id", func(c *gin.Context) {
+			employee_action.DeleteLuggage(c, service)
+		})
+		luggage.PUT("/:id", func(c *gin.Context) {
+			employee_action.UpdateLuggage(c, service)
+		})
+		luggage.GET("", func(c *gin.Context) {
+			employee_action.GetLuggage(c, service)
+		})
+	}
+	//标签表
+	tag := internal.Group("/tag")
+	{
+		tag.POST("", func(c *gin.Context) {
+			employee_action.AddMac(c, service)
+		})
+		tag.PUT("/:id", func(c *gin.Context) {
+			employee_action.UpdateTag(c, service)
+		})
+		tag.DELETE("/:id", func(c *gin.Context) {
+			employee_action.DeleteTag(c, service)
+		})
+		tag.GET("", func(c *gin.Context) {
+			employee_action.GetTag(c, service)
+		})
+	}
+	//照片表
+	photo := internal.Group("/photo")
+	{
+		photo.POST("", func(c *gin.Context) {
+			employee_action.UploadPhoto(c, service)
+		})
+		photo.GET("/:filename", func(c *gin.Context) {
+			employee_action.DownloadPhoto(c)
+		})
+		photo.POST("/touch", func(c *gin.Context) {
+			employee_action.PhotoTouchLuggageStorage(c, service)
+		})
+	}
+	//寄存室表
+	location := internal.Group("/location")
+	{
+		location.POST("", func(c *gin.Context) {
+			employee_action.AddLocation(c, service)
+		})
+		location.PUT("/:id", func(c *gin.Context) {
+			employee_action.UpdateLocation(c, service)
+		})
+		location.DELETE("/:id", func(c *gin.Context) {
+			employee_action.DeleteLocation(c, service)
+		})
+		location.GET("", func(c *gin.Context) {
+			employee_action.GetLocation(c, service)
+		})
+	}
+	//客户表
+	guest := internal.Group("/guest")
+	{
+		guest.GET("", func(c *gin.Context) {
+			employee_action.GetGuest(c, service)
+		})
+	}
+	//酒店表
+	hotel := internal.Group("/hotel")
+	{
+		hotel.POST("", func(c *gin.Context) {
+			admin.AddHotel(c, service)
+		})
+		hotel.DELETE("/:id", func(c *gin.Context) {
+			employee_action.DeleteHotel(c, service)
+		})
+		hotel.PUT("/:id", func(c *gin.Context) {
+			employee_action.UpdateHotel(c, service)
+		})
+		hotel.GET("", func(c *gin.Context) {
+			employee_action.GetHotel(c, service)
+		})
 	}
 
 	//管理员组
@@ -165,7 +160,7 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 				admin.AddRolePermission(service, c)
 			})
 			a.POST("/hotel", func(c *gin.Context) {
-				admin.AddHotel(service, c)
+				admin.AddHotel(c, service)
 			})
 		}
 

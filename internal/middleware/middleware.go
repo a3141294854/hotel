@@ -21,7 +21,7 @@ func CheckAction(name string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, ok := c.Get(name)
 		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{
+			c.JSON(http.StatusForbidden, gin.H{
 				"success": false,
 				"message": "没有权限",
 			})

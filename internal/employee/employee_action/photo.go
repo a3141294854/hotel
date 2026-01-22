@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -116,6 +117,11 @@ func DownloadPhoto(c *gin.Context) {
 		return
 	}
 
+	if strings.Contains(filename, "..") {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
 	path := fmt.Sprintf("./uploads/photos/%s", filename)
 
 	// 检查文件是否存在
@@ -165,21 +171,21 @@ func StaticDownloadPhoto(c *gin.Context) {
 }
 
 func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
-	var req struct {
-		LuggageStorageID uint     `json:"luggage_storage_id"`
-		FileName         []string `json:"file_name"`
-	}
-	// 绑定请求数据
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	LuggageStorageId := c.Query("luggage_storage_id")
+	FileName := c.Query("file_name")
+	LuggageStorageID, err := strconv.ParseUint(LuggageStorageId, 10, 64)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "请求格式不正确",
+			"message": "请提供行李寄存ID",
+			"请求id":    c.GetUint("request_id"),
 		})
 		return
 	}
+
 	// 检查参数
-	if len(req.FileName) == 0 || req.LuggageStorageID == 0 {
+	if FileName == "" || LuggageStorageID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请提供照片名称和行李寄存ID",
@@ -187,7 +193,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		return
 	}
 	// 检查行李寄存是否存在
-	ok, err := util.ExIf(s.DB, "id", &models.LuggageStorage{}, fmt.Sprintf("%d", req.LuggageStorageID))
+	ok, err := util.ExIf(s.DB, "id", &models.LuggageStorage{}, fmt.Sprintf("%d", LuggageStorageID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -203,18 +209,17 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		return
 	}
 	// 更新照片
-	for _, fileName := range req.FileName {
-		result := s.DB.Model(&models.Photo{}).Where("file_name = ?", fileName).Update("luggage_storage_id", req.LuggageStorageID)
-		if result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"message": "更新照片失败",
-			})
-			util.Logger.WithFields(logrus.Fields{
-				"error": result.Error.Error(),
-			}).Error("更新照片失败")
-			return
-		}
+
+	result := s.DB.Model(&models.Photo{}).Where("file_name = ?", FileName).Update("luggage_storage_id", LuggageStorageID)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "更新照片失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error": result.Error.Error(),
+		}).Error("更新照片失败")
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

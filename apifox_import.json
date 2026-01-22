@@ -1,0 +1,1148 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "酒店行李管理系统 API",
+    "version": "1.0.0",
+    "description": "酒店行李寄存管理系统 API 文档"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "本地开发环境"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "员工ID" },
+          "name": { "type": "string", "description": "员工姓名" },
+          "user": { "type": "string", "description": "用户名" },
+          "phone": { "type": "string", "description": "电话" },
+          "hotel_id": { "type": "integer", "description": "酒店ID" },
+          "role_id": { "type": "integer", "description": "角色ID" }
+        }
+      },
+      "Hotel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "place": { "type": "string" },
+          "remark": { "type": "string" }
+        }
+      },
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "room": { "type": "string" }
+        }
+      },
+      "LuggageStorage": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "bag_count": { "type": "integer", "description": "背包数量" },
+          "backpack_count": { "type": "integer", "description": "双肩包数量" },
+          "box_count": { "type": "integer", "description": "箱子数量" },
+          "other_count": { "type": "integer", "description": "其他数量" },
+          "operator_id": { "type": "integer" },
+          "operator_name": { "type": "string" },
+          "hotel_id": { "type": "integer" },
+          "guest_id": { "type": "integer" },
+          "pick_up_code": { "type": "string", "description": "取件码" },
+          "status": { "type": "string", "description": "状态：寄存中/已取走" },
+          "remark": { "type": "string" },
+          "guest": { "$ref": "#/components/schemas/Guest" }
+        }
+      },
+      "Luggage": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "status": { "type": "string" },
+          "luggage_storage_id": { "type": "integer" },
+          "location_id": { "type": "integer" },
+          "tag_id": { "type": "integer" },
+          "tag": { "$ref": "#/components/schemas/Tag" },
+          "location": { "$ref": "#/components/schemas/Location" }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "mac": { "type": "string" }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "hotel_id": { "type": "integer" }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data": { "type": "object" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "员工登录",
+        "tags": ["认证"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hotel_id": { "type": "integer", "example": 1 },
+                  "user": { "type": "string", "example": "admin" },
+                  "password": { "type": "string", "example": "123456" }
+                },
+                "required": ["user", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "登录成功" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": { "type": "string" },
+                        "refresh_token": { "type": "string" },
+                        "expires_in": { "type": "integer", "example": 900 },
+                        "token_type": { "type": "string", "example": "Bearer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "post": {
+        "summary": "刷新访问令牌",
+        "tags": ["认证"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": { "type": "string" }
+                },
+                "required": ["refresh_token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "刷新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "token刷新成功" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": { "type": "string" },
+                        "refresh_token": { "type": "string" },
+                        "expires_in": { "type": "integer", "example": 900 },
+                        "token_type": { "type": "string", "example": "Bearer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/photos/{filename}": {
+      "get": {
+        "summary": "获取照片",
+        "tags": ["公共接口"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "filename", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "照片文件",
+            "content": {
+              "image/*": { "schema": { "type": "string", "format": "binary" } }
+            }
+          }
+        }
+      }
+    },
+    "/internal/luggageStorage": {
+      "post": {
+        "summary": "创建行李寄存",
+        "tags": ["行李寄存"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bag_count": { "type": "integer", "example": 2 },
+                  "backpack_count": { "type": "integer", "example": 1 },
+                  "box_count": { "type": "integer", "example": 0 },
+                  "other_count": { "type": "integer", "example": 3 },
+                  "guest_name": { "type": "string", "example": "张三" },
+                  "guest_phone": { "type": "string", "example": "13800138000" },
+                  "guest_room": { "type": "string", "example": "305" },
+                  "status": { "type": "string", "example": "寄存中" },
+                  "remark": { "type": "string", "example": "备注信息" },
+                  "luggage": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "tag_id": { "type": "integer", "example": 1 },
+                        "location_id": { "type": "integer", "example": 1 },
+                        "status": { "type": "string", "example": "正常" }
+                      }
+                    }
+                  }
+                },
+                "required": ["guest_name", "guest_phone", "guest_room"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/LuggageStorage" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "获取行李寄存列表",
+        "tags": ["行李寄存"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "guest_name", "in": "query", "schema": { "type": "string" } },
+          { "name": "pick_up_code", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "operator_name", "in": "query", "schema": { "type": "string" } },
+          { "name": "id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/LuggageStorage" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/luggageStorage/{id}": {
+      "put": {
+        "summary": "更新行李寄存",
+        "tags": ["行李寄存"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LuggageStorage" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      },
+      "delete": {
+        "summary": "删除行李寄存",
+        "tags": ["行李寄存"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/luggageStorage/code/{pick_up_code}": {
+      "delete": {
+        "summary": "根据取件码删除行李",
+        "tags": ["行李寄存"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "pick_up_code", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/luggage": {
+      "get": {
+        "summary": "获取行李列表",
+        "tags": ["行李"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "tag_id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "location_id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "mac", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Luggage" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/luggage/{id}": {
+      "put": {
+        "summary": "更新行李",
+        "tags": ["行李"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Luggage" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      },
+      "delete": {
+        "summary": "删除行李",
+        "tags": ["行李"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/tag": {
+      "post": {
+        "summary": "创建标签",
+        "tags": ["标签"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "标签1" },
+                  "mac": { "type": "string", "example": "AA:BB:CC:DD:EE:FF" }
+                },
+                "required": ["mac"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Tag" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "获取标签列表",
+        "tags": ["标签"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "mac", "in": "query", "schema": { "type": "string" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Tag" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/tag/{id}": {
+      "put": {
+        "summary": "更新标签",
+        "tags": ["标签"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Tag" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      },
+      "delete": {
+        "summary": "删除标签",
+        "tags": ["标签"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/photo": {
+      "post": {
+        "summary": "上传照片",
+        "tags": ["照片"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "照片文件（支持jpg、jpeg、png、gif，最大5MB）"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "上传成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "上传成功" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "url": { "type": "string", "example": "/photos/20250122000000_abc123.jpg" },
+                        "filename": { "type": "string", "example": "20250122000000_abc123.jpg" },
+                        "size": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "关联照片到行李寄存",
+        "tags": ["照片"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "luggage_storage_id", "in": "query", "required": true, "schema": { "type": "integer" } },
+          { "name": "file_name", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "关联成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/photo/touch": {
+      "post": {
+        "summary": "关联照片到行李寄存",
+        "tags": ["照片"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "luggage_storage_id", "in": "query", "required": true, "schema": { "type": "integer" } },
+          { "name": "file_name", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "关联成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/photo/{filename}": {
+      "get": {
+        "summary": "下载照片",
+        "tags": ["照片"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "filename", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "照片文件",
+            "content": {
+              "image/*": { "schema": { "type": "string", "format": "binary" } }
+            }
+          }
+        }
+      }
+    },
+    "/internal/location": {
+      "post": {
+        "summary": "创建寄存室",
+        "tags": ["寄存室"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "A区寄存室" },
+                  "hotel_id": { "type": "integer", "example": 1 }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Location" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "获取寄存室列表",
+        "tags": ["寄存室"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "hotel_id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Location" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/location/{id}": {
+      "put": {
+        "summary": "更新寄存室",
+        "tags": ["寄存室"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Location" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      },
+      "delete": {
+        "summary": "删除寄存室",
+        "tags": ["寄存室"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/internal/guest": {
+      "get": {
+        "summary": "获取客户列表",
+        "tags": ["客户"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "hotel_id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Guest" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/hotel": {
+      "post": {
+        "summary": "创建酒店",
+        "tags": ["酒店"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "某某酒店" },
+                  "place": { "type": "string", "example": "北京市" },
+                  "remark": { "type": "string", "example": "备注" }
+                },
+                "required": ["name", "place"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Hotel" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "获取酒店列表",
+        "tags": ["酒店"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "query", "schema": { "type": "integer" } },
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "place", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Hotel" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/hotel/{id}": {
+      "put": {
+        "summary": "更新酒店",
+        "tags": ["酒店"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Hotel" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "更新成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      },
+      "delete": {
+        "summary": "删除酒店",
+        "tags": ["酒店"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/add/permission": {
+      "post": {
+        "summary": "添加权限",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "查看行李" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "添加成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/add/role": {
+      "post": {
+        "summary": "添加角色",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "管理员" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "添加成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/add/employee": {
+      "post": {
+        "summary": "添加员工",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "张三" },
+                  "user": { "type": "string", "example": "zhangsan" },
+                  "password": { "type": "string", "example": "123456" },
+                  "phone": { "type": "string", "example": "13800138000" },
+                  "hotel_id": { "type": "integer", "example": 1 },
+                  "role_id": { "type": "integer", "example": 1 }
+                },
+                "required": ["name", "user", "password", "hotel_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "添加成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/add/role_permission": {
+      "post": {
+        "summary": "添加角色权限关联",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role_id": { "type": "integer", "example": 1 },
+                  "permission_id": { "type": "integer", "example": 1 }
+                },
+                "required": ["role_id", "permission_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "添加成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/get/employee": {
+      "get": {
+        "summary": "获取所有员工",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Employee" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool/get/permission": {
+      "get": {
+        "summary": "获取所有权限",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Permission" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool/get/role": {
+      "get": {
+        "summary": "获取所有角色",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Role" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool/get/location": {
+      "get": {
+        "summary": "获取所有寄存室",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [{ "$ref": "#/components/schemas/SuccessResponse" }],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Location" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tool/change/employee_role": {
+      "post": {
+        "summary": "修改员工角色",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "employee_id": { "type": "integer", "example": 1 },
+                  "role_id": { "type": "integer", "example": 2 }
+                },
+                "required": ["employee_id", "role_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "修改成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/delete/employee": {
+      "post": {
+        "summary": "删除员工",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer", "example": 1 }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/delete/role": {
+      "post": {
+        "summary": "删除角色",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer", "example": 1 }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    },
+    "/tool/delete/permission": {
+      "post": {
+        "summary": "删除权限",
+        "tags": ["管理员"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer", "example": 1 }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "删除成功", "$ref": "#/components/schemas/SuccessResponse" }
+        }
+      }
+    }
+  }
+}

@@ -26,3 +26,29 @@ func UpdateLuggage(c *gin.Context, s *services.Services) {
 		CheckField: []string{"ID"},
 	})
 }
+func UpdateTag(c *gin.Context, s *services.Services) {
+	util.Update(c, s.DB, util.RequestList{
+		Model:      &models.Tag{},
+		CheckExist: true,
+		CheckType:  "id",
+		CheckField: []string{"ID"},
+	})
+}
+
+func UpdateLocation(c *gin.Context, s *services.Services) {
+	util.Update(c, s.DB, util.RequestList{
+		Model:      &models.Location{},
+		CheckExist: true,
+		CheckType:  "id",
+		CheckField: []string{"ID"},
+	})
+}
+
+func UpdateHotel(c *gin.Context, s *services.Services) {
+	util.Update(c, s.DB, util.RequestList{
+		Model:      &models.Hotel{},
+		CheckExist: true,
+		CheckType:  "id",
+		CheckField: []string{"ID"},
+	})
+}

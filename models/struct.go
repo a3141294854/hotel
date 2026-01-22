@@ -81,7 +81,7 @@ type Luggage struct {
 	ID     uint   `json:"id" gorm:"primaryKey;autoIncrement"`
 	Status string `json:"status"`
 
-	LuggageStorageID uint            `json:"luggage_storage_id"`
+	LuggageStorageID uint            `json:"luggage_storage_id" gorm:"index"`
 	LuggageStorage   *LuggageStorage `json:"luggage_storage,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
 	LocationID uint      `json:"location_id" gorm:"index"`
@@ -107,7 +107,7 @@ type Tag struct {
 
 type Photo struct {
 	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	FileName string `json:"file_name" gorm:"index`
+	FileName string `json:"file_name" gorm:"index"`
 	Url      string `json:"url"`
 	//因为是指针在sql中会自动转换为null，不一定需要，所以可以暂时不写
 	LuggageStorageID *uint           `json:"luggage_storage_id"`

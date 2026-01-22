@@ -13,8 +13,8 @@ import (
 	"hotel/services"
 )
 
-// DeleteStorage 删除行李寄存表
-func DeleteStorage(c *gin.Context, s *services.Services) {
+// DeleteLuggageStorage 删除行李寄存表
+func DeleteLuggageStorage(c *gin.Context, s *services.Services) {
 
 	id := c.Param("id")
 
@@ -37,6 +37,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
 				"luggage_id": id,
+				"请求id":       c.GetUint("request_id"),
 			}).Error("查询行李失败")
 		}
 		return
@@ -55,6 +56,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("删除行李失败")
 		return
 	}
@@ -69,6 +71,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
 			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("删除行李失败")
 		return
 	}
@@ -82,6 +85,7 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
 			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("事务提交失败")
 		return
 	}
@@ -96,23 +100,12 @@ func DeleteStorage(c *gin.Context, s *services.Services) {
 
 // DeleteLuggage 删除行李
 func DeleteLuggage(c *gin.Context, s *services.Services) {
-	var luggage models.Luggage
-	//绑定
-	if err := c.ShouldBind(&luggage); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": err.Error(),
-		}).Error("请求数据格式错误")
-		return
-	}
+	id := c.Param("id")
 	//检查是否存在
 	var ex models.Luggage
 	result := s.DB.Model(&models.Luggage{}).
 		Preload("LuggageStorage").
-		Where("id = ?", luggage.ID).First(&ex)
+		Where("id = ?", id).First(&ex)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -121,7 +114,8 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
-				"luggage_id": luggage.ID,
+				"luggage_id": id,
+				"请求id":       c.GetUint("request_id"),
 			}).Error("行李不存在")
 			return
 		}
@@ -131,14 +125,15 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("行李数据库查询错误")
 		return
 	}
 	//开启事务
 	tx := s.DB.Begin()
 	//删除行李
-	result = tx.Model(&models.Luggage{}).Where("id = ?", luggage.ID).Delete(&models.Luggage{})
+	result = tx.Model(&models.Luggage{}).Where("id = ?", id).Delete(&models.Luggage{})
 	if result.Error != nil {
 		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -147,7 +142,8 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("行李数据库删除错误")
 		return
 	}
@@ -164,7 +160,8 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("行李数据库删除错误")
 		return
 	}
@@ -180,7 +177,8 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
-				"luggage_id": luggage.ID,
+				"luggage_id": id,
+				"请求id":       c.GetUint("request_id"),
 			}).Error("行李数据库删除错误")
 			return
 		}
@@ -194,7 +192,8 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
-			"luggage_id": luggage.ID,
+			"luggage_id": id,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("事务提交失败")
 		return
 	}
@@ -206,6 +205,7 @@ func DeleteLuggage(c *gin.Context, s *services.Services) {
 
 }
 
+// DeleteLocation 删除寄存室
 func DeleteLocation(c *gin.Context, s *services.Services) {
 	var location models.Location
 	//绑定
@@ -284,21 +284,13 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 // DeleteLuggageStorageByCode 根据行李寄存码删除行李
 func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
 
-	var luggage models.LuggageStorage
-	//绑定
-	if err := c.ShouldBind(&luggage); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		return
-	}
+	PickUpCode := c.Param("pick_up_code")
 	//检查是否存在
 	var existingLuggage models.LuggageStorage
 	if err := s.DB.
 		Preload("Guest").
 		Preload("Luggage").
-		Where("pick_up_code = ?", luggage.PickUpCode).First(&existingLuggage).Error; err != nil {
+		Where("pick_up_code = ?", PickUpCode).First(&existingLuggage).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
@@ -311,7 +303,8 @@ func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error":      err,
-				"luggage_id": luggage.ID,
+				"luggage_id": existingLuggage.ID,
+				"请求id":       c.GetUint("request_id"),
 			}).Error("查询行李失败")
 		}
 		return
@@ -329,7 +322,8 @@ func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": existingLuggage.ID,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("删除行李失败")
 		return
 	}
@@ -343,7 +337,8 @@ func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      result.Error,
-			"luggage_id": luggage.ID,
+			"luggage_id": existingLuggage.ID,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("删除行李失败")
 		return
 	}
@@ -356,15 +351,142 @@ func DeleteLuggageStorageByCode(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":      err,
-			"luggage_id": luggage.ID,
+			"luggage_id": existingLuggage.ID,
+			"请求id":       c.GetUint("request_id"),
 		}).Error("事务提交失败")
 		return
 	}
 	//删除redis缓存，更出新的取件码
-	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", luggage.HotelID, luggage.PickUpCode))
+	s.RdbRand.Del(c, fmt.Sprintf("%d:%s", existingLuggage.HotelID, existingLuggage.PickUpCode))
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "行李删除成功",
 	})
+}
+
+func DeleteTag(c *gin.Context, s *services.Services) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "id不能为空",
+		})
+	}
+
+	var tag models.Tag
+	result := s.DB.Model(&models.Tag{}).Where("id = ?", id).First(&tag)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "标签不存在",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error":  result.Error,
+				"tag_id": id,
+				"请求id":   c.GetUint("request_id"),
+			}).Error("标签不存在")
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "查询标签失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":  result.Error,
+			"tag_id": id,
+			"请求id":   c.GetUint("request_id"),
+		}).Error("查询标签失败")
+		return
+	}
+
+	result = s.DB.Model(&models.Luggage{}).Where("tag_id = ?", tag.ID).Delete(&models.Luggage{})
+	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "标签下有行李",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":  result.Error,
+			"tag_id": id,
+			"请求id":   c.GetUint("request_id"),
+		}).Error("标签下有行李")
+		return
+	}
+
+	result = s.DB.Model(&models.Tag{}).Where("id = ?", id).Delete(&models.Tag{})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除标签失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":  result.Error,
+			"tag_id": id,
+			"请求id":   c.GetUint("request_id"),
+		}).Error("删除标签失败")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "标签删除成功",
+	})
+}
+
+func DeleteHotel(c *gin.Context, s *services.Services) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "id不能为空",
+		})
+	}
+
+	var hotel models.Hotel
+	result := s.DB.Model(&models.Hotel{}).Where("id = ?", id).First(&hotel)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"message": "酒店不存在",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error":    result.Error,
+				"hotel_id": id,
+				"请求id":     c.GetUint("request_id"),
+			}).Error("酒店不存在")
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "查询酒店失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":    result.Error,
+			"hotel_id": id,
+			"请求id":     c.GetUint("request_id"),
+		}).Error("查询酒店失败")
+		return
+	}
+
+	result = s.DB.Model(&models.Hotel{}).Where("id = ?", id).Delete(&models.Hotel{})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "删除酒店失败",
+		})
+		util.Logger.WithFields(logrus.Fields{
+			"error":    result.Error,
+			"hotel_id": id,
+			"请求id":     c.GetUint("request_id"),
+		}).Error("删除酒店失败")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "酒店删除成功",
+	})
+
 }

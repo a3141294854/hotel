@@ -98,6 +98,7 @@ func open(db *gorm.DB) {
 		{Name: "更新行李"},
 		{Name: "删除行李"},
 		{Name: "管理员"},
+		{Name: "内部接口"},
 	}
 
 	for _, p := range permissions {
@@ -110,11 +111,12 @@ func open(db *gorm.DB) {
 	p3, _ := getPermissionByName(db, "更新行李")
 	p4, _ := getPermissionByName(db, "删除行李")
 	p5, _ := getPermissionByName(db, "管理员")
+	p6, _ := getPermissionByName(db, "内部接口")
 
 	// 创建角色
 	roles := []models.Role{
-		{Name: "员工", Permissions: []models.Permission{p1, p2, p3, p4}},
-		{Name: "管理员", Permissions: []models.Permission{p1, p2, p3, p4, p5}},
+		{Name: "员工", Permissions: []models.Permission{p1, p2, p3, p4, p6}},
+		{Name: "管理员", Permissions: []models.Permission{p1, p2, p3, p4, p5, p6}},
 	}
 
 	for _, r := range roles {

@@ -38,6 +38,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("行李数据绑定错误")
 		return
 	}
@@ -76,6 +77,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 				util.Logger.WithFields(logrus.Fields{
 					"error":      err,
 					"guest_name": req.GuestName,
+					"请求id":       c.GetUint("request_id"),
 				}).Error("创建客户记录失败")
 				return
 			}
@@ -88,6 +90,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 			util.Logger.WithFields(logrus.Fields{
 				"error":      result.Error,
 				"guest_name": req.GuestName,
+				"请求id":       c.GetUint("request_id"),
 			}).Error("查询客户失败")
 			return
 		}
@@ -124,6 +127,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("生成取件码失败")
 		return
 	}
@@ -137,6 +141,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error,
+			"请求id":  c.GetUint("request_id"),
 		}).Error("创建行李记录失败")
 		return
 	}
@@ -152,6 +157,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
+				"请求id":  c.GetUint("request_id"),
 			}).Error("创建行李记录失败")
 			return
 		}
@@ -173,7 +179,6 @@ func AddMac(c *gin.Context, s *services.Services) {
 		CheckType:  "mac",
 		CheckField: []string{"Mac"},
 	})
-
 }
 
 func AddLocation(c *gin.Context, s *services.Services) {
@@ -186,6 +191,7 @@ func AddLocation(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("位置数据绑定错误")
 		return
 	}
