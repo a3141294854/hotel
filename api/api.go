@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -13,8 +13,8 @@ import (
 	"hotel/services"
 )
 
-// open 启动路由配置
-func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
+// Init 启动路由配置
+func Init(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	//中间件配置
 	r.Use(middleware.Recovery())
 	r.Use(middleware.RequestIDMiddleware())
@@ -25,9 +25,16 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	r.POST("/login", func(c *gin.Context) {
 		employee_check.EmployeeLogin(c, service)
 	})
+	r.POST("/logout", func(c *gin.Context) {
+		employee_check.EmployeeLogout(c, service)
+	})
 	r.POST("/refresh", func(c *gin.Context) {
 		employee_check.RefreshToken(c, service)
 	})
+	r.POST("/register", middleware.JwtCheck(service), middleware.AuthCheck(service), middleware.CheckAction("管理员"), func(c *gin.Context) {
+		employee_check.EmployeeRegister(c, service)
+	})
+
 	r.GET("/photos/:filename", middleware.JwtCheck(service), func(c *gin.Context) {
 		employee_action.StaticDownloadPhoto(c)
 	})
@@ -49,6 +56,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 		luggageStorage.PUT("/:id", func(c *gin.Context) {
 			employee_action.UpdateLuggageStorage(c, service)
 		})
+		luggageStorage.POST("/code/:code", func(c *gin.Context) {
+			employee_action.CheckOutLuggageStorage(c, service)
+		})
 		luggageStorage.DELETE("/:id", func(c *gin.Context) {
 			employee_action.DeleteLuggageStorage(c, service)
 		})
@@ -59,6 +69,9 @@ func open(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	//行李表
 	luggage := internal.Group("/luggage")
 	{
+		luggage.POST("/:id", func(c *gin.Context) {
+			employee_action.CheckOutLuggage(c, service)
+		})
 		luggage.DELETE("/:id", func(c *gin.Context) {
 			employee_action.DeleteLuggage(c, service)
 		})

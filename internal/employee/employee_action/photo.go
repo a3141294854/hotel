@@ -91,17 +91,14 @@ func UploadPhoto(c *gin.Context, s *services.Services) {
 	// 返回文件访问路径
 	photoURL := fmt.Sprintf("/photos/%s", filename)
 	s.DB.Model(&models.Photo{}).Create(&models.Photo{
-		FileName: filename,
-		Url:      photoURL,
+		Url: photoURL,
 	})
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "上传成功",
 		"data": gin.H{
-			"url":      photoURL,
-			"filename": filename,
-			"size":     file.Size,
+			"url": photoURL,
 		},
 	})
 }

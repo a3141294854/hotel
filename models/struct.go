@@ -48,12 +48,9 @@ type Permission struct {
 type LuggageStorage struct {
 	ID uint `json:"id" gorm:"primaryKey;autoIncrement"`
 
-	/*TagID uint `json:"tag_id"`
-	Tag   *Tag `json:"tag,omitempty" gorm:"foreignKey:TagID"`*/
-	BagCount      int `json:"bag_count"`
-	BackpackCount int `json:"backpack_count"`
-	BoxCount      int `json:"box_count"`
-	OtherCount    int `json:"other_count"`
+	BagCount   int `json:"bag_count"`
+	BoxCount   int `json:"box_count"`
+	OtherCount int `json:"other_count"`
 
 	OperatorID   uint   `json:"operator_id" gorm:"index"`
 	OperatorName string `json:"operator_name"`
@@ -68,13 +65,15 @@ type LuggageStorage struct {
 
 	Photos []Photo `json:"photos,omitempty" gorm:"foreignKey:LuggageStorageID"`
 
-	PickUpCode string `json:"pick_up_code"`
+	PickUpCode string `json:"pick_up_code" gorm:"index"`
+	Type       string `json:"type"`
 	Status     string `json:"status" gorm:"index"`
 	Remark     string `json:"remark"`
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	CheckOutAt *time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
 }
 
 type Luggage struct {
@@ -90,9 +89,10 @@ type Luggage struct {
 	TagID uint `json:"tag_id" gorm:"index"`
 	Tag   *Tag `json:"tag,omitempty" gorm:"foreignKey:TagID"`
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	CheckOutAt *time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
 }
 
 type Tag struct {
@@ -106,9 +106,8 @@ type Tag struct {
 }
 
 type Photo struct {
-	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
-	FileName string `json:"file_name" gorm:"index"`
-	Url      string `json:"url"`
+	ID  uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Url string `json:"url" gorm:"index"`
 	//因为是指针在sql中会自动转换为null，不一定需要，所以可以暂时不写
 	LuggageStorageID *uint           `json:"luggage_storage_id"`
 	LuggageStorage   *LuggageStorage `json:"luggage_storage,omitempty" gorm:"foreignKey:LuggageStorageID"`

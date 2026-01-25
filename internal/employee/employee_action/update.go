@@ -13,7 +13,6 @@ func UpdateLuggageStorage(c *gin.Context, s *services.Services) {
 		Model:      &models.LuggageStorage{},
 		CheckExist: true,
 		CheckType:  "id",
-		CheckField: []string{"ID"},
 	})
 }
 

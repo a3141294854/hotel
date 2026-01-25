@@ -117,3 +117,26 @@ func CheckPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+// SetValue 在模型中设置指定字段的值
+func SetValue(model interface{}, fieldName string, value interface{}) error {
+	v := reflect.ValueOf(model).Elem()
+	field := v.FieldByName(fieldName)
+
+	if !field.IsValid() {
+		return fmt.Errorf("字段 %s 不存在", fieldName)
+	}
+
+	if !field.CanSet() {
+		return fmt.Errorf("字段 %s 不可设置", fieldName)
+	}
+
+	// 根据类型设置值
+	val := reflect.ValueOf(value)
+	if field.Type() != val.Type() {
+		return fmt.Errorf("字段 %s 类型不匹配", fieldName)
+	}
+
+	field.Set(val)
+	return nil
+}

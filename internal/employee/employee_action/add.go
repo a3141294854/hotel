@@ -16,19 +16,19 @@ import (
 func AddLuggageStorage(c *gin.Context, s *services.Services) {
 
 	var req struct {
-		BagCount      int `json:"bag_count"`
-		BackpackCount int `json:"backpack_count"`
-		BoxCount      int `json:"box_count"`
-		OtherCount    int `json:"other_count"`
+		BagCount   int `json:"bag_count"`
+		BoxCount   int `json:"box_count"`
+		OtherCount int `json:"other_count"`
 
 		GuestName  string `json:"guest_name"`
 		GuestPhone string `json:"guest_phone"`
 		GuestRoom  string `json:"guest_room"`
 
 		Luggage []models.Luggage `json:"luggage"`
+		Photos  []models.Photo   `json:"photos"`
 
-		Status string `json:"status"`
 		Remark string `json:"remark"`
+		Type   string `json:"type"`
 	}
 	//绑定
 	if err := c.ShouldBind(&req); err != nil {
@@ -50,7 +50,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-	if req.BagCount == 0 && req.BackpackCount == 0 && req.BoxCount == 0 && req.OtherCount == 0 {
+	if req.BagCount == 0 && req.BoxCount == 0 && req.OtherCount == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "行李数量不能为0",
@@ -98,12 +98,12 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 
 	//创建行李表记录
 	insert := models.LuggageStorage{
-		GuestID:       guest.ID,
-		BagCount:      req.BagCount,
-		BackpackCount: req.BackpackCount,
-		BoxCount:      req.BoxCount,
-		Status:        req.Status,
-		Remark:        req.Remark,
+		GuestID:    guest.ID,
+		BagCount:   req.BagCount,
+		BoxCount:   req.BoxCount,
+		Remark:     req.Remark,
+		OtherCount: req.OtherCount,
+		Type:       req.Type,
 	}
 	//存默认值和获取
 	a, _ := c.Get("hotel_id")
@@ -116,6 +116,9 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 	insert.OperatorName = d.(string)
 
 	insert.Status = "寄存中"
+	if req.Type == "" {
+		insert.Status = "入住行李"
+	}
 
 	//生成取件码
 	code, err := util.GeneratePickUpCode(s.RdbRand, a.(uint))
@@ -162,11 +165,27 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 			return
 		}
 	}
+	//创建照片表
+	for _, v := range req.Photos {
+		v.LuggageStorageID = &insert.ID
+		result = s.DB.Model(&models.Photo{}).Create(&v)
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "创建照片记录失败",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error": result.Error,
+				"请求id":  c.GetUint("request_id"),
+			}).Error("创建照片记录失败")
+			return
+		}
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"success": true,
 		"message": "行李添加成功",
-		"data":    insert,
+		"data":    insert.PickUpCode,
 	})
 
 }

@@ -93,7 +93,7 @@ func Create(c *gin.Context, db *gorm.DB, list RequestList) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "创建成功",
-		"data":    req,
+		//"data":    req,
 	})
 
 }
@@ -188,6 +188,23 @@ func Update(c *gin.Context, db *gorm.DB, list RequestList) {
 		})
 		return
 	}
+
+	// ✨ 新增：如果 URL 参数中有 ID，自动设置到模型中
+	if list.CheckType != "" {
+		idParam := c.Param(list.CheckType)
+		if idParam != "" {
+			var id uint
+			if _, err := fmt.Sscanf(idParam, "%d", &id); err == nil {
+				// 使用反射设置 ID 字段
+				reqValue := reflect.ValueOf(req).Elem()
+				idField := reqValue.FieldByName("ID")
+				if idField.IsValid() && idField.CanSet() {
+					idField.Set(reflect.ValueOf(id))
+				}
+			}
+		}
+	}
+
 	//需要检查的字段
 	if len(list.CheckField) > 0 {
 		for _, v := range list.CheckField {

@@ -16,9 +16,10 @@ import (
 
 // EmployeeRegister 员工注册
 func EmployeeRegister(c *gin.Context, s *services.Services) {
+
 	var e models.Employee
 	//绑定
-	err := c.ShouldBind(&e)
+	err := c.ShouldBindJSON(&e)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -89,7 +90,6 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		c.JSON(http.StatusCreated, gin.H{
 			"success": true,
 			"message": "注册成功",
-			"data":    employee,
 		})
 	}
 }
@@ -97,7 +97,6 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 // EmployeeLogin 员工登录
 func EmployeeLogin(c *gin.Context, s *services.Services) {
 	var e struct {
-		HotelID  int    `json:"hotel_id"`
 		User     string `json:"user"`
 		Password string `json:"password"`
 	}
@@ -120,16 +119,11 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		})
 		return
 	}
-	//设置默认值
-	if e.HotelID == 0 {
-		e.HotelID = 1
-	}
 
 	//检查用户名是否存在
 	var user models.Employee
 	result := s.DB.Model(models.Employee{}).
 		Where("user=?", e.User).
-		Where("hotel_id=?", e.HotelID).
 		First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -182,10 +176,10 @@ func EmployeeLogin(c *gin.Context, s *services.Services) {
 		"success": true,
 		"message": "登录成功",
 		"data": gin.H{
-			"access_token":  accessToken,
-			"refresh_token": refreshToken,
-			"expires_in":    900,
-			"token_type":    "Bearer",
+			"access_token": accessToken,
+			//"refresh_token": refreshToken,
+			//"expires_in":    900,
+			//"token_type":    "Bearer",
 		},
 	})
 }

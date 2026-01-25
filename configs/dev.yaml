@@ -41,7 +41,7 @@ rate_limiting:
   # 默认配置（当特定位置未配置时使用）
   default:
     name: "local"
-    capacity: 100
+    capacity: 50
     fill_rate: 10ms
 
   # 不同位置的限流配置

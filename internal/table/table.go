@@ -137,6 +137,7 @@ func open(db *gorm.DB) {
 	// 创建管理员员工
 	admin := models.Employee{
 		User:           "admin",
+		Name:           "管理员",
 		Password:       password,
 		LastActiveTime: time.Now(),
 		RoleID:         2,

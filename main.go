@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
 	"hotel/internal/table"
 	"hotel/internal/util"
 	"hotel/services"
-	"time"
+
+	"hotel/api"
 )
 
 func main() {
@@ -84,6 +88,5 @@ func main() {
 	// ====================
 	// CORS 配置结束
 	// ====================
-	open(r, service, cfg)
-
+	api.Init(r, service, cfg)
 }
