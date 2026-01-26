@@ -435,23 +435,12 @@ func CheckOutLuggage(c *gin.Context, s *services.Services) {
 
 // DeleteLocation 删除寄存室
 func DeleteLocation(c *gin.Context, s *services.Services) {
-	var location models.Location
-	//绑定
-	if err := c.ShouldBind(&location); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "请求数据格式错误",
-		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": err.Error(),
-		}).Error("请求数据格式错误")
-		return
-	}
-	//检查是否存在
+	ID := c.Param("id")
+	//检查是否存
 	var ex models.Location
 	result := s.DB.Model(&models.Location{}).
 		Preload("Luggage").
-		Where("id = ?", location.ID).First(&ex)
+		Where("id = ?", ID).First(&ex)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -460,7 +449,7 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error":       result.Error,
-				"location_id": location.ID,
+				"location_id": ID,
 			}).Error("位置不存在")
 			return
 		}
@@ -479,19 +468,19 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 		return
 	}
 	//检查位置下是否还有行李
-	if len(location.Luggage) > 0 {
+	if len(ex.Luggage) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "位置下还有行李，无法删除",
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":       result.Error,
-			"location_id": location.ID,
+			"location_id": ID,
 		}).Error("位置下还有行李，无法删除")
 		return
 	}
 	//删除位置
-	result = s.DB.Model(&models.Location{}).Where("id = ?", location.ID).Delete(&models.Location{})
+	result = s.DB.Model(&models.Location{}).Where("id = ?", ID).Delete(&models.Location{})
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -499,7 +488,7 @@ func DeleteLocation(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error":       result.Error,
-			"location_id": location.ID,
+			"location_id": ID,
 		}).Error("位置数据库删除错误")
 		return
 	}

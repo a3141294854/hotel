@@ -28,6 +28,8 @@ func main() {
 	//建立数据库连接和表
 	service := services.NewDatabase(cfg)
 	table.Table(service.DB)
+	//建立cos实例
+	client := services.StartTencentCos(cfg)
 
 	//创建全局限流
 	util.NewTokenBucketLimiter(cfg.RateLimiting.Default.Name, cfg.RateLimiting.Default.Capacity, cfg.RateLimiting.Default.FillRate, service.RdbLim)
@@ -88,5 +90,5 @@ func main() {
 	// ====================
 	// CORS 配置结束
 	// ====================
-	api.Init(r, service, cfg)
+	api.Init(r, service, cfg, client)
 }

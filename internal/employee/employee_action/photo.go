@@ -2,6 +2,13 @@ package employee_action
 
 import (
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/tencentyun/cos-go-sdk-v5"
+
+	"context"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"hotel/internal/util"
 	"hotel/models"
 	"hotel/services"
@@ -11,54 +18,44 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
-// UploadPhoto 上传照片
-func UploadPhoto(c *gin.Context, s *services.Services) {
-	// 获取上传的文件
-	file, err := c.FormFile("photo")
+// UploadPhoto 上传照片（支持多张）
+func UploadPhoto(c *gin.Context, s *services.Services, client *cos.Client, cfg *util.Config) {
+	// 获取表单数据
+	form, err := c.MultipartForm()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "请上传照片",
+			"message": "获取上传文件失败",
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("获取上传文件失败")
 		return
 	}
 
-	// 检查文件大小（限制 5MB）
-	const maxSize = 5 * 1024 * 1024
-	if file.Size > maxSize {
+	// 获取上传的文件列表
+	files := form.File["photos"] // ← 前端需要使用 "photos[]" 字段名
+	if len(files) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "照片大小不能超过 5MB",
+			"message": "请上传照片",
 		})
 		return
 	}
 
-	// 检查文件类型
-	ext := filepath.Ext(file.Filename)
-	allowedExts := map[string]bool{
-		".jpg":  true,
-		".jpeg": true,
-		".png":  true,
-		".gif":  true,
-	}
-	if !allowedExts[ext] {
+	// 检查文件数量限制（可选）
+	if len(files) > 10 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "只支持 jpg、jpeg、png、gif 格式",
+			"message": "一次最多上传 10 张照片",
 		})
 		return
 	}
 
-	// 创建保存目录
+	/* 创建保存目录
 	uploadDir := "./uploads/photos"
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -67,38 +64,125 @@ func UploadPhoto(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": err.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("创建上传目录失败")
 		return
-	}
+	}*/
 
-	// 生成唯一文件名
-	timestamp := time.Now().Format("20060102150405")
-	filename := fmt.Sprintf("%s_%s%s", timestamp, generateRandomString(6), ext)
-	path := filepath.Join(uploadDir, filename)
+	// 处理每个文件
+	var uploadedPhotos []gin.H
 
-	// 保存文件
-	if err := c.SaveUploadedFile(file, path); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "保存照片失败",
+	for _, file := range files {
+		// 检查文件大小（限制 5MB）
+		const maxSize = 5 * 1024 * 1024
+		if file.Size > maxSize {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": fmt.Sprintf("照片 %s 大小超过 5MB", file.Filename),
+			})
+			return
+		}
+
+		// 检查文件类型
+		ext := filepath.Ext(file.Filename)
+		allowedExts := map[string]bool{
+			".jpg":  true,
+			".jpeg": true,
+			".png":  true,
+			".gif":  true,
+		}
+		if !allowedExts[ext] {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": fmt.Sprintf("照片 %s 格式不支持，只支持 jpg、jpeg、png、gif", file.Filename),
+			})
+			return
+		}
+
+		// 生成唯一文件名
+		uploadDir := "uploads/photos"
+		filename := uuid.New().String() + ext
+		cosKey := strings.Join([]string{uploadDir, filename}, "/")
+
+		// 打开文件
+		fileReader, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "打开文件失败",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error": err.Error(),
+				"请求id":  c.GetString("request_id"),
+			}).Error("打开文件失败")
+			return
+		}
+		defer fileReader.Close()
+
+		// ✅ 直接上传到 COS（使用流，不需要本地保存）
+		_, err = client.Object.Put(
+			context.Background(), // ✅ 第一个参数：context
+			cosKey,               // ✅ 第二个参数：COS 的 key（不包含 ./）
+			fileReader,           // ✅ 第三个参数：文件流
+			nil,                  // 第四个参数：选项（可以为 nil）
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "上传到 COS 失败",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error":   err.Error(),
+				"cos_key": cosKey,
+				"请求id":    c.GetString("request_id"),
+			}).Error("上传到 COS 失败")
+			return
+		}
+
+		/* 保存文件
+		if err := c.SaveUploadedFile(file, path); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": fmt.Sprintf("保存照片 %s 失败", file.Filename),
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error": err.Error(),
+				"请求id":  c.GetUint("request_id"),
+			}).Error("保存照片失败")
+			return
+		}*/
+
+		urlPath := fmt.Sprintf("%s/%s", cfg.Cos.Website, cosKey)
+
+		// 保存到数据库
+		photoURL := fmt.Sprintf("%s", urlPath)
+		result := s.DB.Model(&models.Photo{}).Create(&models.Photo{
+			Url: photoURL,
 		})
-		util.Logger.WithFields(logrus.Fields{
-			"error": err.Error(),
-		}).Error("保存照片失败")
-		return
-	}
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "保存照片失败",
+			})
+			util.Logger.WithFields(logrus.Fields{
+				"error": result.Error.Error(),
+				"请求id":  c.GetString("request_id"),
+			}).Error("保存照片失败")
+			return
+		}
 
-	// 返回文件访问路径
-	photoURL := fmt.Sprintf("/photos/%s", filename)
-	s.DB.Model(&models.Photo{}).Create(&models.Photo{
-		Url: photoURL,
-	})
+		// 添加到结果列表
+		uploadedPhotos = append(uploadedPhotos, gin.H{
+			"url": photoURL,
+		})
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "上传成功",
+		"message": fmt.Sprintf("成功上传 %d 张照片", len(uploadedPhotos)),
 		"data": gin.H{
-			"url": photoURL,
+			"count":  len(uploadedPhotos),
+			"photos": uploadedPhotos,
 		},
 	})
 }
@@ -215,6 +299,7 @@ func PhotoTouchLuggageStorage(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("更新照片失败")
 		return
 	}
@@ -236,6 +321,7 @@ func GetAllPhoto(c *gin.Context, s *services.Services) {
 		})
 		util.Logger.WithFields(logrus.Fields{
 			"error": result.Error.Error(),
+			"请求id":  c.GetUint("request_id"),
 		}).Error("查询照片失败")
 		return
 	}

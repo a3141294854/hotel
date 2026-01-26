@@ -16,6 +16,8 @@ type Config struct {
 	JWT          JWTConfig          `yaml:"jwt"`
 	RateLimiting RateLimitingConfig `yaml:"rate_limiting"`
 	Log          LogConfig          `yaml:"log"`
+	Tencent      TencentConfig      `yaml:"tencent"`
+	Cos          CosConfig          `yaml:"cos"`
 }
 
 // DatabaseConfig 数据库配置
@@ -87,6 +89,17 @@ type LogConfig struct {
 	MaxSize    int    `yaml:"max_size"`    // 单个日志文件最大大小(MB)
 	MaxBackups int    `yaml:"max_backups"` // 保留的旧日志文件数量
 	MaxAge     int    `yaml:"max_age"`     // 保留日志文件的最大天数
+}
+
+type TencentConfig struct {
+	SecretId  string `yaml:"secret_id"`
+	SecretKey string `yaml:"secret_key"`
+}
+
+type CosConfig struct {
+	Bucket  string `yaml:"bucket"`
+	Region  string `yaml:"region"`
+	Website string `yaml:"website"`
 }
 
 // LoadConfig 加载配置文件

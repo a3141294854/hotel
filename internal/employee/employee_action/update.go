@@ -22,7 +22,6 @@ func UpdateLuggage(c *gin.Context, s *services.Services) {
 		Model:      &models.Luggage{},
 		CheckExist: true,
 		CheckType:  "id",
-		CheckField: []string{"ID"},
 	})
 }
 func UpdateTag(c *gin.Context, s *services.Services) {
@@ -30,7 +29,6 @@ func UpdateTag(c *gin.Context, s *services.Services) {
 		Model:      &models.Tag{},
 		CheckExist: true,
 		CheckType:  "id",
-		CheckField: []string{"ID"},
 	})
 }
 
@@ -39,7 +37,6 @@ func UpdateLocation(c *gin.Context, s *services.Services) {
 		Model:      &models.Location{},
 		CheckExist: true,
 		CheckType:  "id",
-		CheckField: []string{"ID"},
 	})
 }
 
@@ -48,6 +45,5 @@ func UpdateHotel(c *gin.Context, s *services.Services) {
 		Model:      &models.Hotel{},
 		CheckExist: true,
 		CheckType:  "id",
-		CheckField: []string{"ID"},
 	})
 }

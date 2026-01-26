@@ -172,6 +172,9 @@ func GetLocation(c *gin.Context, s *services.Services) {
 	if c.Query("name") != "" {
 		query = query.Where("name = ?", c.Query("name"))
 	}
+	if c.Query("number") != "" {
+		query = query.Where("number = ?", c.Query("number"))
+	}
 	if c.Query("hotel_id") != "" {
 		query = query.Where("hotel_id = ?", c.Query("hotel_id"))
 	}

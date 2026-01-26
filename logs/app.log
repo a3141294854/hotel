@@ -3274,3 +3274,474 @@ time="2025-12-27 14:25:00" level=info msg="服务器启动" mode=release
 [2026-01-25 15:17:01] [INFO] 请求处理完成 - 请求id=0b264e64-d62d-4f58-99b3-7f07d7cf890f, 请求方法=GET, 路径=/photos/20260125151640_sB4kZm.png, 状态码=401, 使用时间=800.9µs, 操作员=未知, 客户端IP=::1
 [2026-01-25 15:17:10] [DEBUG] 限流器状态 - name=local, tokens=49
 [2026-01-25 15:17:10] [INFO] 请求处理完成 - 请求id=ae45cae6-6292-4c02-8e15-9296ec0bc6e3, 请求方法=GET, 路径=/photos/20260125151640_sB4kZm.png, 状态码=200, 使用时间=36.7132ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:27:21] [INFO] 数据库表创建成功
+[2026-01-25 15:27:21] [INFO] 服务器启动 - mode=debug
+[2026-01-25 15:28:04] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:28:04] [INFO] 请求处理完成 - 请求id=30cd8b53-192a-4bf3-8be4-004dfc344090, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=14.5335ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:28:52] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 15:28:52] [INFO] 请求处理完成 - 请求id=ab7e3329-ab84-4a3a-a110-c270da9e0c8e, 请求方法=POST, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.3585ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:28:55] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:28:55] [INFO] 请求处理完成 - 请求id=fb4b543b-ba24-4d99-9d48-d806522a1e76, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=47.3851ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:29:02] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:29:03] [INFO] 员工登录成功 - username=admin
+[2026-01-25 15:29:03] [INFO] 请求处理完成 - 请求id=db2e9263-a733-430d-9d37-8dcc181ba880, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=46.7345ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:29:05] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 15:29:05] [INFO] 请求处理完成 - 请求id=3ca3051f-a26e-4f7c-b713-5e6f31b813f2, 请求方法=POST, 路径=/internal/luggageStorage, 状态码=201, 使用时间=83.3566ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:30:21] [INFO] 数据库表创建成功
+[2026-01-25 15:30:21] [INFO] 服务器启动 - mode=debug
+[2026-01-25 15:30:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:30:23] [INFO] 请求处理完成 - 请求id=cea7de32-499f-410a-ad4c-051173c3dfb1, 请求方法=POST, 路径=/internal/photo, 状态码=401, 使用时间=1.0459ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:30:26] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:30:26] [INFO] 员工登录成功 - username=admin
+[2026-01-25 15:30:26] [INFO] 请求处理完成 - 请求id=86c21cfe-f110-4552-8b54-cd51e432272f, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=44.8415ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:30:28] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 15:30:28] [INFO] 请求处理完成 - 请求id=89bb3c5a-2478-4126-9b12-ef47dba83ca3, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=8.5997ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:30:42] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:30:42] [INFO] 请求处理完成 - 请求id=d892bd27-e83b-4f18-9c52-170b445fd3bf, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=12.5288ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:33:16] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:33:16] [INFO] 请求处理完成 - 请求id=c141bb06-31bd-40ba-88f9-711105a0b3a6, 请求方法=POST, 路径=/internal/luggageStorage, 状态码=401, 使用时间=2.0224ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:33:20] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:33:20] [INFO] 员工登录成功 - username=admin
+[2026-01-25 15:33:20] [INFO] 请求处理完成 - 请求id=75db377b-4e20-4f62-8ab8-e71781a9dd1e, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=53.0456ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:33:21] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:33:21] [INFO] 请求处理完成 - 请求id=3bfc334c-a606-4aa3-b304-96abc154d20d, 请求方法=POST, 路径=/internal/luggageStorage, 状态码=201, 使用时间=22.3467ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:33:53] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:33:53] [INFO] 请求处理完成 - 请求id=84676989-3284-44c6-9cda-1deb0ee55fe3, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=142.7954ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:34:19] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 15:34:19] [INFO] 请求处理完成 - 请求id=6f7c4cb3-f68c-4d33-867d-7c6bd84fdd86, 请求方法=GET, 路径=/uploads/luggage_photos/2026/01/25/d391a9c46e04581e07f6770325ab9a4f.jpg, 状态码=404, 使用时间=998µs, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:34:30] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:34:30] [INFO] 请求处理完成 - 请求id=739ed3ce-a95b-49ab-b787-2ea055c603ab, 请求方法=GET, 路径=/photos/20260125153353_tiG1l3.png, 状态码=200, 使用时间=42.7673ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:46:34] [INFO] 数据库表创建成功
+[2026-01-25 15:46:34] [INFO] 服务器启动 - mode=debug
+[2026-01-25 15:58:27] [INFO] 数据库表创建成功
+[2026-01-25 15:58:27] [INFO] 服务器启动 - mode=debug
+[2026-01-25 15:58:42] [ERROR] 限流器执行脚本失败 - error=MISCONF Redis is configured to save RDB snapshots, but it's currently unable to persist to disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error. script: 28e2beabd17123c3991c66f202d51fd23c624dbc, on @user_script:26., name=local
+[2026-01-25 15:58:42] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2026-01-25 15:58:42] [INFO] 请求处理完成 - 请求id=a7ed3a73-6b34-4af4-8604-76e2cf16aba0, 请求方法=POST, 路径=/login, 状态码=429, 使用时间=1.1428ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:59:01] [ERROR] 限流器执行脚本失败 - name=local, error=dial tcp 127.0.0.1:6379: connectex: No connection could be made because the target machine actively refused it.
+[2026-01-25 15:59:01] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2026-01-25 15:59:01] [INFO] 请求处理完成 - 请求id=8991efef-c2ee-4c00-847e-5f90e5c84b58, 请求方法=POST, 路径=/login, 状态码=429, 使用时间=1.5756382s, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:59:20] [INFO] 数据库表创建成功
+[2026-01-25 15:59:20] [INFO] 服务器启动 - mode=debug
+[2026-01-25 15:59:22] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:59:23] [INFO] 员工登录成功 - username=admin
+[2026-01-25 15:59:23] [INFO] 请求处理完成 - 请求id=230baf21-4f58-419f-84fe-1b3422a78b11, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=46.1492ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 15:59:27] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:59:27] [INFO] 请求处理完成 - 请求id=b3b655e6-86c6-4445-8cbf-e6180dfdaf25, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=11.884ms, 操作员=, 客户端IP=::1
+[2026-01-25 15:59:34] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 15:59:34] [ERROR] 位置不存在 - error=record not found, location_id=0
+[2026-01-25 15:59:34] [INFO] 请求处理完成 - 请求id=39a69452-c262-4009-b296-23b38b569679, 请求方法=DELETE, 路径=/internal/location/4, 状态码=404, 使用时间=9.471ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:01:17] [INFO] 数据库表创建成功
+[2026-01-25 16:01:18] [INFO] 服务器启动 - mode=debug
+[2026-01-25 16:01:25] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:01:25] [INFO] 员工登录成功 - username=admin
+[2026-01-25 16:01:25] [INFO] 请求处理完成 - 请求id=d793f807-9d04-4542-b0c1-b3344814b6da, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=45.6939ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 16:01:28] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:01:28] [INFO] 请求处理完成 - 请求id=323a7ceb-3e95-4a0e-9783-6917153d8d36, 请求方法=DELETE, 路径=/internal/location/4, 状态码=200, 使用时间=23.8833ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:01:32] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:01:32] [INFO] 请求处理完成 - 请求id=3bbaad36-63eb-4d54-b428-8121f87b9a4d, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=9.8745ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:03:39] [INFO] 数据库表创建成功
+[2026-01-25 16:03:39] [INFO] 服务器启动 - mode=debug
+[2026-01-25 16:03:42] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:03:42] [INFO] 请求处理完成 - 请求id=ac44cc29-2d47-4b5f-b135-fb99e60730d9, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=11.0284ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:04:08] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:04:08] [ERROR] 位置下还有行李，无法删除 - error=<nil>, location_id=1
+[2026-01-25 16:04:08] [INFO] 请求处理完成 - 请求id=59555da5-c817-4da5-8fda-98e14afb3642, 请求方法=DELETE, 路径=/internal/location/1, 状态码=400, 使用时间=14.7078ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:04:46] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 16:04:46] [INFO] 请求处理完成 - 请求id=2ec0baf6-3cc3-49fe-be90-6e47a57a4653, 请求方法=PUT, 路径=/internal/location/2, 状态码=200, 使用时间=17.7201ms, 操作员=, 客户端IP=::1
+[2026-01-25 16:04:49] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 16:04:49] [INFO] 请求处理完成 - 请求id=95e1e0a7-a3ed-4ec2-be66-a34bce8259db, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=10.8447ms, 操作员=, 客户端IP=::1
+[2026-01-25 17:26:19] [INFO] 数据库表创建成功
+[2026-01-25 17:26:22] [INFO] 服务器启动 - mode=debug
+[2026-01-25 17:26:29] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:26:29] [INFO] 请求处理完成 - 请求id=e3036ffc-7e4b-48dc-806f-53448ac35ca8, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=50.3088ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 17:26:36] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:26:36] [INFO] 员工登录成功 - username=admin
+[2026-01-25 17:26:36] [INFO] 请求处理完成 - 请求id=e32da7c2-3b17-4008-a633-bb288060a1cf, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=51.1671ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 17:26:38] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:26:38] [INFO] 请求处理完成 - 请求id=4fb953a5-e4a2-4e71-a69e-6af216978c93, 请求方法=GET, 路径=/internal/luggage, 状态码=401, 使用时间=1.0985ms, 操作员=未知, 客户端IP=::1
+[2026-01-25 17:26:56] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:26:56] [INFO] 请求处理完成 - 请求id=17c14a38-dc46-4990-9044-18c4e596006d, 请求方法=GET, 路径=/internal/luggage, 状态码=401, 使用时间=964.3µs, 操作员=未知, 客户端IP=::1
+[2026-01-25 17:28:00] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:28:00] [INFO] 请求处理完成 - 请求id=9f13fe44-96e0-46f4-906a-b315740db436, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=16.004ms, 操作员=, 客户端IP=::1
+[2026-01-25 17:33:12] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:33:12] [INFO] 请求处理完成 - 请求id=12fa588f-1b8c-4f41-a39f-3028b1b36485, 请求方法=GET, 路径=/internal/tags, 状态码=404, 使用时间=508.7µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-25 17:33:18] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 17:33:18] [INFO] 请求处理完成 - 请求id=829cbe04-2440-4547-8939-77e851145486, 请求方法=PUT, 路径=/internal/luggage/2, 状态码=200, 使用时间=12.2322ms, 操作员=, 客户端IP=::1
+[2026-01-25 17:33:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:33:23] [INFO] 请求处理完成 - 请求id=419ffec4-66b3-478e-8eec-c9ceeefd4ef5, 请求方法=GET, 路径=/internal/luggageStorage/tag/EB19FB3E2DC5, 状态码=404, 使用时间=1.0022ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-25 17:33:24] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:33:24] [INFO] 请求处理完成 - 请求id=71070493-e0d1-4c59-adc9-74957fe24503, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=10.3358ms, 操作员=, 客户端IP=::1
+[2026-01-25 17:34:06] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-25 17:34:06] [INFO] 请求处理完成 - 请求id=4ab05e13-7964-437a-8322-c963efde5748, 请求方法=GET, 路径=/internal/luggageStorage/tag/EB19FB3E2DC5, 状态码=404, 使用时间=1.4093ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-25 17:36:43] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-25 17:36:43] [INFO] 请求处理完成 - 请求id=a4865f7a-ff4b-4aca-81c0-e122c6e8e47d, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=10.4754ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:25:57] [INFO] 数据库表创建成功
+[2026-01-26 09:25:59] [INFO] 服务器启动 - mode=debug
+[2026-01-26 09:26:15] [ERROR] 限流器执行脚本失败 - name=local, error=dial tcp 127.0.0.1:6379: connectex: No connection could be made because the target machine actively refused it.
+[2026-01-26 09:26:15] [WARNING] 请求过于频繁 - 客户端IP=::1
+[2026-01-26 09:26:15] [INFO] 请求处理完成 - 请求id=fde2582c-8ff5-485c-a09b-a8ad55b6001a, 请求方法=POST, 路径=/login, 状态码=429, 使用时间=2.0916854s, 操作员=未知, 客户端IP=::1
+[2026-01-26 09:26:30] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 09:26:30] [INFO] 请求处理完成 - 请求id=0befee09-7b57-4f35-8ea8-6474a4d2f83e, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=65.007ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 09:26:39] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 09:26:39] [INFO] 员工登录成功 - username=admin
+[2026-01-26 09:26:39] [INFO] 请求处理完成 - 请求id=ccca814f-b3f9-4dcf-92d7-cb43ad232383, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=52.8493ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 09:26:45] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 09:26:45] [INFO] 请求处理完成 - 请求id=3325967a-6fa7-4408-916b-90ce2cfb9610, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=59.2943ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:27:05] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 09:27:05] [INFO] 请求处理完成 - 请求id=e222cb8d-9934-418c-af5d-51b39d188d02, 请求方法=POST, 路径=/internal/tag, 状态码=409, 使用时间=67.7135ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:27:12] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 09:27:12] [INFO] 请求处理完成 - 请求id=6c485a2d-8924-4f76-b3b2-ed2e4f977959, 请求方法=POST, 路径=/internal/tag, 状态码=200, 使用时间=71.9953ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:27:17] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 09:27:17] [INFO] 请求处理完成 - 请求id=30087b48-28c7-4799-9455-cd69f16b2b62, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=12.1215ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:27:55] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 09:27:55] [INFO] 请求处理完成 - 请求id=5b3f4c98-8fc6-412c-ba38-78669b20fa67, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=15.2871ms, 操作员=, 客户端IP=::1
+[2026-01-26 09:28:54] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 09:28:54] [INFO] 请求处理完成 - 请求id=b416daf8-39ed-4ca9-b726-4cfe9fef5f0e, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=13.6916ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:15:48] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:15:48] [INFO] 员工登录成功 - username=admin
+[2026-01-26 10:15:48] [INFO] 请求处理完成 - 请求id=1ce6fa1e-156e-4fe3-b33d-558dad78232d, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=54.2876ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 10:15:52] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:15:52] [INFO] 请求处理完成 - 请求id=3a72d918-c8b7-4335-b806-19ddf1c3c740, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=66.4082ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:16:04] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:16:04] [INFO] 请求处理完成 - 请求id=5f8f9ec6-d256-4fa2-afe2-3ef4bf43e0d5, 请求方法=POST, 路径=/internal/luggage/2, 状态码=401, 使用时间=1.2514ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 10:16:15] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:16:15] [INFO] 请求处理完成 - 请求id=4f177f7b-57b7-4385-ac36-cfa700e0cff6, 请求方法=POST, 路径=/internal/luggage/2, 状态码=200, 使用时间=21.1816ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:16:33] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:16:33] [INFO] 请求处理完成 - 请求id=4d90fa08-f4f6-4a43-aa87-284bf7e78ffb, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=14.3312ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:16:42] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:16:42] [INFO] 请求处理完成 - 请求id=bbb5ba9d-7a1a-4af2-a958-1af876a8091a, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=14.3744ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:16:46] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:16:46] [INFO] 请求处理完成 - 请求id=7eaeb003-eb6c-4933-9ab6-d6a399e75c77, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=31.9246ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:17:06] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:17:06] [INFO] 请求处理完成 - 请求id=9601faac-dfaa-4c4a-9fed-a77ca9f9ad4f, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=14.17ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:18:33] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:18:33] [INFO] 请求处理完成 - 请求id=a2a46cab-b06a-4bcc-a3f3-b2a195361804, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=28.8113ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:18:39] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:18:39] [INFO] 请求处理完成 - 请求id=019b987c-f1be-4649-a1e7-8987255f8a81, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=36.6031ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:18:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:18:41] [INFO] 请求处理完成 - 请求id=e787a3fc-a75d-4336-a980-31d80d0ea5bf, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=16.437ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:19:02] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:19:02] [INFO] 请求处理完成 - 请求id=de5bfa47-69e4-4a34-8317-1ee1fcd89510, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=14.9905ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:02] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:20:02] [INFO] 请求处理完成 - 请求id=fb95d636-bb28-4b12-bfc8-1cbdad310bec, 请求方法=DELETE, 路径=/internal/luggageStorage/3, 状态码=404, 使用时间=15.0629ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:05] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:20:05] [INFO] 请求处理完成 - 请求id=1f253ff8-b4d5-4b4c-aa5e-e8b63396c3d0, 请求方法=DELETE, 路径=/internal/luggageStorage/4, 状态码=404, 使用时间=24.6158ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:07] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:20:07] [INFO] 请求处理完成 - 请求id=f5ac4fc2-7f2e-4e48-84df-4cee6d704b46, 请求方法=DELETE, 路径=/internal/luggageStorage/5, 状态码=404, 使用时间=12.2294ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:09] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:09] [INFO] 请求处理完成 - 请求id=02157b2b-e307-4948-a062-5c276b10f448, 请求方法=DELETE, 路径=/internal/luggageStorage/7, 状态码=404, 使用时间=12.3947ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:12] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:12] [INFO] 请求处理完成 - 请求id=102fca7a-1c8e-4786-9839-b6846a7d03ce, 请求方法=DELETE, 路径=/internal/luggageStorage/8, 状态码=200, 使用时间=40.8359ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:14] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:20:14] [INFO] 请求处理完成 - 请求id=8dde14b1-2bbe-4e0d-8a7f-adde383278d5, 请求方法=DELETE, 路径=/internal/luggageStorage/9, 状态码=404, 使用时间=12.7897ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:17] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:17] [INFO] 请求处理完成 - 请求id=6ed7df93-22e5-4e89-be8e-eccfe6f7165f, 请求方法=DELETE, 路径=/internal/luggageStorage/10, 状态码=404, 使用时间=6.2099ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:19] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:19] [INFO] 请求处理完成 - 请求id=ce702a6e-c57e-4a0f-bdf4-8c7c8e54163c, 请求方法=DELETE, 路径=/internal/luggageStorage/11, 状态码=200, 使用时间=57.0462ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:23] [INFO] 请求处理完成 - 请求id=9c6c33d5-68c0-40ce-92fd-18a578481d4e, 请求方法=DELETE, 路径=/internal/luggageStorage/12, 状态码=200, 使用时间=21.2993ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:26] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:20:26] [INFO] 请求处理完成 - 请求id=56f8cc25-de03-43e3-b727-1041e6781c2d, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=18.3219ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:41] [INFO] 请求处理完成 - 请求id=5c91723e-8213-40c5-84a1-cf673271ae83, 请求方法=DELETE, 路径=/internal/luggageStorage/6, 状态码=200, 使用时间=157.0457ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:20:44] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:20:44] [INFO] 请求处理完成 - 请求id=db771efb-231a-4d65-b3a8-4f21fd7a85c8, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=13.7231ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:03] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:03] [INFO] 请求处理完成 - 请求id=d6688f78-9bbf-4b19-8de9-73258a76fb80, 请求方法=DELETE, 路径=/internal/luggageStorage/13, 状态码=200, 使用时间=108.667ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:08] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:21:08] [INFO] 请求处理完成 - 请求id=9a501451-f81c-4791-8844-a093d5700b5e, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=113.2395ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:12] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:12] [INFO] 请求处理完成 - 请求id=29b337e9-496d-4b7d-88fb-e3941c8c6e89, 请求方法=DELETE, 路径=/internal/luggageStorage/14, 状态码=200, 使用时间=18.6837ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:18] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:18] [INFO] 请求处理完成 - 请求id=9f1a4b29-71e5-4abe-a06e-8c716864502c, 请求方法=DELETE, 路径=/internal/luggageStorage/15, 状态码=404, 使用时间=13.9506ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:20] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:20] [INFO] 请求处理完成 - 请求id=1a4f073e-aa0d-4a8f-85d8-775776f212aa, 请求方法=DELETE, 路径=/internal/luggageStorage/16, 状态码=200, 使用时间=15.3678ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:24] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:24] [INFO] 请求处理完成 - 请求id=0052b0e7-464a-4589-968e-3f203e2f3842, 请求方法=DELETE, 路径=/internal/luggageStorage/17, 状态码=200, 使用时间=19.6266ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:27] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:27] [INFO] 请求处理完成 - 请求id=944ecad6-d17b-46fb-a17f-84ec5643237e, 请求方法=DELETE, 路径=/internal/luggageStorage/18, 状态码=200, 使用时间=69.9619ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:21:30] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:21:30] [INFO] 请求处理完成 - 请求id=fc1be023-775c-40fb-b344-2ce80a7c2a91, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=15.4887ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:22:32] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:22:32] [INFO] 请求处理完成 - 请求id=d54eadb2-9bbf-47b1-a1e2-67a4432ac44f, 请求方法=POST, 路径=/internal/luggage/30, 状态码=200, 使用时间=18.9628ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:22:36] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:22:36] [INFO] 请求处理完成 - 请求id=5d112f47-e295-4fed-9fe7-245e0daf8123, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=15.9732ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:23:15] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 10:23:15] [INFO] 请求处理完成 - 请求id=ed99af2f-4765-4b15-8205-97f50a266440, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=10.188ms, 操作员=, 客户端IP=::1
+[2026-01-26 10:23:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 10:23:23] [INFO] 请求处理完成 - 请求id=c378346d-b721-4ec8-8ec6-08d82003e91b, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=13.7987ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:01:14] [INFO] 数据库表创建成功
+[2026-01-26 15:01:16] [INFO] 服务器启动 - mode=debug
+[2026-01-26 15:04:12] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:04:12] [INFO] 请求处理完成 - 请求id=be31685d-7390-4bcd-a6bf-1b0ec532f6da, 请求方法=POST, 路径=/auth/login, 状态码=404, 使用时间=10.5103ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:08:10] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:08:10] [INFO] 请求处理完成 - 请求id=800d41b2-18b1-41f3-a315-f32515f2d316, 请求方法=GET, 路径=/internal/luggage, 状态码=401, 使用时间=1.0327ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:14:54] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:14:54] [INFO] 请求处理完成 - 请求id=1a0c0bfc-af33-4ddb-90af-a3079222b2d7, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=115.1432ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:17:44] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:17:45] [INFO] 请求处理完成 - 请求id=fd4fff10-02d0-4166-af89-2cfcdee0ebbe, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=119.9954ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:18:31] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:18:31] [INFO] 请求处理完成 - 请求id=f69455f0-65d0-45c8-8127-a4b08bffde71, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=2.5747ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:24:01] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:24:01] [INFO] 请求处理完成 - 请求id=e42c8993-c65e-49f5-a566-ec808ed3d53d, 请求方法=POST, 路径=/api/login, 状态码=404, 使用时间=1.1154ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:25:35] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:25:35] [INFO] 员工登录成功 - username=admin
+[2026-01-26 15:25:35] [INFO] 请求处理完成 - 请求id=3ad4434d-7e7d-4e7d-b130-a409223cd5df, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=128.6478ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 15:30:22] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:30:22] [INFO] 请求处理完成 - 请求id=dcc69293-1f27-4242-bed3-3676204d49f3, 请求方法=GET, 路径=/internal/location, 状态码=401, 使用时间=510.1µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:33:42] [INFO] 数据库表创建成功
+[2026-01-26 15:33:42] [INFO] 服务器启动 - mode=debug
+[2026-01-26 15:34:21] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:34:21] [INFO] 请求处理完成 - 请求id=dbe46120-4517-4d36-8686-6abef0f0709d, 请求方法=POST, 路径=/tool/add/employee, 状态码=401, 使用时间=0s, 操作员=未知, 客户端IP=::1
+[2026-01-26 15:34:30] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:34:30] [INFO] 员工登录成功 - username=admin
+[2026-01-26 15:34:30] [INFO] 请求处理完成 - 请求id=726d55bf-907f-4169-b635-a74bdddd7fa2, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=126.5863ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 15:34:37] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:34:37] [INFO] 请求处理完成 - 请求id=c0f80ca7-960c-4a65-a3cc-64f374b2f05b, 请求方法=POST, 路径=/tool/add/employee, 状态码=400, 使用时间=26.9474ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:35:51] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:35:51] [ERROR] 员工注册失败 - error=invalid character '}' looking for beginning of object key string
+[2026-01-26 15:35:51] [INFO] 请求处理完成 - 请求id=2f2a7397-187f-4876-872b-3d1fb9442118, 请求方法=POST, 路径=/tool/add/employee, 状态码=400, 使用时间=18.8761ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:36:00] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:36:00] [INFO] 请求处理完成 - 请求id=c49451c8-c387-4729-b786-2c06f33384ba, 请求方法=POST, 路径=/tool/add/employee, 状态码=400, 使用时间=20.2621ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:37:06] [INFO] 数据库表创建成功
+[2026-01-26 15:37:07] [INFO] 服务器启动 - mode=debug
+[2026-01-26 15:37:09] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:37:10] [INFO] 员工注册成功 - username=123456
+[2026-01-26 15:37:10] [INFO] 请求处理完成 - 请求id=5880a362-f60e-4dd8-9d85-9a5d02b5cf08, 请求方法=POST, 路径=/tool/add/employee, 状态码=201, 使用时间=156.2474ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:37:28] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:37:28] [INFO] 员工登录成功 - username=123456
+[2026-01-26 15:37:28] [INFO] 请求处理完成 - 请求id=ee838ea3-6ee2-4062-9917-470b6b3ce82b, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=124.2417ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:37:50] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:37:50] [INFO] 请求处理完成 - 请求id=b3acc767-3a77-4574-a7fe-ca87faad77aa, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=74.6016ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:38:27] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:38:27] [INFO] 请求处理完成 - 请求id=88171eff-59a5-408e-886d-a2fe77505dc0, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=17.1817ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:04] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:39:04] [INFO] 请求处理完成 - 请求id=1a50332b-18da-4160-9741-cbbc8c79738b, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=18.1505ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:39:23] [INFO] 请求处理完成 - 请求id=5201053e-2f5d-4667-8b62-8571c945953f, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=19.3295ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:34] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:39:34] [INFO] 请求处理完成 - 请求id=b9cb1834-ea09-492c-a25d-a440b145415b, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=19.5811ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:43] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:39:43] [INFO] 请求处理完成 - 请求id=b3af3f34-7ac9-4257-9d07-0c2c0bc50360, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=18.4005ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:50] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:39:50] [INFO] 请求处理完成 - 请求id=1c9d83c0-d16a-430d-8591-b99b62e853d6, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=18.0958ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:39:52] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:39:52] [INFO] 请求处理完成 - 请求id=79debcea-4232-4a81-acdd-46dfe574ac9c, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=16.8811ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:40:06] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:40:06] [INFO] 请求处理完成 - 请求id=643c0bef-3742-4a68-bf6e-9a8168e3a2d3, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=17.3849ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:40:10] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:40:10] [INFO] 请求处理完成 - 请求id=4ac41802-0a75-4ba5-91d5-54696f561949, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=23.8284ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:40:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:40:41] [INFO] 请求处理完成 - 请求id=bae06d16-4351-436e-9870-cd1cab03b300, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=17.9307ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:40:55] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:40:55] [INFO] 请求处理完成 - 请求id=f8cfd79b-eb27-4900-a4c2-eaf11d4b5e20, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.9585ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:41:08] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:41:08] [INFO] 请求处理完成 - 请求id=de800c4e-169f-4af2-8f91-b0e7b0e40f6e, 请求方法=POST, 路径=/internal/luggageStorage/code/256131, 状态码=200, 使用时间=30.0114ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:41:22] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:41:22] [INFO] 请求处理完成 - 请求id=efe0c279-dc94-4333-8b2d-c1767980f7d3, 请求方法=POST, 路径=/internal/luggageStorage/code/216131, 状态码=404, 使用时间=47.3696ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:41:57] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:41:57] [INFO] 请求处理完成 - 请求id=0bab2a4f-4fde-4708-9811-6df722216f86, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=19.4663ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:42:04] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:42:04] [INFO] 请求处理完成 - 请求id=fce81edb-f589-43d5-b636-8d28abfffdb7, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=29.1898ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:43:20] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:43:20] [INFO] 请求处理完成 - 请求id=41104e8c-a854-4582-81cf-5aeaa3a87d4c, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=17.8569ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:44:30] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:44:30] [INFO] 请求处理完成 - 请求id=8305ea1c-8d8f-4d5e-80eb-6c6ee44777f1, 请求方法=POST, 路径=/internal/tag, 状态码=401, 使用时间=520.2µs, 操作员=未知, 客户端IP=::1
+[2026-01-26 15:44:31] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:44:31] [INFO] 员工登录成功 - username=123456
+[2026-01-26 15:44:31] [INFO] 请求处理完成 - 请求id=1afd4416-cd4d-4fc6-bbdc-822fee64eb72, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=115.5118ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:44:35] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:44:35] [INFO] 员工登录成功 - username=admin
+[2026-01-26 15:44:35] [INFO] 请求处理完成 - 请求id=f5a85f88-6991-45fc-81b6-351ae38e42d7, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=118.3264ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 15:44:37] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:44:37] [INFO] 请求处理完成 - 请求id=e167882f-b9bc-4a36-a508-4deb39466ac4, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=11.3031ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:44:38] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:44:38] [INFO] 请求处理完成 - 请求id=e76ed708-9016-4916-bc37-e1548d671863, 请求方法=POST, 路径=/internal/tag, 状态码=200, 使用时间=17.2073ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:44:47] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:44:47] [INFO] 请求处理完成 - 请求id=3bf6f7dd-8168-4914-9adb-410c2500e834, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=15.8319ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:45:15] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:45:15] [INFO] 请求处理完成 - 请求id=bf2ceffd-13d3-4f9c-a096-a1ec136504bf, 请求方法=POST, 路径=/internal/tag, 状态码=200, 使用时间=20.3729ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:45:21] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:45:21] [INFO] 请求处理完成 - 请求id=102dab0f-79d6-4055-bd01-7ee3b5fe0f02, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=16.187ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:45:34] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:45:34] [INFO] 请求处理完成 - 请求id=c01787b9-0f50-4a84-8eac-53f883c44363, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=16.8384ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:46:02] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:46:02] [INFO] 请求处理完成 - 请求id=ab490e9c-5f93-40b1-8813-c1483627816d, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=19.3798ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:46:24] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:46:24] [INFO] 请求处理完成 - 请求id=9d0773a3-fc14-4ddd-a180-11935a34b055, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=25.5391ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:47:11] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:47:11] [INFO] 员工登录成功 - username=123456
+[2026-01-26 15:47:11] [INFO] 请求处理完成 - 请求id=d483be0a-85a6-40a5-becd-4fcaf991cf30, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=124.7553ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:47:16] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:47:16] [INFO] 请求处理完成 - 请求id=c35cbd7b-d04a-4664-9240-9e18cb972450, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=20.6711ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:53:11] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:53:11] [INFO] 请求处理完成 - 请求id=bbb2a2f2-67bd-4385-996f-67b4ff909956, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=16.8975ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:53:27] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:53:27] [INFO] 请求处理完成 - 请求id=9a752eaf-b448-4817-b4b2-555416961702, 请求方法=GET, 路径=/internal/luggage, 状态码=401, 使用时间=1.5261ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:53:59] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:54:00] [INFO] 员工登录成功 - username=123456
+[2026-01-26 15:54:00] [INFO] 请求处理完成 - 请求id=f252eab8-52f4-4cac-8ba9-56fad6cbede0, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=116.9521ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:54:05] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:54:05] [INFO] 请求处理完成 - 请求id=d3dbf4c6-6c34-4f50-832a-c107646874c5, 请求方法=GET, 路径=/internal/luggage, 状态码=200, 使用时间=17.5233ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:56:35] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:56:35] [INFO] 请求处理完成 - 请求id=b3e98f24-563b-4d13-8012-5e99a01fc991, 请求方法=GET, 路径=/internal/tag, 状态码=401, 使用时间=1.1123ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:56:35] [DEBUG] 限流器状态 - name=local, tokens=48
+[2026-01-26 15:56:35] [INFO] 请求处理完成 - 请求id=80c22510-1e37-4ad1-84c6-736326020e3f, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.1063ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:56:36] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:56:36] [INFO] 请求处理完成 - 请求id=a63d32ec-e54f-44e7-ad08-8f6f3f401c4e, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.1853ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:56:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:56:41] [DEBUG] 限流器状态 - name=local, tokens=47
+[2026-01-26 15:56:41] [INFO] 请求处理完成 - 请求id=7dcd8fe7-1ca2-4c10-9878-1c7903a9d890, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=5.5748ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 15:56:41] [INFO] 请求处理完成 - 请求id=b51f3213-0bcf-450b-917a-e917bddc69ba, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=31.3367ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:57:19] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:57:19] [INFO] 请求处理完成 - 请求id=c1181fdd-b0f6-4b87-8b07-39b75d93a8d5, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=22.6129ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:58:06] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:58:06] [INFO] 请求处理完成 - 请求id=c5ea003d-51fd-4e09-870a-74978f7869aa, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.6259ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 15:58:08] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 15:58:08] [INFO] 请求处理完成 - 请求id=49915c3d-8981-4744-a095-96482d804f9d, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=17.7473ms, 操作员=, 客户端IP=::1
+[2026-01-26 15:58:15] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 15:58:15] [INFO] 请求处理完成 - 请求id=6d751db1-0446-4da5-a74c-ab171896f6d6, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.5952ms, 操作员=, 客户端IP=::1
+[2026-01-26 16:02:35] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:02:35] [DEBUG] 限流器状态 - name=local, tokens=48
+[2026-01-26 16:02:35] [INFO] 请求处理完成 - 请求id=0b8c02ef-0abe-4d6a-8182-2d2f9152cc28, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=511.6µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:02:35] [INFO] 请求处理完成 - 请求id=69f6c27e-3185-4f2e-9981-81afff3dc572, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=18.2465ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:02:49] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:02:49] [INFO] 请求处理完成 - 请求id=e5a89b99-0eb7-475f-9c03-506c5ed59a8c, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=29.9799ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:02:51] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:02:51] [INFO] 请求处理完成 - 请求id=3fc346de-d9de-4d2f-925c-72367b5c3ab2, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.7318ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:05:21] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:05:21] [INFO] 请求处理完成 - 请求id=271c6050-6161-4456-9a6f-68fb34ad8025, 请求方法=GET, 路径=/internal/location, 状态码=401, 使用时间=1.4558ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:05:21] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:05:21] [INFO] 请求处理完成 - 请求id=e06fb02b-78ef-47eb-bbfe-1cace9db76d6, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=16.3008ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:05:50] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:05:50] [INFO] 请求处理完成 - 请求id=40e00c45-1239-47d0-8bdb-a7749ff71f27, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.0047ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 16:05:56] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:05:56] [INFO] 员工登录成功 - username=admin
+[2026-01-26 16:05:56] [INFO] 请求处理完成 - 请求id=e5c58f5a-4841-470a-a4da-e022ed6775ed, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=122.2144ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 16:06:00] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:06:00] [INFO] 请求处理完成 - 请求id=dc37c022-8daa-4b8b-bd04-86ed694b6949, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=18.747ms, 操作员=, 客户端IP=::1
+[2026-01-26 16:07:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:07:23] [INFO] 请求处理完成 - 请求id=c6ea6f08-892d-4d33-b7b7-926e4530e6c6, 请求方法=GET, 路径=/internal/location, 状态码=401, 使用时间=1.5484ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:20] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:09:20] [INFO] 请求处理完成 - 请求id=d359ec60-8109-421a-91e2-f8f0fc530a73, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.1552ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:25] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:09:25] [INFO] 请求处理完成 - 请求id=9ab9557f-9ac7-431b-9c26-2ea4885523a4, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=787.8µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:31] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:09:31] [INFO] 请求处理完成 - 请求id=9b70b1fd-d982-4171-92de-c946021568a2, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.0618ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:39] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:09:39] [INFO] 请求处理完成 - 请求id=00912940-6b7f-4199-8df3-d77f94a8d6e0, 请求方法=POST, 路径=/login, 状态码=401, 使用时间=117.9573ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:48] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:09:48] [INFO] 员工登录成功 - username=123456
+[2026-01-26 16:09:48] [INFO] 请求处理完成 - 请求id=09e08ad9-3581-45c3-a702-f97b3124e84d, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=118.1907ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:09:53] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:09:53] [INFO] 请求处理完成 - 请求id=ee928688-6d17-4f74-b077-1b24cc16bcb8, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.9483ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:12:07] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:12:07] [INFO] 请求处理完成 - 请求id=c1d34f64-35cf-4f07-bf12-37def420cf9d, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=13.9883ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:14:33] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:14:33] [INFO] 请求处理完成 - 请求id=6b499dfa-b5d0-43e1-bdaf-e56da6e0b616, 请求方法=POST, 路径=/internal/luggageStorage, 状态码=201, 使用时间=51.9199ms, 操作员=, 客户端IP=::1
+[2026-01-26 16:14:37] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:14:37] [INFO] 请求处理完成 - 请求id=c02a8c51-14e1-4e4d-9079-7604905c5cdc, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=19.2112ms, 操作员=, 客户端IP=::1
+[2026-01-26 16:18:34] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:18:34] [INFO] 请求处理完成 - 请求id=fa17656c-d829-4084-82c9-3ec4dbcaf241, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=29.1041ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:18:56] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:18:56] [DEBUG] 限流器状态 - name=local, tokens=48
+[2026-01-26 16:18:56] [INFO] 请求处理完成 - 请求id=8d1df973-4397-46c4-83a2-9b70dd9a5ee6, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.0016ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:18:56] [INFO] 请求处理完成 - 请求id=a11bedd0-5a41-416b-a66a-db1b3f7f1210, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=22.4257ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:21:13] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:21:13] [INFO] 请求处理完成 - 请求id=2e3a2943-b8f3-4920-871d-817a1cca3964, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.845ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:21:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:21:41] [INFO] 请求处理完成 - 请求id=bd488bfe-671a-4de2-9473-1eb1d7931228, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.4502ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:21:42] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:21:42] [INFO] 请求处理完成 - 请求id=a7887b4d-8091-4f50-8bea-20c5c1a5d756, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=14.0648ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:01] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:23:01] [INFO] 请求处理完成 - 请求id=0b4b62ed-55a9-4391-8c93-a291b6d3d59f, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.4972ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:16] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:23:16] [INFO] 请求处理完成 - 请求id=a479cf67-1cde-4448-b7ad-ef0e304e6ac0, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.8192ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:20] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:23:20] [INFO] 请求处理完成 - 请求id=355567c7-30c4-4967-a30c-b68072ee12fc, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=21.9451ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:22] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:23:22] [INFO] 请求处理完成 - 请求id=00675658-f262-41b7-a552-bc84bde1dfc0, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=32.3459ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:26] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:23:26] [INFO] 请求处理完成 - 请求id=531ee1f2-e37c-473b-b124-97399d62b57a, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=18.697ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:51] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:23:51] [INFO] 请求处理完成 - 请求id=c607109a-cb87-46aa-ad0b-635cab2adab2, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=17.4855ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:23:57] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:23:57] [INFO] 请求处理完成 - 请求id=1f9f4323-f834-4220-9a8f-c0f821d4befd, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=22.2302ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:25:45] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:25:45] [INFO] 请求处理完成 - 请求id=5a6de337-72ab-4d68-83bc-7b59aca23a01, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=3.8488ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:25:59] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:25:59] [INFO] 员工登录成功 - username=123456
+[2026-01-26 16:25:59] [INFO] 请求处理完成 - 请求id=9cfea258-8328-4b8b-9614-90e9c5512f9b, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=111.2951ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:26:03] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:26:03] [INFO] 请求处理完成 - 请求id=ef035608-6f70-4e8b-a8de-528b089e5141, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=18.8684ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:26:13] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:26:13] [INFO] 请求处理完成 - 请求id=ba706aee-64cd-42eb-b8f5-464129242833, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=27.6199ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:26:31] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:26:31] [INFO] 请求处理完成 - 请求id=55305e7f-ba16-4deb-8f83-bae5ffac4c16, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=22.0999ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:26:35] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:26:35] [INFO] 请求处理完成 - 请求id=e20d723a-209c-49d2-91e0-f5a25f39ac4a, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=25.1672ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:26:39] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:26:39] [INFO] 请求处理完成 - 请求id=5c7c5f6f-4a03-4fb5-bba7-feee544740d9, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=20.5007ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:43:32] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:43:32] [INFO] 请求处理完成 - 请求id=31a76c58-f766-4554-9c72-45aec6042e55, 请求方法=GET, 路径=/internal/location, 状态码=401, 使用时间=549.8µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:43:38] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:43:38] [INFO] 请求处理完成 - 请求id=3dcdd878-a069-41fc-af71-9e04d1b3edb1, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=0s, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:48:23] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:48:23] [INFO] 请求处理完成 - 请求id=43d54127-5922-4af8-8a76-3b0e6cdd8480, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=1.5289ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:49:13] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:49:13] [INFO] 请求处理完成 - 请求id=405b5680-2357-4cbf-8c0d-329d152fe6e0, 请求方法=POST, 路径=/internal/luggageStorage/code/675081, 状态码=401, 使用时间=687µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:50:56] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:50:56] [INFO] 员工登录成功 - username=123456
+[2026-01-26 16:50:56] [INFO] 请求处理完成 - 请求id=2a68be44-0413-4565-834c-9960b74d2966, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=43.1425ms, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 16:50:59] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:50:59] [INFO] 请求处理完成 - 请求id=6874af90-b510-4f1f-90ac-ab9d76626b4f, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=12.6358ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:04] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:51:04] [INFO] 请求处理完成 - 请求id=8fecf23d-0f41-4626-bdeb-53b47de610bc, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=14.0997ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:13] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:51:13] [INFO] 请求处理完成 - 请求id=af0a1ee0-4087-4092-9108-292302aaedd0, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=14.5519ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:22] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:51:22] [INFO] 请求处理完成 - 请求id=b6a5a58b-fbd2-4bae-8947-9821fb74e1bd, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=28.0009ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:27] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:51:27] [INFO] 请求处理完成 - 请求id=c113ad3a-f3c3-452e-86f8-d720d293f0ca, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=13.5511ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:38] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:51:38] [INFO] 请求处理完成 - 请求id=c473282c-9a58-4e8b-b72c-b85ffa0796be, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=7.2578ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:51:52] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:51:52] [INFO] 请求处理完成 - 请求id=fcb90608-cab1-42ae-a53b-f7762bd1382b, 请求方法=GET, 路径=/internal/tag, 状态码=200, 使用时间=11.3509ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:52:03] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:52:03] [INFO] 请求处理完成 - 请求id=fd86c307-18d5-49f0-80de-f852e33e06ff, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=10.531ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:52:05] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:52:05] [INFO] 请求处理完成 - 请求id=b1a66fdd-9422-45ba-8a54-2bb54952ce7b, 请求方法=GET, 路径=/internal/location, 状态码=200, 使用时间=14.1169ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:52:27] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:52:27] [INFO] 请求处理完成 - 请求id=5d5b19f7-daa5-49eb-9061-f237f8422fda, 请求方法=POST, 路径=/internal/luggageStorage/code/675081, 状态码=404, 使用时间=11.7124ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:52:28] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 16:52:28] [INFO] 请求处理完成 - 请求id=2f65d6ef-b252-46ab-8ef0-0e5898418784, 请求方法=POST, 路径=/internal/luggageStorage/code/675081, 状态码=404, 使用时间=11.437ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 16:56:14] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 16:56:14] [INFO] 请求处理完成 - 请求id=f87dd9a5-8441-4f68-917b-5f6a9e445b10, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=200, 使用时间=11.7683ms, 操作员=张三, 客户端IP=111.55.210.75
+[2026-01-26 17:06:43] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 17:06:43] [INFO] 请求处理完成 - 请求id=6df9c388-dd74-4b1f-8fb1-cd91bd6a4b3a, 请求方法=GET, 路径=/internal/luggageStorage, 状态码=401, 使用时间=695.2µs, 操作员=未知, 客户端IP=111.55.210.75
+[2026-01-26 17:16:23] [INFO] 数据库表创建成功
+[2026-01-26 17:16:23] [INFO] 服务器启动 - mode=debug
+[2026-01-26 17:30:32] [INFO] 数据库表创建成功
+[2026-01-26 17:30:32] [INFO] 服务器启动 - mode=debug
+[2026-01-26 17:30:36] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 17:30:36] [INFO] 请求处理完成 - 请求id=31681b94-3238-4002-a7bd-0869b836ee52, 请求方法=POST, 路径=/internal/photo, 状态码=401, 使用时间=530µs, 操作员=未知, 客户端IP=::1
+[2026-01-26 17:30:41] [DEBUG] 限流器状态 - name=local, tokens=49
+[2026-01-26 17:30:41] [INFO] 员工登录成功 - username=admin
+[2026-01-26 17:30:41] [INFO] 请求处理完成 - 请求id=818b9f6f-6a76-43b1-aa78-99999d0c4aff, 请求方法=POST, 路径=/login, 状态码=200, 使用时间=47.2171ms, 操作员=未知, 客户端IP=::1
+[2026-01-26 17:30:43] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 17:30:44] [INFO] 请求处理完成 - 请求id=2bed7094-3193-4086-8dbb-98218cf1fde3, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=497.9922ms, 操作员=, 客户端IP=::1
+[2026-01-26 17:31:19] [INFO] 数据库表创建成功
+[2026-01-26 17:31:19] [INFO] 服务器启动 - mode=debug
+[2026-01-26 17:31:22] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 17:31:22] [INFO] 请求处理完成 - 请求id=223734be-4d34-4513-bca3-d5ee15394488, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=262.2692ms, 操作员=, 客户端IP=::1
+[2026-01-26 17:34:29] [INFO] 数据库表创建成功
+[2026-01-26 17:34:29] [INFO] 服务器启动 - mode=debug
+[2026-01-26 17:34:31] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 17:34:32] [INFO] 请求处理完成 - 请求id=01b33547-3c13-4b3c-b554-36723315d2af, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=1.3567536s, 操作员=, 客户端IP=::1
+[2026-01-26 17:35:37] [INFO] 数据库表创建成功
+[2026-01-26 17:35:37] [INFO] 服务器启动 - mode=debug
+[2026-01-26 17:35:39] [DEBUG] 限流器状态 - tokens=49, name=local
+[2026-01-26 17:35:40] [INFO] 请求处理完成 - 请求id=1f84ef95-c27b-47be-a881-30f1f3ad9051, 请求方法=POST, 路径=/internal/photo, 状态码=200, 使用时间=393.2745ms, 操作员=, 客户端IP=::1
+[2026-01-26 17:36:06] [INFO] 数据库表创建成功
+[2026-01-26 17:36:06] [INFO] 服务器启动 - mode=debug

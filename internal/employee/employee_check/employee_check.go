@@ -31,7 +31,7 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 		return
 	}
 	//检查必要字段
-	if e.User == "" || e.Password == "" || e.Name == "" || e.HotelID == 0 {
+	if e.User == "" || e.Password == "" || e.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "请求数据格式错误",
@@ -51,6 +51,9 @@ func EmployeeRegister(c *gin.Context, s *services.Services) {
 	//设置默认值
 	if e.RoleID == 0 {
 		e.RoleID = 1
+	}
+	if e.HotelID == 0 {
+		e.HotelID = 1
 	}
 
 	e.Password, err = util.HashPassword(e.Password)

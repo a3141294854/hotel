@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/tencentyun/cos-go-sdk-v5"
 	"hotel/internal/employee/employee_action"
 	"hotel/internal/employee/employee_check"
 	"hotel/internal/util"
@@ -14,7 +15,7 @@ import (
 )
 
 // Init 启动路由配置
-func Init(r *gin.Engine, service *services.Services, cfg *util.Config) {
+func Init(r *gin.Engine, service *services.Services, cfg *util.Config, client *cos.Client) {
 	//中间件配置
 	r.Use(middleware.Recovery())
 	r.Use(middleware.RequestIDMiddleware())
@@ -102,7 +103,7 @@ func Init(r *gin.Engine, service *services.Services, cfg *util.Config) {
 	photo := internal.Group("/photo")
 	{
 		photo.POST("", func(c *gin.Context) {
-			employee_action.UploadPhoto(c, service)
+			employee_action.UploadPhoto(c, service, client, cfg)
 		})
 		photo.GET("/:filename", func(c *gin.Context) {
 			employee_action.DownloadPhoto(c)

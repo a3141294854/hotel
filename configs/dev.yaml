@@ -59,3 +59,13 @@ log:
   max_size: 100  # MB
   max_backups: 3
   max_age: 28  # days
+
+#密钥
+tencent:
+  secret_id: "AKIDxqdJtKZaN0QehZFj1AEFD62pOkC4ufVI"
+  secret_key: "X2MVR9d9h5GDyWxJl5RoAOSIwLWaS9d2"
+#cos
+cos:
+  bucket: "pet-1394661084.cos"
+  region: "ap-guangzhou"
+  website: "https://pet-1394661084.cos.ap-guangzhou.myqcloud.com"

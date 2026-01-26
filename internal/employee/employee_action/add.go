@@ -165,19 +165,19 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 			return
 		}
 	}
-	//创建照片表
+	//更新照片表
 	for _, v := range req.Photos {
 		v.LuggageStorageID = &insert.ID
-		result = s.DB.Model(&models.Photo{}).Create(&v)
+		result = s.DB.Model(&models.Photo{}).Where("url = ?", v.Url).Update("luggage_storage_id", insert.ID)
 		if result.Error != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
-				"message": "创建照片记录失败",
+				"message": "更新照片记录失败",
 			})
 			util.Logger.WithFields(logrus.Fields{
 				"error": result.Error,
 				"请求id":  c.GetUint("request_id"),
-			}).Error("创建照片记录失败")
+			}).Error("更新照片记录失败")
 			return
 		}
 	}
