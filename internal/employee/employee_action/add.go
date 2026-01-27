@@ -42,6 +42,7 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 		}).Error("行李数据绑定错误")
 		return
 	}
+
 	//检查必要字段
 	if req.GuestName == "" || req.GuestPhone == "" || req.GuestRoom == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -181,6 +182,12 @@ func AddLuggageStorage(c *gin.Context, s *services.Services) {
 			return
 		}
 	}
+
+	/*util.Logger.WithFields(logrus.Fields{
+		"luggage_storage_id": insert.ID,
+		"pick_up_code":       insert.PickUpCode,
+		"请求id":               c.GetUint("request_id"),
+	}).Info("行李添加成功")*/
 
 	c.JSON(http.StatusCreated, gin.H{
 		"success": true,

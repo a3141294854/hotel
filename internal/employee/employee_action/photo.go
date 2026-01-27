@@ -119,12 +119,12 @@ func UploadPhoto(c *gin.Context, s *services.Services, client *cos.Client, cfg *
 		}
 		defer fileReader.Close()
 
-		// ✅ 直接上传到 COS（使用流，不需要本地保存）
+		//直接上传到 COS
 		_, err = client.Object.Put(
-			context.Background(), // ✅ 第一个参数：context
-			cosKey,               // ✅ 第二个参数：COS 的 key（不包含 ./）
-			fileReader,           // ✅ 第三个参数：文件流
-			nil,                  // 第四个参数：选项（可以为 nil）
+			context.Background(),
+			cosKey,
+			fileReader,
+			nil,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{

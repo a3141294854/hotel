@@ -1,61 +1,71 @@
 # 数据库配置
 database:
-  driver: mysql
-  host: mysql
-  port: 3306
-  username: root
-  password: "@furenjie321"
-  name: study
-  charset: utf8mb4
-  parse_time: true
-  loc: Local
+  driver: ""           # 数据库驱动 (mysql/postgres等)
+  host: ""             # 数据库主机地址
+  port: 0              # 数据库端口
+  username: ""         # 数据库用户名
+  password: ""         # 数据库密码
+  name: ""             # 数据库名称
+  charset: utf8mb4     # 字符集
+  parse_time: true     # 是否解析时间
+  loc: Local           # 时区
 
 # Redis配置
 redis:
-  host: redis
-  port: 6379
-  password: ""
+  host: ""             # Redis主机地址
+  port: 6379           # Redis端口
+  password: ""         # Redis密码
 
   # Redis数据库配置
   databases:
-    access_token: 0  # 访问令牌
-    refresh_token: 1  # 刷新令牌
-    cache: 2         # 缓存
-    rate_limit: 3    # 限流
-    random: 4 # 随机数
+    access_token: 0    # 访问令牌存储数据库
+    refresh_token: 1   # 刷新令牌存储数据库
+    cache: 2           # 缓存存储数据库
+    rate_limit: 3      # 限流存储数据库
+    random: 4          # 随机数存储数据库
 
 # 服务器配置
 server:
-  host: 0.0.0.0
-  port: 8080
-  mode: release  # debug, release, test
+  host: 0.0.0.0        # 服务器监听地址
+  port: 8080           # 服务器端口
+  mode: ""             # 运行模式 (debug/release/test)
 
 # JWT配置
 jwt:
-  secret_key: "hotel-prod-jwt-secret-key-furenjie-2024"
-  access_token_duration: 900s  # 15分钟 (秒)
-  refresh_token_duration: 604800s  # 7天 (秒)
+  secret_key: ""       # JWT密钥 (生产环境请修改)
+  access_token_duration: 900s      # 访问令牌有效期 (15分钟)
+  refresh_token_duration: 604800s  # 刷新令牌有效期 (7天)
 
 # 限流配置
 rate_limiting:
   # 默认配置（当特定位置未配置时使用）
   default:
-    name: "local"
-    capacity: 100
-    fill_rate: 10ms
+    name: ""           # 限流位置名称
+    capacity: 50       # 桶容量
+    fill_rate: 10ms    # 填充速率
 
   # 不同位置的限流配置
   locations:
-    - name: "local"           # 全局限流
-      capacity: 100
-      fill_rate: 10ms
-
+    - name: ""         # 限流位置名称
+      capacity: 0      # 桶容量
+      fill_rate: ""    # 填充速率
 
 # 日志配置
 log:
-  level: info  # debug, info, warn, error, fatal
-  output: both  # console, file, both
-  file_path: logs/app.log
-  max_size: 100  # MB
-  max_backups: 3
-  max_age: 28  # days
+  level: ""            # 日志级别 (debug/info/warn/error/fatal)
+  output: ""           # 输出方式 (console/file/both)
+  file_path: ""        # 日志文件路径
+  max_size: 100        # 单个日志文件最大大小 (MB)
+  max_backups: 3       # 日志文件备份数量
+  max_age: 28          # 日志文件保留天数
+
+# 腾讯云密钥配置
+tencent:
+  secret_id: ""        # 腾讯云SecretId
+  secret_key: ""       # 腾讯云SecretKey
+
+# COS对象存储配置
+cos:
+  bucket: ""           # 存储桶名称
+  region: ""           # 地域
+  website: ""          # 访问域名
